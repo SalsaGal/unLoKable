@@ -1,7 +1,8 @@
+CC = gcc
 OBJS = $(addprefix out/,main.o)
 
 out/able: $(OBJS)
-	clang -o $@ $(OBJS)
+	$(CC) -o $@ $(OBJS)
 
 out/%.o: src/%.c
-	clang -o $@ $< -g -c
+	$(CC) -o $@ $< -g -c
