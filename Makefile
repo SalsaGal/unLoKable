@@ -5,4 +5,4 @@ out/able: $(OBJS)
 	$(CC) -o $@ $(OBJS)
 
 out/%.o: src/%.c
-	$(CC) -o $@ $< -g -c
+	$(CC) -o $@ $< -g -c -Wall -Wextra
