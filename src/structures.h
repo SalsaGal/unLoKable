@@ -48,3 +48,57 @@ typedef struct msqHeader {
 		unsigned short int padding;
 
 }
+
+/*
+typedef struct vagHeader {
+		char ID[4];
+		unsigned int version;
+		unsigned int reserved;
+		unsigned int dataSize;
+		unsigned int sampleRate;
+		char padding[12];
+		char name[16];
+
+}
+
+typedef struct vabProgramBody {
+		unsigned char numTones;
+		unsigned char volume;
+		unsigned char priority;
+		unsigned char mode;
+		unsigned char panPosition;
+		unsigned char reserved;
+		unsigned short int attribute;
+		unsigned int padding1;
+		unsigned int padding2;
+}
+*/
+/*
+typedef struct vabZone {
+		unsigned char priority;
+		unsigned char reverbMode;
+		unsigned char volume;
+		unsigned char panPosition;
+		unsigned char rootKey;
+        unsigned char pitchFinetuning;
+        unsigned char noteLow;
+		unsigned char noteHigh;
+		unsigned char vibWidth;
+		unsigned char vibTime;
+		unsigned char porWidth;
+		unsigned char porHoldingTime;
+		unsigned char minPitchRange;
+		unsigned char maxPitchRange;
+		unsigned char padding1;
+		unsigned char padding2;
+		unsigned short int ADSR1;
+		unsigned short int ADSR2;
+		unsigned short int parentProgram;
+		unsigned short int waveIndex;
+		unsigned short int padding3;
+		unsigned short int padding4;
+		unsigned short int padding5;
+		unsigned short int padding6;
+
+}
+*/
