@@ -7,6 +7,10 @@
 
 #define BUFFER_SIZE 1024 * 1024
 
+bool is_magic_number(char *file) {
+  return strncmp(file, "DNSa", 4) == 0;
+}
+
 int main(int argc, char *argv[]) {
   if (argc != 3) {
     printf("Incorrect argument count\n");
@@ -28,9 +32,10 @@ int main(int argc, char *argv[]) {
     printf("WARNING: Buffer full, might not have been fully read.\n");
   }
 
-  return 0;
-}
+  if (!is_magic_number(snd_buffer)) {
+    printf("ERROR: Not a valid file\n");
+    return 1;
+  }
 
-bool is_magic_number(char *file) {
-  return strncmp(file, "DNSa", 4) == 0;
+  return 0;
 }
