@@ -1,12 +1,16 @@
 #include <assert.h>
+#include <bits/getopt_core.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "structures.h"
 
 #define BUFFER_SIZE 1024 * 1024
+#define HELP_MESSAGE "Usage: able [OPTIONS] [SND FILE] [SMP FILE]\n" \
+                     "Rips audio from the Legacy of Kain.\n"
 
 char *loadBuffer(char *path) {
   FILE *file = fopen(path, "rb");;
@@ -21,13 +25,17 @@ char *loadBuffer(char *path) {
 }
 
 int main(int argc, char *argv[]) {
-  if (argc != 3) {
-    printf("Incorrect argument count\n");
-    return 1;
+  int opt;
+  while ((opt = getopt(argc, argv, "h")) != -1) {
+    switch (opt) {
+      case 'h':
+        printf(HELP_MESSAGE);
+        return 0;
+    }
   }
 
-  char *snd_buffer = loadBuffer(argv[1]);
-  char *smp_buffer = loadBuffer(argv[2]);
+  char *snd_buffer = loadBuffer(argv[optind++]);
+  char *smp_buffer = loadBuffer(argv[optind++]);
 
   SndFile snd = parseSndFile(&snd_buffer);
 
