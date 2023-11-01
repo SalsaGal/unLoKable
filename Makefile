@@ -1,5 +1,5 @@
 CC = gcc
-OBJS = $(addprefix out/,main.o)
+OBJS = $(addprefix out/,main.o structures.o)
 
 out/able: $(OBJS)
 	$(CC) -o $@ $(OBJS)
