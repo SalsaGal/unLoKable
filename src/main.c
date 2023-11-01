@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
   size_t bytes = fread(buffer, sizeof(char), BUFFER_SIZE, file);
 
   printf("%s\n", buffer);
-  printf("Bytes: 0x%zu\n", bytes);
+  printf("Bytes: 0x%lx\n", bytes);
 
   if (bytes == BUFFER_SIZE) {
     printf("WARNING: Buffer full, might not have been fully read.\n");
