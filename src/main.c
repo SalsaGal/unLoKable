@@ -8,23 +8,26 @@
 
 #define BUFFER_SIZE 1024 * 1024
 
+char *loadBuffer(char *path) {
+  FILE *file = fopen(path, "rb");;
+  char *buffer = malloc(BUFFER_SIZE);
+  size_t size = fread(buffer, sizeof(char), BUFFER_SIZE, file);
+
+  if (size == BUFFER_SIZE) {
+    printf("WARNING: Buffer full, might not have been fully read.\n");
+  }
+
+  return buffer;
+}
+
 int main(int argc, char *argv[]) {
   if (argc != 3) {
     printf("Incorrect argument count\n");
     return 1;
   }
 
-  FILE *snd_file = fopen(argv[1], "rb");
-  char *snd_buffer = malloc(BUFFER_SIZE);
-  size_t snd_size = fread(snd_buffer, sizeof(char), BUFFER_SIZE, snd_file);
-
-  FILE *smp_file = fopen(argv[2], "rb");
-  char *smp_buffer = malloc(BUFFER_SIZE);
-  size_t smp_size = fread(smp_buffer, sizeof(char), BUFFER_SIZE, smp_file);
-
-  if (snd_size == BUFFER_SIZE || smp_size == BUFFER_SIZE) {
-    printf("WARNING: Buffer full, might not have been fully read.\n");
-  }
+  char *snd_buffer = loadBuffer(argv[1]);
+  char *smp_buffer = loadBuffer(argv[2]);
 
   SndFile snd = parseSndFile(&snd_buffer);
 
