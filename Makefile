@@ -6,3 +6,7 @@ out/able: $(OBJS)
 
 out/%.o: src/%.c
 	$(CC) -o $@ $< -g -c -Wall -Wextra
+
+clean:
+	rm $(OBJS)
+	rm out/able
