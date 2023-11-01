@@ -30,6 +30,7 @@ int main(int argc, char *argv[]) {
   }
 
   SndHeader header = parseHeader(&snd_buffer);
+  printf("HEADER:\n");
   printf("Magic Number: %d\n", header.magicNumber);
   printf("Header Size: %d\n", header.headerSize);
   printf("Bank Version: %d\n", header.bankVersion);
@@ -40,6 +41,13 @@ int main(int argc, char *argv[]) {
   printf("Num Labels: %d\n", header.numLabels);
   printf("Reverb Mode: %d\n", header.reverbMode);
   printf("Reverb Depth: %d\n", header.reverbDepth);
+
+  SndProgram program = parseProgram(&snd_buffer);
+  printf("PROGRAM:\n");
+  printf("Num Zones: %d\n", program.numZones);
+  printf("First Tone: %d\n", program.firstTone);
+  printf("Volume: %d\n", program.volume);
+  printf("Pan Pos: %d\n", program.panPos);
 
   return 0;
 }

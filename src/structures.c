@@ -10,6 +10,20 @@ int parseInt(char **file) {
 	return toReturn;
 }
 
+int parseWord(char **file) {
+	int toReturn =
+		((int) (*file)[0] * 0x0001)
+				+ ((int) (*file)[1] * 0x0100);
+	*file += 2;
+	return toReturn;
+}
+
+int parseByte(char **file) {
+	int toReturn = (int) (*file)[0];
+	*file += 1;
+	return toReturn;
+}
+
 SndHeader parseHeader(char **file) {
 	SndHeader header;
 	header.magicNumber = parseInt(file);
@@ -23,4 +37,14 @@ SndHeader parseHeader(char **file) {
 	header.reverbMode = parseInt(file);
 	header.reverbDepth = parseInt(file);
 	return header;
+}
+
+SndProgram parseProgram(char **file) {
+	SndProgram program;
+	program.numZones = parseWord(file);
+	program.firstTone = parseWord(file);
+	program.volume = parseByte(file);
+	program.panPos = parseByte(file);
+	parseWord(file);
+	return program;
 }

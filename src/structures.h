@@ -1,6 +1,8 @@
 #pragma once
 
 int parseInt(char **file);
+int parseWord(char **file);
+int parseByte(char **file);
 
 typedef struct {
 		int magicNumber;
@@ -22,8 +24,9 @@ typedef struct {
 		unsigned short int firstTone;
 		unsigned char volume;
 		unsigned char panPos;
-		unsigned short int padding;
 } SndProgram;
+
+SndProgram parseProgram(char **file);
 
 typedef struct {
 		unsigned char priority;
