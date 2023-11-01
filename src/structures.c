@@ -13,5 +13,13 @@ SndHeader parseHeader(char *file) {
 	SndHeader header;
 	header.magicNumber = parseInt(file);
 	header.headerSize = parseInt(file + 4);
+	header.bankVersion = parseInt(file + 8);
+	header.numPrograms = parseInt(file + 12);
+	header.numZones = parseInt(file + 16);
+	header.numWaves = parseInt(file + 20);
+	header.numSequences = parseInt(file + 24);
+	header.numLabels = parseInt(file + 28);
+	header.reverbMode = parseInt(file + 32);
+	header.reverbDepth = parseInt(file + 36);
 	return header;
 }

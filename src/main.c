@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,7 +30,16 @@ int main(int argc, char *argv[]) {
   }
 
   SndHeader header = parseHeader(snd_buffer);
-  printf("%d\n", header.headerSize);
+  printf("Magic Number: %d\n", header.magicNumber);
+  printf("Header Size: %d\n", header.headerSize);
+  printf("Bank Version: %d\n", header.bankVersion);
+  printf("Num Programs: %d\n", header.numPrograms);
+  printf("Num Zones: %d\n", header.numZones);
+  printf("Num Waves: %d\n", header.numWaves);
+  printf("Num Sequences: %d\n", header.numSequences);
+  printf("Num Labels: %d\n", header.numLabels);
+  printf("Reverb Mode: %d\n", header.reverbMode);
+  printf("Reverb Depth: %d\n", header.reverbDepth);
 
   return 0;
 }
