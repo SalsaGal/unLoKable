@@ -11,7 +11,9 @@
 
 #define BUFFER_SIZE 1024 * 1024
 #define HELP_MESSAGE "Usage: able [OPTIONS] [SND FILE] [SMP FILE]\n" \
-                     "Rips audio from the Legacy of Kain.\n"
+                     "Rips audio from the Legacy of Kain\n" \
+                     "  -h  Displays this help message\n" \
+                     "  -v  Displays extra information about files being loaded\n"
 
 char *loadBuffer(char *path) {
   FILE *file = fopen(path, "rb");;
