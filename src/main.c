@@ -1,5 +1,7 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "structures_new_engine.h"
 
@@ -27,4 +29,8 @@ int main(int argc, char *argv[]) {
   }
 
   return 0;
+}
+
+bool is_magic_number(char *file) {
+  return strncmp(file, "DNSa", 4) == 0;
 }
