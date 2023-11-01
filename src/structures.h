@@ -1,8 +1,8 @@
 #pragma once
 
 int parseInt(char **file);
-int parseWord(char **file);
-int parseByte(char **file);
+unsigned short int parseWord(char **file);
+unsigned char parseByte(char **file);
 
 typedef struct {
 		int magicNumber;
@@ -43,6 +43,8 @@ typedef struct {
 		unsigned short int ADSR2;
 		unsigned short int waveIndex;
 } SndZone;
+
+SndZone parseZone(char **file);
 
 typedef struct {
 		int msqID;
