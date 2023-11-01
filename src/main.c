@@ -14,6 +14,7 @@
 
 char *loadBuffer(char *path) {
   FILE *file = fopen(path, "rb");;
+  if (file == NULL) return NULL;
   char *buffer = malloc(BUFFER_SIZE);
   size_t size = fread(buffer, sizeof(char), BUFFER_SIZE, file);
 
@@ -34,8 +35,21 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  if (optind >= argc - 1) {
+    printf("ERROR: Missing arguments\n");
+    return 1;
+  }
+
   char *snd_buffer = loadBuffer(argv[optind++]);
   char *smp_buffer = loadBuffer(argv[optind++]);
+
+  if (snd_buffer == NULL) {
+    printf("ERROR: Unable to load %s\n", argv[optind - 2]);
+    return 1;
+  } else if (smp_buffer == NULL) {
+    printf("ERROR: Unable to load %s\n", argv[optind - 1]);
+    return 1;
+  }
 
   SndFile snd = parseSndFile(&snd_buffer);
 
