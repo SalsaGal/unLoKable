@@ -1,6 +1,6 @@
 #pragma once
 
-typedef struct musHeader {
+typedef struct {
 		int ID;
 		int headerSize;
 		int versionNumber;
@@ -13,14 +13,14 @@ typedef struct musHeader {
 		int numWaves;
 		int numPrograms;
 		int numPresets;
-}
+} MusHeader;
 
-typedef struct msqTable {
+typedef struct {
 		int msqIndex;
 		int msqOffset;
-}
+} MsqTable;
 
-typedef struct waveEntry {
+typedef struct {
 		char name[20];
 		int offset;
 		int loopBegin;
@@ -30,24 +30,24 @@ typedef struct waveEntry {
 		int originalPitch; /* to re-define and re-align */
 		int loopInfo;
 		int sndHandle;
-}
+} WaveEntry;
 
-typedef struct envelope {
+typedef struct {
 		float delay;
 		float attack;
 		float hold;
 		float decay;
 		float sustain;
 		float release;
-}
+} Envelope;
 
-typedef struct programZone {
+typedef struct {
 		int pitchFinetuning;
 		int reverb;
 		float panPosition;
 		int keynumHold;
 		int keynumDecay;
-		struct envelope volumeEnv;
+		Envelope volumeEnv;
 		float volumeEnvAtten;
 		float vibDelay;
 		float vibFrequency;
@@ -59,39 +59,39 @@ typedef struct programZone {
 		char velocityHigh;
 		int waveIndex;
 		float basePriority;
-		struct envelope modulEnv;
+		Envelope modulEnv;
 		float modulEnvToPitch;
-}
+} ProgramZone;
 
-typedef struct programEntry {
+typedef struct {
 		char name[20];
 		int numZones;		
-}
+} ProgramEntry;
 
-typedef struct presetZone {
+typedef struct {
 		int rootKey; /* usually padded as 0xFFFFFFFF. Copy the value from the "rootKey" variable from the "programZone" structure */
 		char noteLow;
 		char noteHigh;
 		char velocityLow;
 		char velocityHigh;
 		int programIndex;
-}
+} PresetZone;
 
-typedef struct presetEntry {
+typedef struct {
 		char name[20];
 		int MIDIBankNumber;
 		int MIDIPresetNumber;
 		int numZones;
-}
+} PresetEntry;
 
-typedef struct msqHeader {
+typedef struct {
 		int msqID;
 		unsigned int quarterNoteTime;
 		unsigned short int ppqn;
 		unsigned short int version;
 		unsigned short int numTracks;
 		unsigned short int padding;
-}
+} MsqHeader;
 
 /*
 typedef struct vagHeader {

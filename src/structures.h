@@ -1,6 +1,6 @@
 #pragma once
 
-typedef struct SndHeader {
+typedef struct {
 		int ID;
 		int headerSize;
 		int bankVersion;
@@ -13,7 +13,7 @@ typedef struct SndHeader {
 		int reverbDepth;
 } SndHeader;
 
-typedef struct SndProgram {
+typedef struct {
 		unsigned short int numZones;
 		unsigned short int firstTone;
 		unsigned char volume;
@@ -21,7 +21,7 @@ typedef struct SndProgram {
 		unsigned short int padding;
 } SndProgram;
 
-typedef struct SndZone {
+typedef struct {
 		unsigned char priority;
 		unsigned char parentProgram;
 		unsigned char volume;
@@ -37,7 +37,7 @@ typedef struct SndZone {
 		unsigned short int waveIndex;
 } SndZone;
 
-typedef struct MsqHeader {
+typedef struct {
 		int msqID;
 		unsigned int quarterNoteTime;
 		unsigned short int ppqn;
@@ -47,7 +47,7 @@ typedef struct MsqHeader {
 } MsqHeader;
 
 /*
-typedef struct vagHeader {
+typedef struct {
 		char ID[4];
 		unsigned int version;
 		unsigned int reserved;
@@ -58,7 +58,7 @@ typedef struct vagHeader {
 
 }
 
-typedef struct vabProgramBody {
+typedef struct {
 		unsigned char numTones;
 		unsigned char volume;
 		unsigned char priority;
@@ -71,7 +71,7 @@ typedef struct vabProgramBody {
 }
 */
 /*
-typedef struct vabZone {
+typedef struct {
 		unsigned char priority;
 		unsigned char reverbMode;
 		unsigned char volume;

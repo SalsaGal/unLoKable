@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "structures_new_engine.h"
+
 #define BUFFER_SIZE 1024 * 1024
 
 int main(int argc, char *argv[]) {
