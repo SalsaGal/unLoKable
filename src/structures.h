@@ -1,6 +1,6 @@
 #pragma once
 
-int parseInt(char *file);
+int parseInt(char **file);
 
 typedef struct {
 		int magicNumber;
@@ -15,7 +15,7 @@ typedef struct {
 		int reverbDepth;
 } SndHeader;
 
-SndHeader parseHeader(char *file);
+SndHeader parseHeader(char **file);
 
 typedef struct {
 		unsigned short int numZones;

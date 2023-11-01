@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
     printf("WARNING: Buffer full, might not have been fully read.\n");
   }
 
-  SndHeader header = parseHeader(snd_buffer);
+  SndHeader header = parseHeader(&snd_buffer);
   printf("Magic Number: %d\n", header.magicNumber);
   printf("Header Size: %d\n", header.headerSize);
   printf("Bank Version: %d\n", header.bankVersion);
