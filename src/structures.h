@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdlib.h>
 int parseInt(char **file);
 unsigned short int parseWord(char **file);
 unsigned char parseByte(char **file);
@@ -54,6 +55,17 @@ typedef struct {
   unsigned short int numTracks;
   unsigned short int padding;
 } MsqHeader;
+
+typedef struct {
+  SndHeader header;
+  SndProgram *programs;
+  SndZone *zones;
+  int *waveOffsets;
+  int *sequenceOffsets;
+  int *labels;
+} SndFile;
+
+SndFile parseSndFile(char **file);
 
 /*
 typedef struct {

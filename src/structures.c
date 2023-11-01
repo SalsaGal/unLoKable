@@ -65,3 +65,35 @@ SndZone parseZone(char **file) {
 	zone.waveIndex = parseWord(file);
 	return zone;
 }
+
+SndFile parseSndFile(char **file) {
+  SndFile toReturn;
+  toReturn.header = parseHeader(file);
+
+  toReturn.programs = (SndProgram *) calloc(toReturn.header.numPrograms, sizeof(SndProgram));
+  for (int i = 0; i < toReturn.header.numPrograms; i++) {
+    toReturn.programs[i] = parseProgram(file);
+  }
+
+  toReturn.zones = (SndZone *) calloc(toReturn.header.numZones, sizeof(SndZone));
+  for (int i = 0; i < toReturn.header.numZones; i++) {
+    toReturn.zones[i] = parseZone(file);
+  }
+
+  toReturn.waveOffsets = (int *) calloc(toReturn.header.numWaves, sizeof(int));
+  for (int i = 0; i < toReturn.header.numWaves; i++) {
+    toReturn.waveOffsets[i] = parseInt(file);
+  }
+
+  toReturn.sequenceOffsets = (int *) calloc(toReturn.header.numSequences, sizeof(int));
+  for (int i = 0; i < toReturn.header.numSequences; i++) {
+    toReturn.sequenceOffsets[i] = parseInt(file);
+  }
+
+  toReturn.labels = (int *) calloc(toReturn.header.numLabels, sizeof(int));
+  for (int i = 0; i < toReturn.header.numLabels; i++) {
+    toReturn.labels[i] = parseInt(file);
+  }
+
+  return toReturn;
+}
