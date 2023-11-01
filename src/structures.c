@@ -1,4 +1,5 @@
 #include "structures.h"
+#include "strings.h"
 #include <stdio.h>
 
 int parseInt(char **file) {
@@ -27,7 +28,7 @@ SndHeader parseHeader(char **file) {
 	SndHeader header;
 	header.magicNumber = parseInt(file);
 	if (header.magicNumber != 0x61534e44) {
-		printf("ERROR: Invalid header\n");
+		printf(ERROR_INVALID_HEADER);
 		exit(1);
 	}
 	header.headerSize = parseInt(file);
