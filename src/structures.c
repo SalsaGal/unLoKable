@@ -26,6 +26,10 @@ unsigned char parseByte(char **file) {
 SndHeader parseHeader(char **file) {
 	SndHeader header;
 	header.magicNumber = parseInt(file);
+	if (header.magicNumber != 0x61534e44) {
+		printf("ERROR: Invalid header\n");
+		exit(1);
+	}
 	header.headerSize = parseInt(file);
 	header.bankVersion = parseInt(file);
 	header.numPrograms = parseInt(file);
