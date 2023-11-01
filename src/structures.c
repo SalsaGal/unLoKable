@@ -13,7 +13,6 @@ int parseInt(char **file) {
 // NEEDS TO BE 0xEE8C
 unsigned short int parseWord(char **file) {
 	unsigned short int toReturn = ((*file)[0] & 0xff) * 0x0100 + ((*file)[1] & 0xff);
-	printf("DEBUG: %x\n", toReturn);
 	*file += 2;
 	return toReturn;
 }
