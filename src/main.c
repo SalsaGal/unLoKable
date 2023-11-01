@@ -69,5 +69,11 @@ int main(int argc, char *argv[]) {
     printf("Wave Index: %x\n", zone.waveIndex);
   }
 
+  printf("\n");
+  for (int i = 0; i < header.numWaves; i++) {
+    int waveOffset = parseInt(&snd_buffer);
+    printf("Wave Offset: %x\n", waveOffset);
+  }
+
   return 0;
 }
