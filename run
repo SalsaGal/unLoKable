@@ -1,3 +1,3 @@
 [default]
 make
-out/able tests/ucma.snd tests/ucma.smp
+out/able -v tests/ucma.snd tests/ucma.smp
