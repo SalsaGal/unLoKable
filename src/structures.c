@@ -2,25 +2,24 @@
 #include <stdio.h>
 
 int parseInt(char **file) {
-	int toReturn =
-		((int) (*file)[0] * 0x00000001)
-				+ ((int) (*file)[1] * 0x00000100)
-				+ ((int) (*file)[2] * 0x00010000)
-				+ ((int) (*file)[3] * 0x01000000);
+	int toReturn = ((*file)[0] & 0xff) * 0x00000001
+		+ ((*file)[1] & 0xff) * 0x00000100
+		+ ((*file)[2] & 0xff) * 0x00010000
+		+ ((*file)[3] & 0xff) * 0x01000000;
 	*file += 4;
 	return toReturn;
 }
 
 // NEEDS TO BE 0xEE8C
 unsigned short int parseWord(char **file) {
-	unsigned short int toReturn = (unsigned short int) (*file)[0] * 0x0100 + ((char) (*file)[1] & 0x00ff);
+	unsigned short int toReturn = ((*file)[0] & 0xff) * 0x0100 + ((*file)[1] & 0xff);
 	printf("DEBUG: %x\n", toReturn);
 	*file += 2;
 	return toReturn;
 }
 
 unsigned char parseByte(char **file) {
-	unsigned char toReturn = (unsigned char) (*file)[0];
+	unsigned char toReturn = (*file)[0] & 0xff;
 	*file += 1;
 	return toReturn;
 }
