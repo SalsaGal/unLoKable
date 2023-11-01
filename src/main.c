@@ -75,5 +75,17 @@ int main(int argc, char *argv[]) {
     printf("Wave Offset: %x\n", waveOffset);
   }
 
+  printf("\n");
+  for (int i = 0; i < header.numSequences; i++) {
+    int sequenceOffset = parseInt(&snd_buffer);
+    printf("Sequence Offset: %x\n", sequenceOffset);
+  }
+
+  printf("\n");
+  for (int i = 0; i < header.numLabels; i++) {
+    int labels = parseInt(&snd_buffer);
+    printf("Labels: %x\n", labels);
+  }
+
   return 0;
 }
