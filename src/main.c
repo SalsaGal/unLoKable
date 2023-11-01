@@ -3,13 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "structures_new_engine.h"
+#include "structures.h"
 
 #define BUFFER_SIZE 1024 * 1024
-
-bool is_magic_number(char *file) {
-  return strncmp(file, "DNSa", 4) == 0;
-}
 
 int main(int argc, char *argv[]) {
   if (argc != 3) {
@@ -32,10 +28,8 @@ int main(int argc, char *argv[]) {
     printf("WARNING: Buffer full, might not have been fully read.\n");
   }
 
-  if (!is_magic_number(snd_buffer)) {
-    printf("ERROR: Not a valid file\n");
-    return 1;
-  }
+  SndHeader header = parseHeader(snd_buffer);
+  printf("%d\n", header.headerSize);
 
   return 0;
 }
