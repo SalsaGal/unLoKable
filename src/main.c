@@ -4,8 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h>
 
 #include "strings.h"
@@ -46,6 +44,22 @@ char *removeExtension(char *path) {
   }
 
   return toReturn;
+}
+
+void makeDirectory(char *path) {
+#if defined(_WIN32)
+  _mkdir(path);
+#elif defined(__linux__)
+  #include <sys/stat.h>
+  #include <sys/types.h>
+  
+  struct stat st = {0};
+  if (stat(path, &st) == -1) {
+    mkdir(path, 0777);
+  } else {
+    printf("Folder %s already exists!\n", path);
+  }
+#endif
 }
 
 int main(int argc, char *argv[]) {
@@ -143,7 +157,7 @@ int main(int argc, char *argv[]) {
   }
 
   char *snd_path_stripped = removeExtension(snd_path);
-  mkdir(snd_path_stripped, 0700);
+  makeDirectory(snd_path_stripped);
   
   return 0;
 }
