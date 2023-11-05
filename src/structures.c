@@ -105,16 +105,11 @@ SndFile parseSndFile(char **file, int file_length) {
 	int sequenceDataSize = end_of_file - *file;
   toReturn.sequenceSlices = (Slice *) calloc(toReturn.header.numSequences, sizeof(Slice));
   for (int i = 0; i < toReturn.header.numSequences; i++) {
+		toReturn.sequenceSlices[i].start = *file + toReturn.sequenceOffsets[i];
 		if (i == toReturn.header.numSequences - 1) {
-			Slice slice;
-			slice.start = *file + toReturn.sequenceOffsets[i];
-			slice.length = sequenceDataSize - toReturn.sequenceOffsets[i];
-			toReturn.sequenceSlices[i] = slice;
+			toReturn.sequenceSlices[i].length = sequenceDataSize - toReturn.sequenceOffsets[i];
 		} else {
-			Slice slice;
-			slice.start = *file + toReturn.sequenceOffsets[i];
-			slice.length = toReturn.sequenceOffsets[i + 1] - toReturn.sequenceOffsets[i];
-			toReturn.sequenceSlices[i] = slice;
+			toReturn.sequenceSlices[i].length = toReturn.sequenceOffsets[i + 1] - toReturn.sequenceOffsets[i];
 		}
   }
 
