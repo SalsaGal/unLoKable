@@ -30,6 +30,22 @@ Slice loadBuffer(char *path) {
   return toReturn;
 }
 
+char *removeExtension(char *path) {
+  char *toReturn = malloc(strlen(path));
+  strcpy(toReturn, path);
+  char *endOfToReturn = toReturn + strlen(path);
+
+  while (endOfToReturn >= toReturn) {
+    if (*endOfToReturn == '.') {
+      *endOfToReturn = '\0';
+      break;
+    }
+    endOfToReturn--;
+  }
+
+  return toReturn;
+}
+
 int main(int argc, char *argv[]) {
   bool verbose = false;
   int opt;
