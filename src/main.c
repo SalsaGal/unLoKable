@@ -10,10 +10,12 @@
 #include "structures.h"
 
 #define BUFFER_SIZE 1024 * 1024
-#define HELP_MESSAGE "Usage: able [OPTIONS] [SND FILE] [SMP FILE]\n" \
-                     "Rips audio from the Legacy of Kain\n" \
-                     "  -h  Displays this help message\n" \
-                     "  -v  Displays extra information about files being loaded\n"
+#define HELP_MESSAGE \
+  "Usage: able [OPTIONS] [SND FILE] [SMP FILE]\n" \
+  "Rips audio from the Legacy of Kain\n" \
+  "  -h  Displays this help message\n" \
+  "  -o  Specifies the path for the output directory, eg `-o song`\n"\
+  "  -v  Displays extra information about files being loaded\n"
 
 Slice loadBuffer(char *path) {
   Slice toReturn;
