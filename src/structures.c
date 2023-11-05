@@ -67,7 +67,7 @@ SndZone parseZone(char **file) {
 	zone.maxPitchRange = parseByte(file);
 	zone.ADSR1 = parseWord(file);
 	zone.ADSR2 = parseWord(file);
-	zone.waveIndex = parseWord(file);
+	zone.waveIndex = parseWord(file) + 1;
 	return zone;
 }
 
