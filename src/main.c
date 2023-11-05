@@ -79,8 +79,9 @@ void makeDirectory(char *path) {
 
 int main(int argc, char *argv[]) {
   bool verbose = false;
+  char *output_dir = NULL;
   int opt;
-  while ((opt = getopt(argc, argv, "hv")) != -1) {
+  while ((opt = getopt(argc, argv, "hvo:")) != -1) {
     switch (opt) {
       case 'h':
         printf(HELP_MESSAGE);
@@ -88,6 +89,10 @@ int main(int argc, char *argv[]) {
 
       case 'v':
         verbose = true;
+        break;
+
+      case 'o':
+        output_dir = optarg;
         break;
     }
   }
@@ -173,7 +178,12 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  char *snd_path_stripped = removeExtension(snd_path);
+  char *snd_path_stripped;
+  if (output_dir) {
+    snd_path_stripped = output_dir;
+  } else {
+    snd_path_stripped = removeExtension(snd_path);
+  }
   makeDirectory(snd_path_stripped);
 
   for (int i = 0; i < snd.header.numSequences; i++) {
