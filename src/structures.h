@@ -57,15 +57,21 @@ typedef struct {
 } MsqHeader;
 
 typedef struct {
+  char *start;
+  int length;
+} Slice;
+
+typedef struct {
   SndHeader header;
   SndProgram *programs;
   SndZone *zones;
   int *waveOffsets;
   int *sequenceOffsets;
   int *labels;
+  Slice *sequenceSlices;
 } SndFile;
 
-SndFile parseSndFile(char **file);
+SndFile parseSndFile(char **file, int length);
 
 /*
 typedef struct {

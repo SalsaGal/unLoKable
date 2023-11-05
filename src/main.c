@@ -15,17 +15,19 @@
                      "  -h  Displays this help message\n" \
                      "  -v  Displays extra information about files being loaded\n"
 
-char *loadBuffer(char *path) {
-  FILE *file = fopen(path, "rb");;
-  if (file == NULL) return NULL;
-  char *buffer = malloc(BUFFER_SIZE);
-  size_t size = fread(buffer, sizeof(char), BUFFER_SIZE, file);
+Slice loadBuffer(char *path) {
+  Slice toReturn;
 
-  if (size == BUFFER_SIZE) {
+  FILE *file = fopen(path, "rb");;
+  // if (file == NULL) return NULL;
+  toReturn.start = malloc(BUFFER_SIZE);
+  toReturn.length = fread(toReturn.start, sizeof(char), BUFFER_SIZE, file);
+
+  if (toReturn.length == BUFFER_SIZE) {
     printf(WARNING_BUFFER_FULL);
   }
 
-  return buffer;
+  return toReturn;
 }
 
 int main(int argc, char *argv[]) {
@@ -48,18 +50,19 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  char *snd_buffer = loadBuffer(argv[optind++]);
-  char *smp_buffer = loadBuffer(argv[optind++]);
+  Slice snd_buffer = loadBuffer(argv[optind++]);
+  char *snd_buffer_start = snd_buffer.start;
+  Slice smp_buffer = loadBuffer(argv[optind++]);
 
-  if (snd_buffer == NULL) {
+  if (snd_buffer.start == NULL) {
     printf(ERROR_INVALID_FILE, argv[optind - 2]);
     return 1;
-  } else if (smp_buffer == NULL) {
+  } else if (smp_buffer.start == NULL) {
     printf(ERROR_INVALID_FILE, argv[optind - 1]);
     return 1;
   }
 
-  SndFile snd = parseSndFile(&snd_buffer);
+  SndFile snd = parseSndFile(&snd_buffer.start, snd_buffer.length);
   if (verbose) {
     printf("HEADER\n");
     printf("headerSize: %d\n", snd.header.headerSize);
@@ -110,6 +113,11 @@ int main(int argc, char *argv[]) {
     printf("\n");
     for (int i = 0; i < snd.header.numLabels; i++) {
       printf("Label %d: %d\n", i, snd.labels[i]);
+    }
+
+    printf("\n");
+    for (int i = 0; i < snd.header.numSequences; i++) {
+      printf("Sequence %d: starts at %lu, length is %lu\n", i, snd.sequenceSlices[i].start - snd_buffer_start, snd.sequenceSlices[i].length);
     }
   }
 

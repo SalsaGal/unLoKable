@@ -71,7 +71,9 @@ SndZone parseZone(char **file) {
 	return zone;
 }
 
-SndFile parseSndFile(char **file) {
+SndFile parseSndFile(char **file, int file_length) {
+	char *end_of_file = *file + file_length;
+	
   SndFile toReturn;
   toReturn.header = parseHeader(file);
 
@@ -98,6 +100,22 @@ SndFile parseSndFile(char **file) {
   toReturn.labels = (int *) calloc(toReturn.header.numLabels, sizeof(int));
   for (int i = 0; i < toReturn.header.numLabels; i++) {
     toReturn.labels[i] = parseInt(file);
+  }
+
+	int sequenceDataSize = end_of_file - *file;
+  toReturn.sequenceSlices = (Slice *) calloc(toReturn.header.numSequences, sizeof(Slice));
+  for (int i = 0; i < toReturn.header.numSequences; i++) {
+		if (i == toReturn.header.numSequences - 1) {
+			Slice slice;
+			slice.start = *file + toReturn.sequenceOffsets[i];
+			slice.length = sequenceDataSize - toReturn.sequenceOffsets[i];
+			toReturn.sequenceSlices[i] = slice;
+		} else {
+			Slice slice;
+			slice.start = *file + toReturn.sequenceOffsets[i];
+			slice.length = toReturn.sequenceOffsets[i + 1] - toReturn.sequenceOffsets[i];
+			toReturn.sequenceSlices[i] = slice;
+		}
   }
 
   return toReturn;
