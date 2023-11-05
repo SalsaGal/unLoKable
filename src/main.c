@@ -215,6 +215,27 @@ int main(int argc, char *argv[]) {
       fprintf(output, "%c", smp.waves[i].start[j]);
     }
   }
+
+  char *vpr_output_path = malloc(128); // TODO Make this better
+  sprintf(vpr_output_path, "%s/%s.vpr", snd_path_stripped, removePath(snd_path_stripped));
+
+  FILE *vpr_output = fopen(vpr_output_path, "wb");
+  for (int i = 0; i < snd.header.numPrograms; i++) {
+    SndProgram *program = &snd.programs[i];
+    char toWrite[] = {
+      (char) (program->numZones >> 8),
+      program->volume,
+      0,
+      0,
+      program->panPos,
+      0, 0, 0, 0,
+      0, 0, 0, 0,
+      0, 0, 0,
+    };
+    for (int j = 0; j < 16; j++) {
+      fprintf(vpr_output, "%c", toWrite[j]);
+    }
+  }
   
   return 0;
 }
