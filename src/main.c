@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 #include "strings.h"
@@ -18,7 +20,7 @@
 Slice loadBuffer(char *path) {
   Slice toReturn;
 
-  FILE *file = fopen(path, "rb");;
+  FILE *file = fopen(path, "rb");
   // if (file == NULL) return NULL;
   toReturn.start = malloc(BUFFER_SIZE);
   toReturn.length = fread(toReturn.start, sizeof(char), BUFFER_SIZE, file);
@@ -66,9 +68,12 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  Slice snd_buffer = loadBuffer(argv[optind++]);
+  char *snd_path = argv[optind++];
+  char *smp_path = argv[optind++];
+
+  Slice snd_buffer = loadBuffer(snd_path);
   char *snd_buffer_start = snd_buffer.start;
-  Slice smp_buffer = loadBuffer(argv[optind++]);
+  Slice smp_buffer = loadBuffer(smp_path);
 
   if (snd_buffer.start == NULL) {
     printf(ERROR_INVALID_FILE, argv[optind - 2]);
@@ -137,5 +142,8 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  char *snd_path_stripped = removeExtension(snd_path);
+  mkdir(snd_path_stripped, 0700);
+  
   return 0;
 }
