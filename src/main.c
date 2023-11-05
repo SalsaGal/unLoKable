@@ -218,7 +218,6 @@ int main(int argc, char *argv[]) {
 
   char *vpr_output_path = malloc(128); // TODO Make this better
   sprintf(vpr_output_path, "%s/%s.vpr", snd_path_stripped, removePath(snd_path_stripped));
-
   FILE *vpr_output = fopen(vpr_output_path, "wb");
   for (int i = 0; i < snd.header.numPrograms; i++) {
     SndProgram *program = &snd.programs[i];
@@ -234,6 +233,39 @@ int main(int argc, char *argv[]) {
     };
     for (int j = 0; j < 16; j++) {
       fprintf(vpr_output, "%c", toWrite[j]);
+    }
+  }
+
+  char *vzn_output_path = malloc(128); // TODO Make this better
+  sprintf(vzn_output_path, "%s/%s.vzn", snd_path_stripped, removePath(snd_path_stripped));
+  FILE *vzn_output = fopen(vzn_output_path, "wb");
+  for (int i = 0; i < snd.header.numZones; i++) {
+    SndZone *zone = &snd.zones[i];
+    char toWrite[] = {
+      zone->priority,
+      zone->mode,
+      zone->volume,
+      zone->panPos,
+      zone->rootKey,
+      zone->pitchFinetuning,
+      zone->noteLow,
+      zone->noteHigh,
+      0, 0, 0, 0,
+      zone->maxPitchRange,
+      zone->maxPitchRange,
+      0, 0,
+      (char) ((zone->ADSR1 & 0xff00) >> 8),
+      (char) (zone->ADSR1 & 0xff),
+      (char) ((zone->ADSR2 & 0xff00) >> 8),
+      (char) (zone->ADSR2 & 0xff),
+      zone->parentProgram, 0,
+      (char) ((zone->waveIndex & 0xff00) >> 8),
+      (char) (zone->waveIndex & 0xff),
+      0, 0, 0, 0,
+      0, 0, 0, 0
+    };
+    for (int j = 0; j < 32; j++) {
+      fprintf(vzn_output, "%c", toWrite[j]);
     }
   }
   
