@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdlib.h>
+
 int parseInt(char **file);
 unsigned short int parseWord(char **file);
 unsigned char parseByte(char **file);
@@ -102,7 +103,7 @@ typedef struct {
   unsigned short int attribute;
   unsigned int padding1;
   unsigned int padding2;
-}
+} VabProgram;
 */
 /*
 typedef struct {
