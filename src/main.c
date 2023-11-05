@@ -113,6 +113,8 @@ int main(int argc, char *argv[]) {
   }
 
   SndFile snd = parseSndFile(&snd_buffer.start, snd_buffer.length);
+  SmpFile smp = parseSmpFile(&smp_buffer.start, &snd, smp_buffer.length);
+
   if (verbose) {
     printf("HEADER\n");
     printf("headerSize: %d\n", snd.header.headerSize);
@@ -167,7 +169,7 @@ int main(int argc, char *argv[]) {
 
     printf("\n");
     for (int i = 0; i < snd.header.numSequences; i++) {
-      printf("Sequence %d: starts at %lu, length is %lu\n", i, snd.sequenceSlices[i].start - snd_buffer_start, snd.sequenceSlices[i].length);
+      printf("Sequence %d: starts at %lu, length is %d\n", i, snd.sequenceSlices[i].start - snd_buffer_start, snd.sequenceSlices[i].length);
     }
   }
 
@@ -181,6 +183,15 @@ int main(int argc, char *argv[]) {
     FILE *output = fopen(output_path, "wb");
     for (int j = 0; j < snd.sequenceSlices[i].length; j++) {
       fprintf(output, "%c", snd.sequenceSlices[i].start[j]);
+    }
+  }
+  for (int i = 0; i < snd.header.numWaves; i++) {
+    char *output_path = malloc(128); // TODO Make this better
+    sprintf(output_path, "%s/%s_%04d.vb", snd_path_stripped, removePath(snd_path_stripped), i);
+
+    FILE *output = fopen(output_path, "wb");
+    for (int j = 0; j < smp.waves[i].length; j++) {
+      fprintf(output, "%c", smp.waves[i].start[j]);
     }
   }
   

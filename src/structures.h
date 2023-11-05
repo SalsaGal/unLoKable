@@ -73,6 +73,14 @@ typedef struct {
 
 SndFile parseSndFile(char **file, int length);
 
+typedef struct {
+  char magicNumber[4]; // PMSa
+  int bodySize;
+  Slice *waves;
+} SmpFile;
+
+SmpFile parseSmpFile(char **file, SndFile *snd, int length);
+
 /*
 typedef struct {
   char ID[4];
@@ -82,7 +90,7 @@ typedef struct {
   unsigned int sampleRate;
   char padding[12];
   char name[16];
-}
+} VagHeader;
 
 typedef struct {
   unsigned char numTones;

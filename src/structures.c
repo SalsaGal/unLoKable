@@ -115,3 +115,27 @@ SndFile parseSndFile(char **file, int file_length) {
 
   return toReturn;
 }
+
+SmpFile parseSmpFile(char **file, SndFile *snd, int length) {
+	char *end_of_file = *file + length;
+
+	SmpFile toReturn;
+	toReturn.magicNumber[0] = parseByte(file);
+	toReturn.magicNumber[1] = parseByte(file);
+	toReturn.magicNumber[2] = parseByte(file);
+	toReturn.magicNumber[3] = parseByte(file);
+	toReturn.bodySize = parseInt(file);
+
+	int waveDataSize = end_of_file - *file;
+	toReturn.waves = (Slice *) calloc(snd->header.numWaves, sizeof(Slice));
+	for (int i = 0; i < snd->header.numWaves; i++) {
+		toReturn.waves[i].start = *file + snd->waveOffsets[i];
+		if (i == snd->header.numWaves - 1) {
+			toReturn.waves[i].length = waveDataSize - snd->waveOffsets[i];
+		} else {
+			toReturn.waves[i].length = snd->waveOffsets[i + 1] - snd->waveOffsets[i];
+		}
+	}
+
+	return toReturn;
+}
