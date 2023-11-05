@@ -30,6 +30,21 @@ Slice loadBuffer(char *path) {
   return toReturn;
 }
 
+char *removePath(char *path) {
+  char *toReturn = malloc(strlen(path));
+  strcpy(toReturn, path);
+  char *endOfToReturn = toReturn + strlen(path);
+
+  while (endOfToReturn >= toReturn) {
+    if (*endOfToReturn == '/' || *endOfToReturn == '\\') {
+      return endOfToReturn + 1;
+    }
+    endOfToReturn--;
+  }
+
+  return path;
+}
+
 char *removeExtension(char *path) {
   char *toReturn = malloc(strlen(path));
   strcpy(toReturn, path);
@@ -158,6 +173,16 @@ int main(int argc, char *argv[]) {
 
   char *snd_path_stripped = removeExtension(snd_path);
   makeDirectory(snd_path_stripped);
+
+  for (int i = 0; i < snd.header.numSequences; i++) {
+    char *output_path = malloc(128); // TODO Make this better
+    sprintf(output_path, "%s/%s_%04d.msq", snd_path_stripped, removePath(snd_path_stripped), i);
+
+    FILE *output = fopen(output_path, "wb");
+    for (int j = 0; j < snd.sequenceSlices[i].length; j++) {
+      fprintf(output, "%c", snd.sequenceSlices[i].start[j]);
+    }
+  }
   
   return 0;
 }
