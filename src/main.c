@@ -187,9 +187,30 @@ int main(int argc, char *argv[]) {
   }
   for (int i = 0; i < snd.header.numWaves; i++) {
     char *output_path = malloc(128); // TODO Make this better
-    sprintf(output_path, "%s/%s_%04d.vb", snd_path_stripped, removePath(snd_path_stripped), i);
+    sprintf(output_path, "%s/%s_%04d.vag", snd_path_stripped, removePath(snd_path_stripped), i);
 
     FILE *output = fopen(output_path, "wb");
+    int sample_length = smp.waves[i].length;
+    char header[48] = {
+      0x56, 0x41, 0x47, 0x70,     // Magic number
+      0, 0, 0, 3,                 // Version number
+      0, 0, 0, 0,               // Padding
+      (sample_length & 0xff000000) >> 24,    // Size
+      (sample_length & 0xff0000) >> 16,
+      (sample_length & 0xff00) >> 8,
+      sample_length & 0xff,
+      0x00, 0x00, 0xAC, 0x44, // Sample rate
+      0, 0, 0, 0,             // Padding
+      0, 0, 0, 0,
+      0, 0, 0, 0,
+      0, 0, 0, 0,             // Name
+      0, 0, 0, 0,
+      0, 0, 0, 0,
+      0, 0, 0, 0,
+    };
+    for (int j = 0; j < 48; j++) {
+      fprintf(output, "%c", header[j]);
+    }
     for (int j = 0; j < smp.waves[i].length; j++) {
       fprintf(output, "%c", smp.waves[i].start[j]);
     }
