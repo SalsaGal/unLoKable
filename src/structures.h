@@ -2,9 +2,9 @@
 
 #include <stdlib.h>
 
-int parseInt(char **file);
-unsigned short int parseWord(char **file);
-unsigned char parseByte(char **file);
+int parse_int(char **file);
+unsigned short int parse_word(char **file);
+unsigned char parse_byte(char **file);
 
 typedef struct {
   int magicNumber;
@@ -19,7 +19,7 @@ typedef struct {
   int reverbDepth;
 } SndHeader;
 
-SndHeader parseHeader(char **file);
+SndHeader parse_header(char **file);
 
 typedef struct {
   unsigned short int numZones;
@@ -28,7 +28,7 @@ typedef struct {
   unsigned char panPos;
 } SndProgram;
 
-SndProgram parseProgram(char **file);
+SndProgram parse_program(char **file);
 
 typedef struct {
   unsigned char priority;
@@ -46,7 +46,7 @@ typedef struct {
   unsigned short int waveIndex;
 } SndZone;
 
-SndZone parseZone(char **file);
+SndZone parse_zone(char **file);
 
 typedef struct {
   int msqID;
@@ -72,7 +72,7 @@ typedef struct {
   Slice *sequenceSlices;
 } SndFile;
 
-SndFile parseSndFile(char **file, int length);
+SndFile parse_snd_file(char **file, int length);
 
 typedef struct {
   char magicNumber[4]; // PMSa
@@ -80,7 +80,7 @@ typedef struct {
   Slice *waves;
 } SmpFile;
 
-SmpFile parseSmpFile(char **file, SndFile *snd, int length);
+SmpFile parse_smp_file(char **file, SndFile *snd, int length);
 
 /*
 typedef struct {

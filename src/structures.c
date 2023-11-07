@@ -2,7 +2,7 @@
 #include "strings.h"
 #include <stdio.h>
 
-int parseInt(char **file) {
+int parse_int(char **file) {
 	int toReturn = ((*file)[0] & 0xff) * 0x00000001
 		+ ((*file)[1] & 0xff) * 0x00000100
 		+ ((*file)[2] & 0xff) * 0x00010000
@@ -12,94 +12,94 @@ int parseInt(char **file) {
 }
 
 // NEEDS TO BE 0xEE8C
-unsigned short int parseWord(char **file) {
+unsigned short int parse_word(char **file) {
 	unsigned short int toReturn = ((*file)[0] & 0xff) * 0x0100 + ((*file)[1] & 0xff);
 	*file += 2;
 	return toReturn;
 }
 
-unsigned char parseByte(char **file) {
+unsigned char parse_byte(char **file) {
 	unsigned char toReturn = (*file)[0] & 0xff;
 	*file += 1;
 	return toReturn;
 }
 
-SndHeader parseHeader(char **file) {
+SndHeader parse_header(char **file) {
 	SndHeader header;
-	header.magicNumber = parseInt(file);
+	header.magicNumber = parse_int(file);
 	if (header.magicNumber != 0x61534e44) {
 		printf(ERROR_INVALID_HEADER);
 		exit(1);
 	}
-	header.headerSize = parseInt(file);
-	header.bankVersion = parseInt(file);
-	header.numPrograms = parseInt(file);
-	header.numZones = parseInt(file);
-	header.numWaves = parseInt(file);
-	header.numSequences = parseInt(file);
-	header.numLabels = parseInt(file);
-	header.reverbMode = parseInt(file);
-	header.reverbDepth = parseInt(file);
+	header.headerSize = parse_int(file);
+	header.bankVersion = parse_int(file);
+	header.numPrograms = parse_int(file);
+	header.numZones = parse_int(file);
+	header.numWaves = parse_int(file);
+	header.numSequences = parse_int(file);
+	header.numLabels = parse_int(file);
+	header.reverbMode = parse_int(file);
+	header.reverbDepth = parse_int(file);
 	return header;
 }
 
-SndProgram parseProgram(char **file) {
+SndProgram parse_program(char **file) {
 	SndProgram program;
-	program.numZones = parseWord(file);
-	program.firstTone = parseWord(file);
-	program.volume = parseByte(file);
-	program.panPos = parseByte(file);
-	parseWord(file);
+	program.numZones = parse_word(file);
+	program.firstTone = parse_word(file);
+	program.volume = parse_byte(file);
+	program.panPos = parse_byte(file);
+	parse_word(file);
 	return program;
 }
 
-SndZone parseZone(char **file) {
+SndZone parse_zone(char **file) {
 	SndZone zone;
-	zone.priority = parseByte(file);
-	zone.parentProgram = parseByte(file);
-	zone.volume = parseByte(file);
-	zone.panPos = parseByte(file);
-	zone.rootKey = parseByte(file);
-	zone.pitchFinetuning = parseByte(file);
-	zone.noteLow = parseByte(file);
-	zone.noteHigh = parseByte(file);
-	zone.mode = parseByte(file);
-	zone.maxPitchRange = parseByte(file);
-	zone.ADSR1 = parseWord(file);
-	zone.ADSR2 = parseWord(file);
-	zone.waveIndex = parseWord(file) + 1;
+	zone.priority = parse_byte(file);
+	zone.parentProgram = parse_byte(file);
+	zone.volume = parse_byte(file);
+	zone.panPos = parse_byte(file);
+	zone.rootKey = parse_byte(file);
+	zone.pitchFinetuning = parse_byte(file);
+	zone.noteLow = parse_byte(file);
+	zone.noteHigh = parse_byte(file);
+	zone.mode = parse_byte(file);
+	zone.maxPitchRange = parse_byte(file);
+	zone.ADSR1 = parse_word(file);
+	zone.ADSR2 = parse_word(file);
+	zone.waveIndex = parse_word(file) + 1;
 	return zone;
 }
 
-SndFile parseSndFile(char **file, int file_length) {
+SndFile parse_snd_file(char **file, int file_length) {
 	char *end_of_file = *file + file_length;
 	
   SndFile toReturn;
-  toReturn.header = parseHeader(file);
+  toReturn.header = parse_header(file);
 
   toReturn.programs = (SndProgram *) calloc(toReturn.header.numPrograms, sizeof(SndProgram));
   for (int i = 0; i < toReturn.header.numPrograms; i++) {
-    toReturn.programs[i] = parseProgram(file);
+    toReturn.programs[i] = parse_program(file);
   }
 
   toReturn.zones = (SndZone *) calloc(toReturn.header.numZones, sizeof(SndZone));
   for (int i = 0; i < toReturn.header.numZones; i++) {
-    toReturn.zones[i] = parseZone(file);
+    toReturn.zones[i] = parse_zone(file);
   }
 
   toReturn.waveOffsets = (int *) calloc(toReturn.header.numWaves, sizeof(int));
   for (int i = 0; i < toReturn.header.numWaves; i++) {
-    toReturn.waveOffsets[i] = parseInt(file);
+    toReturn.waveOffsets[i] = parse_int(file);
   }
 
   toReturn.sequenceOffsets = (int *) calloc(toReturn.header.numSequences, sizeof(int));
   for (int i = 0; i < toReturn.header.numSequences; i++) {
-    toReturn.sequenceOffsets[i] = parseInt(file);
+    toReturn.sequenceOffsets[i] = parse_int(file);
   }
 
   toReturn.labels = (int *) calloc(toReturn.header.numLabels, sizeof(int));
   for (int i = 0; i < toReturn.header.numLabels; i++) {
-    toReturn.labels[i] = parseInt(file);
+    toReturn.labels[i] = parse_int(file);
   }
 
 	int sequenceDataSize = end_of_file - *file;
@@ -116,15 +116,15 @@ SndFile parseSndFile(char **file, int file_length) {
   return toReturn;
 }
 
-SmpFile parseSmpFile(char **file, SndFile *snd, int length) {
+SmpFile parse_smp_file(char **file, SndFile *snd, int length) {
 	char *end_of_file = *file + length;
 
 	SmpFile toReturn;
-	toReturn.magicNumber[0] = parseByte(file);
-	toReturn.magicNumber[1] = parseByte(file);
-	toReturn.magicNumber[2] = parseByte(file);
-	toReturn.magicNumber[3] = parseByte(file);
-	toReturn.bodySize = parseInt(file);
+	toReturn.magicNumber[0] = parse_byte(file);
+	toReturn.magicNumber[1] = parse_byte(file);
+	toReturn.magicNumber[2] = parse_byte(file);
+	toReturn.magicNumber[3] = parse_byte(file);
+	toReturn.bodySize = parse_int(file);
 
 	int waveDataSize = end_of_file - *file;
 	toReturn.waves = (Slice *) calloc(snd->header.numWaves, sizeof(Slice));

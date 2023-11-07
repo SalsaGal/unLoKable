@@ -17,53 +17,53 @@
   "  -o  Specifies the path for the output directory, eg `-o song`\n"\
   "  -v  Displays extra information about files being loaded\n"
 
-Slice loadBuffer(char *path) {
-  Slice toReturn;
+Slice load_buffer(char *path) {
+  Slice to_return;
 
   FILE *file = fopen(path, "rb");
   // if (file == NULL) return NULL;
-  toReturn.start = malloc(BUFFER_SIZE);
-  toReturn.length = fread(toReturn.start, sizeof(char), BUFFER_SIZE, file);
+  to_return.start = malloc(BUFFER_SIZE);
+  to_return.length = fread(to_return.start, sizeof(char), BUFFER_SIZE, file);
 
-  if (toReturn.length == BUFFER_SIZE) {
+  if (to_return.length == BUFFER_SIZE) {
     printf(WARNING_BUFFER_FULL);
   }
 
-  return toReturn;
+  return to_return;
 }
 
-char *removePath(char *path) {
-  char *toReturn = malloc(strlen(path));
-  strcpy(toReturn, path);
-  char *endOfToReturn = toReturn + strlen(path);
+char *remove_path(char *path) {
+  char *to_return = malloc(strlen(path));
+  strcpy(to_return, path);
+  char *end_of_to_return = to_return + strlen(path);
 
-  while (endOfToReturn >= toReturn) {
-    if (*endOfToReturn == '/' || *endOfToReturn == '\\') {
-      return endOfToReturn + 1;
+  while (end_of_to_return >= to_return) {
+    if (*end_of_to_return == '/' || *end_of_to_return == '\\') {
+      return end_of_to_return + 1;
     }
-    endOfToReturn--;
+    end_of_to_return--;
   }
 
   return path;
 }
 
-char *removeExtension(char *path) {
-  char *toReturn = malloc(strlen(path));
-  strcpy(toReturn, path);
-  char *endOfToReturn = toReturn + strlen(path);
+char *remove_extension(char *path) {
+  char *to_return = malloc(strlen(path));
+  strcpy(to_return, path);
+  char *end_of_to_return = to_return + strlen(path);
 
-  while (endOfToReturn >= toReturn) {
-    if (*endOfToReturn == '.') {
-      *endOfToReturn = '\0';
+  while (end_of_to_return >= to_return) {
+    if (*end_of_to_return == '.') {
+      *end_of_to_return = '\0';
       break;
     }
-    endOfToReturn--;
+    end_of_to_return--;
   }
 
-  return toReturn;
+  return to_return;
 }
 
-void makeDirectory(char *path) {
+void make_directory(char *path) {
 #if defined(_WIN32)
   _mkdir(path);
 #elif defined(__linux__)
@@ -107,9 +107,9 @@ int main(int argc, char *argv[]) {
   char *snd_path = argv[optind++];
   char *smp_path = argv[optind++];
 
-  Slice snd_buffer = loadBuffer(snd_path);
+  Slice snd_buffer = load_buffer(snd_path);
   char *snd_buffer_start = snd_buffer.start;
-  Slice smp_buffer = loadBuffer(smp_path);
+  Slice smp_buffer = load_buffer(smp_path);
 
   if (snd_buffer.start == NULL) {
     printf(ERROR_INVALID_FILE, argv[optind - 2]);
@@ -119,8 +119,8 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  SndFile snd = parseSndFile(&snd_buffer.start, snd_buffer.length);
-  SmpFile smp = parseSmpFile(&smp_buffer.start, &snd, smp_buffer.length);
+  SndFile snd = parse_snd_file(&snd_buffer.start, snd_buffer.length);
+  SmpFile smp = parse_smp_file(&smp_buffer.start, &snd, smp_buffer.length);
 
   if (verbose) {
     printf("HEADER\n");
@@ -184,13 +184,13 @@ int main(int argc, char *argv[]) {
   if (output_dir) {
     snd_path_stripped = output_dir;
   } else {
-    snd_path_stripped = removeExtension(snd_path);
+    snd_path_stripped = remove_extension(snd_path);
   }
-  makeDirectory(snd_path_stripped);
+  make_directory(snd_path_stripped);
 
   for (int i = 0; i < snd.header.numSequences; i++) {
     char *output_path = malloc(128); // TODO Make this better
-    sprintf(output_path, "%s/%s_%04d.msq", snd_path_stripped, removePath(snd_path_stripped), i);
+    sprintf(output_path, "%s/%s_%04d.msq", snd_path_stripped, remove_path(snd_path_stripped), i);
 
     FILE *output = fopen(output_path, "wb");
     for (int j = 0; j < snd.sequenceSlices[i].length; j++) {
@@ -199,7 +199,7 @@ int main(int argc, char *argv[]) {
   }
   for (int i = 0; i < snd.header.numWaves; i++) {
     char *output_path = malloc(128); // TODO Make this better
-    sprintf(output_path, "%s/%s_%04d.vag", snd_path_stripped, removePath(snd_path_stripped), i);
+    sprintf(output_path, "%s/%s_%04d.vag", snd_path_stripped, remove_path(snd_path_stripped), i);
 
     FILE *output = fopen(output_path, "wb");
     int sample_length = smp.waves[i].length;
@@ -229,7 +229,7 @@ int main(int argc, char *argv[]) {
   }
 
   char *vpr_output_path = malloc(128); // TODO Make this better
-  sprintf(vpr_output_path, "%s/%s.vpr", snd_path_stripped, removePath(snd_path_stripped));
+  sprintf(vpr_output_path, "%s/%s.vpr", snd_path_stripped, remove_path(snd_path_stripped));
   FILE *vpr_output = fopen(vpr_output_path, "wb");
   for (int i = 0; i < snd.header.numPrograms; i++) {
     SndProgram *program = &snd.programs[i];
@@ -249,7 +249,7 @@ int main(int argc, char *argv[]) {
   }
 
   char *vzn_output_path = malloc(128); // TODO Make this better
-  sprintf(vzn_output_path, "%s/%s.vzn", snd_path_stripped, removePath(snd_path_stripped));
+  sprintf(vzn_output_path, "%s/%s.vzn", snd_path_stripped, remove_path(snd_path_stripped));
   FILE *vzn_output = fopen(vzn_output_path, "wb");
   for (int i = 0; i < snd.header.numZones; i++) {
     SndZone *zone = &snd.zones[i];
