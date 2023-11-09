@@ -254,8 +254,18 @@ int main(int argc, char *argv[]) {
   char *vzn_output_path = malloc(128); // TODO Make this better
   sprintf(vzn_output_path, "%s/%s.vzn", snd_path_stripped, remove_path(snd_path_stripped));
   FILE *vzn_output = fopen(vzn_output_path, "wb");
+  int current_parent_program = 0;
+  int current_parent_program_streak = 0;
   for (int i = 0; i < snd.header.numZones; i++) {
     SndZone *zone = &snd.zones[i];
+    if (zone->parentProgram != current_parent_program) {
+      for (int j = 0; j < 32 * (16 - current_parent_program_streak); j++) {
+        fprintf(vzn_output, "%c", 0);
+      }
+      current_parent_program = zone->parentProgram;
+      current_parent_program_streak = 0;
+    }
+
     char toWrite[] = {
       zone->priority,
       zone->mode,
@@ -282,6 +292,10 @@ int main(int argc, char *argv[]) {
     for (int j = 0; j < 32; j++) {
       fprintf(vzn_output, "%c", toWrite[j]);
     }
+    current_parent_program_streak++;
+  }
+  for (int i = 0; i < 32 * (16 - current_parent_program_streak); i++) {
+    fprintf(vzn_output, "%c", 0);
   }
   
   return 0;
