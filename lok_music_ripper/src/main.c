@@ -52,12 +52,20 @@ int main(int argc, char *argv[]) {
     return 2;
   }
 
+	int *track_offsets = calloc(header.numTracks, sizeof(int));
+	for (int i = 0; i < header.numTracks; i++) {
+		track_offsets[i] = parse_int(&file_buffer);
+	}
+
   printf("msqID: %d\n", header.msqID);
   printf("quarterNoteTime: %d\n", header.quarterNoteTime);
   printf("ppqn: %d\n", header.ppqn);
   printf("version: %d\n", header.version);
   printf("numTracks: %d\n", header.numTracks);
   printf("padding: %d\n", header.padding);
+	for (int i = 0; i < header.numTracks; i++) {
+		printf("Track #%d: %x\n", i, track_offsets[i]);
+	}
 
   return 0;
 }

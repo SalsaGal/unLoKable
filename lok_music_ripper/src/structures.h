@@ -6,3 +6,8 @@ typedef struct {
   unsigned short int numTracks;
   unsigned short int padding;
 } MsqHeader;
+
+typedef struct {
+  char *start;
+  int length;
+} Slice;
