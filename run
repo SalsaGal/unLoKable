@@ -1,3 +1,4 @@
 [default]
-make --directory lok_music_ripper
-lok_music_ripper/out/able tests/ucma/ucma_0003.msq
+make
+out/bin/sound tests/ucma.snd tests/ucma.smp
+out/bin/sequence tests/ucma/ucma_0003.msq
