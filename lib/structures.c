@@ -138,3 +138,14 @@ SmpFile parse_smp_file(char **file, SndFile *snd, int length) {
 
 	return toReturn;
 }
+
+MsqHeader parse_msq_header(char **file) {
+  MsqHeader to_return;
+  to_return.msqID = parse_int(file);
+  to_return.quarterNoteTime = parse_int(file);
+  to_return.ppqn = parse_word(file);
+  to_return.version = parse_word(file);
+  to_return.numTracks = parse_word(file);
+  to_return.padding = parse_word(file);
+  return to_return;
+}

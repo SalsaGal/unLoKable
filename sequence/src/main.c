@@ -4,17 +4,6 @@
 
 #define BUFFER_SIZE 1024 * 1024
 
-MsqHeader parse_header(char **file) {
-  MsqHeader to_return;
-  to_return.msqID = parse_int(file);
-  to_return.quarterNoteTime = parse_int(file);
-  to_return.ppqn = parse_word(file);
-  to_return.version = parse_word(file);
-  to_return.numTracks = parse_word(file);
-  to_return.padding = parse_word(file);
-  return to_return;
-}
-
 int main(int argc, char *argv[]) {
   if (argc != 2) {
     printf("Missing argument for file!\n");
@@ -26,7 +15,7 @@ int main(int argc, char *argv[]) {
 	char *file_start = file_buffer;
   int file_length = fread(file_buffer, sizeof(char), BUFFER_SIZE, file);
 
-  MsqHeader header = parse_header(&file_buffer);
+  MsqHeader header = parse_msq_header(&file_buffer);
 	if (header.msqID != 0x614d5351 && header.msqID != 0x61534551) {
     printf("Incorrect magic number!\n");
     return 2;

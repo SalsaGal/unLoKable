@@ -81,3 +81,5 @@ typedef struct {
   unsigned short int numTracks;
   unsigned short int padding;
 } MsqHeader;
+
+MsqHeader parse_msq_header(char **file);
