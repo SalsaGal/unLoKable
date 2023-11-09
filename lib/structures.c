@@ -2,7 +2,16 @@
 #include "strings.h"
 #include <stdio.h>
 
-int parse_int(char **file) {
+int parse_int_le(char **file) {
+	int toReturn = ((*file)[3] & 0xff) * 0x00000001
+		+ ((*file)[2] & 0xff) * 0x00000100
+		+ ((*file)[1] & 0xff) * 0x00010000
+		+ ((*file)[0] & 0xff) * 0x01000000;
+	*file += 4;
+	return toReturn;
+}
+
+int parse_int_be(char **file) {
 	int toReturn = ((*file)[0] & 0xff) * 0x00000001
 		+ ((*file)[1] & 0xff) * 0x00000100
 		+ ((*file)[2] & 0xff) * 0x00010000
@@ -11,8 +20,14 @@ int parse_int(char **file) {
 	return toReturn;
 }
 
-unsigned short int parse_word(char **file) {
+unsigned short int parse_word_le(char **file) {
 	unsigned short int toReturn = ((*file)[0] & 0xff) * 0x0100 + ((*file)[1] & 0xff);
+	*file += 2;
+	return toReturn;
+}
+
+unsigned short int parse_word_be(char **file) {
+	unsigned short int toReturn = ((*file)[1] & 0xff) * 0x0100 + ((*file)[0] & 0xff);
 	*file += 2;
 	return toReturn;
 }
@@ -25,30 +40,30 @@ unsigned char parse_byte(char **file) {
 
 SndHeader parse_snd_header(char **file) {
 	SndHeader header;
-	header.magicNumber = parse_int(file);
+	header.magicNumber = parse_int_be(file);
 	if (header.magicNumber != 0x61534e44) {
 		printf(ERROR_INVALID_HEADER);
 		exit(1);
 	}
-	header.headerSize = parse_int(file);
-	header.bankVersion = parse_int(file);
-	header.numPrograms = parse_int(file);
-	header.numZones = parse_int(file);
-	header.numWaves = parse_int(file);
-	header.numSequences = parse_int(file);
-	header.numLabels = parse_int(file);
-	header.reverbMode = parse_int(file);
-	header.reverbDepth = parse_int(file);
+	header.headerSize = parse_int_be(file);
+	header.bankVersion = parse_int_be(file);
+	header.numPrograms = parse_int_be(file);
+	header.numZones = parse_int_be(file);
+	header.numWaves = parse_int_be(file);
+	header.numSequences = parse_int_be(file);
+	header.numLabels = parse_int_be(file);
+	header.reverbMode = parse_int_be(file);
+	header.reverbDepth = parse_int_be(file);
 	return header;
 }
 
 SndProgram parse_program(char **file) {
 	SndProgram program;
-	program.numZones = parse_word(file);
-	program.firstTone = parse_word(file);
+	program.numZones = parse_word_le(file);
+	program.firstTone = parse_word_le(file);
 	program.volume = parse_byte(file);
 	program.panPos = parse_byte(file);
-	parse_word(file);
+	parse_word_le(file);
 	return program;
 }
 
@@ -64,9 +79,9 @@ SndZone parse_zone(char **file) {
 	zone.noteHigh = parse_byte(file);
 	zone.mode = parse_byte(file);
 	zone.maxPitchRange = parse_byte(file);
-	zone.ADSR1 = parse_word(file);
-	zone.ADSR2 = parse_word(file);
-	zone.waveIndex = parse_word(file) + 0x0100;
+	zone.ADSR1 = parse_word_le(file);
+	zone.ADSR2 = parse_word_le(file);
+	zone.waveIndex = parse_word_le(file) + 0x0100;
 	return zone;
 }
 
@@ -88,17 +103,17 @@ SndFile parse_snd_file(char **file, int file_length) {
 
   toReturn.waveOffsets = (int *) calloc(toReturn.header.numWaves, sizeof(int));
   for (int i = 0; i < toReturn.header.numWaves; i++) {
-    toReturn.waveOffsets[i] = parse_int(file);
+    toReturn.waveOffsets[i] = parse_int_be(file);
   }
 
   toReturn.sequenceOffsets = (int *) calloc(toReturn.header.numSequences, sizeof(int));
   for (int i = 0; i < toReturn.header.numSequences; i++) {
-    toReturn.sequenceOffsets[i] = parse_int(file);
+    toReturn.sequenceOffsets[i] = parse_int_be(file);
   }
 
   toReturn.labels = (int *) calloc(toReturn.header.numLabels, sizeof(int));
   for (int i = 0; i < toReturn.header.numLabels; i++) {
-    toReturn.labels[i] = parse_int(file);
+    toReturn.labels[i] = parse_int_be(file);
   }
 
 	int sequenceDataSize = end_of_file - *file;
@@ -123,7 +138,7 @@ SmpFile parse_smp_file(char **file, SndFile *snd, int length) {
 	toReturn.magicNumber[1] = parse_byte(file);
 	toReturn.magicNumber[2] = parse_byte(file);
 	toReturn.magicNumber[3] = parse_byte(file);
-	toReturn.bodySize = parse_int(file);
+	toReturn.bodySize = parse_int_be(file);
 
 	int waveDataSize = end_of_file - *file;
 	toReturn.waves = (Slice *) calloc(snd->header.numWaves, sizeof(Slice));
@@ -141,11 +156,11 @@ SmpFile parse_smp_file(char **file, SndFile *snd, int length) {
 
 MsqHeader parse_msq_header(char **file) {
   MsqHeader to_return;
-  to_return.msqID = parse_int(file);
-  to_return.quarterNoteTime = parse_int(file);
-  to_return.ppqn = parse_word(file);
-  to_return.version = parse_word(file);
-  to_return.numTracks = parse_word(file);
-  to_return.padding = parse_word(file);
+  to_return.msqID = parse_int_be(file);
+  to_return.quarterNoteTime = parse_int_be(file);
+  to_return.ppqn = parse_word_be(file);
+  to_return.version = parse_word_be(file);
+  to_return.numTracks = parse_word_be(file);
+  to_return.padding = parse_word_be(file);
   return to_return;
 }

@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
 
 	int *track_offsets = calloc(header.numTracks, sizeof(int));
 	for (int i = 0; i < header.numTracks; i++) {
-		track_offsets[i] = parse_int(&file_buffer);
+		track_offsets[i] = parse_int_be(&file_buffer);
 	}
 
 	Slice *track_slices = calloc(header.numTracks, sizeof(Slice));

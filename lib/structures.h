@@ -2,8 +2,10 @@
 
 #include <stdlib.h>
 
-int parse_int(char **file);
-unsigned short int parse_word(char **file);
+int parse_int_le(char **file);
+int parse_int_be(char **file);
+unsigned short int parse_word_le(char **file);
+unsigned short int parse_word_be(char **file);
 unsigned char parse_byte(char **file);
 
 typedef struct {
