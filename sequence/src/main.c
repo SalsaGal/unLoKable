@@ -4,27 +4,6 @@
 
 #define BUFFER_SIZE 1024 * 1024
 
-int parse_int(char **file) {
-	int toReturn = ((*file)[0] & 0xff) * 0x00000001
-		+ ((*file)[1] & 0xff) * 0x00000100
-		+ ((*file)[2] & 0xff) * 0x00010000
-		+ ((*file)[3] & 0xff) * 0x01000000;
-	*file += 4;
-	return toReturn;
-}
-
-unsigned short int parse_word(char **file) {
-	unsigned short int toReturn = ((*file)[1] & 0xff) * 0x0100 + ((*file)[0] & 0xff);
-	*file += 2;
-	return toReturn;
-}
-
-unsigned char parse_byte(char **file) {
-	unsigned char toReturn = (*file)[0] & 0xff;
-	*file += 1;
-	return toReturn;
-}
-
 MsqHeader parse_header(char **file) {
   MsqHeader to_return;
   to_return.msqID = parse_int(file);
@@ -46,7 +25,6 @@ int main(int argc, char *argv[]) {
   char *file_buffer = malloc(BUFFER_SIZE);
 	char *file_start = file_buffer;
   int file_length = fread(file_buffer, sizeof(char), BUFFER_SIZE, file);
-	char *file_end = file_start + file_length;
 
   MsqHeader header = parse_header(&file_buffer);
 	if (header.msqID != 0x614d5351 && header.msqID != 0x61534551) {

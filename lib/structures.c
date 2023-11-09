@@ -23,7 +23,7 @@ unsigned char parse_byte(char **file) {
 	return toReturn;
 }
 
-SndHeader parse_header(char **file) {
+SndHeader parse_snd_header(char **file) {
 	SndHeader header;
 	header.magicNumber = parse_int(file);
 	if (header.magicNumber != 0x61534e44) {
@@ -74,7 +74,7 @@ SndFile parse_snd_file(char **file, int file_length) {
 	char *end_of_file = *file + file_length;
 	
   SndFile toReturn;
-  toReturn.header = parse_header(file);
+  toReturn.header = parse_snd_header(file);
 
   toReturn.programs = (SndProgram *) calloc(toReturn.header.numPrograms, sizeof(SndProgram));
   for (int i = 0; i < toReturn.header.numPrograms; i++) {

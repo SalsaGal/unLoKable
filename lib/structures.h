@@ -19,7 +19,7 @@ typedef struct {
   int reverbDepth;
 } SndHeader;
 
-SndHeader parse_header(char **file);
+SndHeader parse_snd_header(char **file);
 
 typedef struct {
   unsigned short int numZones;
@@ -72,3 +72,12 @@ typedef struct {
 } SmpFile;
 
 SmpFile parse_smp_file(char **file, SndFile *snd, int length);
+
+typedef struct {
+  int msqID;
+  unsigned int quarterNoteTime;
+  unsigned short int ppqn;
+  unsigned short int version;
+  unsigned short int numTracks;
+  unsigned short int padding;
+} MsqHeader;
