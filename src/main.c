@@ -247,6 +247,9 @@ int main(int argc, char *argv[]) {
       fprintf(vpr_output, "%c", toWrite[j]);
     }
   }
+  for (int i = 0; i < 16 * (128 - snd.header.numPrograms); i++) {
+    fprintf(vpr_output, "%c", 0);
+  }
 
   char *vzn_output_path = malloc(128); // TODO Make this better
   sprintf(vzn_output_path, "%s/%s.vzn", snd_path_stripped, remove_path(snd_path_stripped));
