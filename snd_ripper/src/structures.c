@@ -11,7 +11,6 @@ int parse_int(char **file) {
 	return toReturn;
 }
 
-// NEEDS TO BE 0xEE8C
 unsigned short int parse_word(char **file) {
 	unsigned short int toReturn = ((*file)[0] & 0xff) * 0x0100 + ((*file)[1] & 0xff);
 	*file += 2;
