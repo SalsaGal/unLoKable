@@ -21,3 +21,7 @@ out/sequence/%.o: sequence/src/%.c
 
 out/lib/%.o: lib/%.c
 	$(CC) -o $@ $< -c $(CC_FLAGS)
+
+clean:
+	rm out/**/*.o
+	rm out/bin/*
