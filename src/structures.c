@@ -60,7 +60,7 @@ SndZone parse_zone(char **file) {
 	zone.volume = parse_byte(file);
 	zone.panPos = parse_byte(file);
 	zone.rootKey = parse_byte(file);
-	zone.pitchFinetuning = parse_byte(file);
+	zone.pitchFinetuning = (char) (((float) parse_byte(file)) / 127.0 * 99.0);
 	zone.noteLow = parse_byte(file);
 	zone.noteHigh = parse_byte(file);
 	zone.mode = parse_byte(file);
