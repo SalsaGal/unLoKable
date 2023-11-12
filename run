@@ -4,6 +4,4 @@ out/bin/sound tests/ucma.snd tests/ucma.smp
 out/bin/sequence tests/ucma/ucma_0003.msq
 
 [clean]
-rm -rf tests/ucma
-rm -rf out/**/*.o
-rm -rf out/bin/*
+rm -rf tests/ucma out/**/*.o out/bin/*
