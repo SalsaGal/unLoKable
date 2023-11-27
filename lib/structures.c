@@ -164,3 +164,15 @@ MsqHeader parse_msq_header(char **file) {
   to_return.padding = parse_word_be(file);
   return to_return;
 }
+
+CdsHeader parse_cds_header(char **file) {
+  CdsHeader to_return;
+  to_return.magic = parse_int_le(file);
+  to_return.version = parse_int_le(file);
+  to_return.ppqn = parse_word_le(file);
+	to_return.quarterNoteTime[0] = parse_byte(file);
+	to_return.quarterNoteTime[1] = parse_byte(file);
+	to_return.quarterNoteTime[2] = parse_byte(file);
+  to_return.timeSignature = parse_word_le(file);
+  return to_return;
+}

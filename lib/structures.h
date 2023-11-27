@@ -85,3 +85,13 @@ typedef struct {
 } MsqHeader;
 
 MsqHeader parse_msq_header(char **file);
+
+typedef struct {
+  int magic;
+  int version;
+  unsigned short int ppqn;
+  char quarterNoteTime[3];
+  unsigned short int timeSignature;
+} CdsHeader;
+
+CdsHeader parse_cds_header(char **file);
