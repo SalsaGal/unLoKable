@@ -6,8 +6,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "strings.h"
-#include "structures.h"
+#include "../../lib/strings.h"
+#include "../../lib/structures.h"
 
 #define BUFFER_SIZE 1024 * 1024
 #define HELP_MESSAGE \
