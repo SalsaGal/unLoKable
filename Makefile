@@ -1,5 +1,5 @@
 CC = gcc
-CC_FLAGS = -Wall -Wextra -Ilib
+CC_FLAGS = -Wall -Wextra -Ilib -g
 
 CDS2SEQ_OBJS = $(addprefix out/cds2seq/,main.o)
 LIB_OBJS = $(addprefix out/lib/,structures.o misc.o)

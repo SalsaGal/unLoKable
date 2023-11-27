@@ -1,5 +1,5 @@
 #include <assert.h>
-#include <bits/getopt_core.h>
+#include <bits/getopt_core.h> // TODO Make it work on Windows
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
