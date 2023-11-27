@@ -28,12 +28,12 @@ int main(int argc, char *argv[]) {
 
   Slice *track_slices = calloc(header.numTracks, sizeof(Slice));
   for (int i = 0; i < header.numTracks; i++) {
-  track_slices[i].start = file_start + track_offsets[i];
-  if (i == header.numTracks - 1) {
-  track_slices[i].length = file_length - track_offsets[i];
-  } else {
-  track_slices[i].length = track_offsets[i + 1] - track_offsets[i];
-  }
+    track_slices[i].start = file_start + track_offsets[i];
+    if (i == header.numTracks - 1) {
+      track_slices[i].length = file_length - track_offsets[i];
+    } else {
+      track_slices[i].length = track_offsets[i + 1] - track_offsets[i];
+    }
   }
 
   printf("msqID: %d\n", header.msqID);
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
   printf("numTracks: %d\n", header.numTracks);
   printf("padding: %d\n", header.padding);
   for (int i = 0; i < header.numTracks; i++) {
-  printf("Track #%d: %x, %x\n", i, track_offsets[i], track_slices[i].length);
+    printf("Track #%d: %x, %x\n", i, track_offsets[i], track_slices[i].length);
   }
 
   return 0;
