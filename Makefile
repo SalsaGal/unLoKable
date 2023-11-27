@@ -1,7 +1,7 @@
 CC = gcc
 CC_FLAGS = -Wall -Wextra -Ilib
 
-LIB_OBJS = $(addprefix out/lib/,structures.o)
+LIB_OBJS = $(addprefix out/lib/,structures.o misc.o)
 SOUND_OBJS = $(addprefix out/sound/,main.o)
 SEQUENCE_OBJS = $(addprefix out/sequence/,main.o)
 
