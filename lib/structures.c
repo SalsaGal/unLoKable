@@ -2,6 +2,35 @@
 #include "strings.h"
 #include <stdio.h>
 
+Slice slice_new(char *data, int length) {
+  Slice slice;
+  slice.start = data;
+  slice.length = length;
+  return slice;
+}
+
+Vec vec_new(int capacity) {
+  Vec vec;
+  vec.start = (char *) calloc(capacity, sizeof(char));
+  vec.length = 0;
+  vec.capacity = capacity;
+  return vec;
+}
+
+void vec_push(Vec *vec, char data) {
+  if (vec->length >= vec->capacity) {
+    Vec new_vec = vec_new(vec->capacity * 2);
+    // TODO Delete array, memory leak.... whoooops
+    for (int i = 0; i < vec->length; i++) {
+      new_vec.start[i] = vec->start[i];
+			new_vec.length++;
+    }
+    *vec = new_vec;
+  }
+  vec->start[vec->length] = data;
+  vec->length++;
+}
+
 int parse_int_le(char **file) {
 	int toReturn = ((*file)[3] & 0xff) * 0x00000001
 		+ ((*file)[2] & 0xff) * 0x00000100

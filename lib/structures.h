@@ -2,6 +2,23 @@
 
 #include <stdlib.h>
 
+typedef struct {
+  char *start;
+  int length;
+} Slice;
+
+// TODO Use this more
+Slice slice_new(char *data, int length);
+
+typedef struct {
+  char *start;
+  int length;
+  int capacity;
+} Vec;
+
+Vec vec_new(int capacity);
+void vec_push(Vec *vec, char data);
+
 int parse_int_le(char **file);
 int parse_int_be(char **file);
 unsigned short int parse_word_le(char **file);
@@ -49,11 +66,6 @@ typedef struct {
 } SndZone;
 
 SndZone parse_zone(char **file);
-
-typedef struct {
-  char *start;
-  int length;
-} Slice;
 
 typedef struct {
   SndHeader header;
