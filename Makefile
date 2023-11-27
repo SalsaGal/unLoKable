@@ -25,3 +25,6 @@ out/lib/%.o: lib/%.c
 clean:
 	rm out/**/*.o
 	rm out/bin/*
+
+setup:
+	mkdir out out/bin out/sound out/sequence out/lib
