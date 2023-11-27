@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
 
     FILE *output = fopen(output_path, "wb");
     int sample_length = smp.waves[i].length;
-    char header[48] = {
+    char header[] = {
       0x56, 0x41, 0x47, 0x70,     // Magic number
       0, 0, 0, 3,                 // Version number
       0, 0, 0, 0,               // Padding
