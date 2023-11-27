@@ -8,10 +8,11 @@ Slice load_buffer(char *path) {
   Slice to_return;
 
   FILE *file = fopen(path, "rb");
-  // if (file == NULL) return NULL;
+  if (file == NULL) return slice_new(NULL, 0);
   to_return.start = malloc(BUFFER_SIZE);
   to_return.length = fread(to_return.start, sizeof(char), BUFFER_SIZE, file);
 
+  fclose(file);
   if (to_return.length == BUFFER_SIZE) {
     printf(WARNING_BUFFER_FULL);
   }
@@ -20,22 +21,21 @@ Slice load_buffer(char *path) {
 }
 
 char *remove_path(char *path) {
-  char *to_return = malloc(strlen(path));
-  strcpy(to_return, path);
-  char *end_of_to_return = to_return + strlen(path);
+  char *to_return = path + strlen(path);
 
-  while (end_of_to_return >= to_return) {
-    if (*end_of_to_return == '/' || *end_of_to_return == '\\') {
-      return end_of_to_return + 1;
+  while (to_return >= path) {
+    if (*to_return == '/' || *to_return == '\\') {
+      return to_return + 1;
     }
-    end_of_to_return--;
+    to_return--;
   }
 
-  return path;
+  return to_return;
 }
 
 char *remove_extension(char *path) {
   char *to_return = malloc(strlen(path));
+  if (to_return == NULL) return NULL;
   strcpy(to_return, path);
   char *end_of_to_return = to_return + strlen(path);
 
