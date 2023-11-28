@@ -16,7 +16,8 @@ int main(int argc, char *argv[]) {
   FILE *file = fopen(argv[1], "rb");
   unsigned char *file_buffer = malloc(BUFFER_SIZE);
   unsigned char *file_start = file_buffer;
-  int file_length = fread(file_buffer, sizeof(unsigned char), BUFFER_SIZE, file);
+  int file_length =
+      fread(file_buffer, sizeof(unsigned char), BUFFER_SIZE, file);
 
   MsqHeader header = parse_msq_header(&file_buffer);
   if (header.msqID != 0x614d5351 && header.msqID != 0x61534551) {
@@ -71,14 +72,21 @@ int main(int argc, char *argv[]) {
     }
     Slice *track = &track_slices[i];
     unsigned char header_bytes[] = {
-      0x70, 0x53, 0x44, 0x43,
-      0x0, 0x0, 0x0, 0x1,
-      (header.ppqn & 0xff00) >> 8,
-      header.ppqn & 0xff,
-      (header.quarterNoteTime & 0x00ff0000) >> 16,
-      (header.quarterNoteTime & 0x0000ff00) >> 8,
-      (header.quarterNoteTime & 0x000000ff),
-      0x4, 0x2,
+        0x70,
+        0x53,
+        0x44,
+        0x43,
+        0x0,
+        0x0,
+        0x0,
+        0x1,
+        (header.ppqn & 0xff00) >> 8,
+        header.ppqn & 0xff,
+        (header.quarterNoteTime & 0x00ff0000) >> 16,
+        (header.quarterNoteTime & 0x0000ff00) >> 8,
+        (header.quarterNoteTime & 0x000000ff),
+        0x4,
+        0x2,
     };
     for (int j = 0; j < 15; j++) {
       fprintf(output, "%c", header_bytes[j]);

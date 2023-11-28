@@ -1,10 +1,10 @@
-#include <stdbool.h>
-#include <stdio.h>
 #include "../../lib/misc.h"
 #include "../../lib/structures.h"
+#include <stdbool.h>
+#include <stdio.h>
 
 bool reached_terminator(unsigned char *index) {
-  return (index[0] == 0xff);// && (index[1] == 0x44) && (index[2] == 0x00);
+  return (index[0] == 0xff); // && (index[1] == 0x44) && (index[2] == 0x00);
 }
 
 int main(int argc, char *argv[]) {
@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
   printf("%x\n", header.timeSignature);
 
   while (!reached_terminator(cds_index)) {
-    printf("%x\n", ((int) *cds_index) % 0xff);
+    printf("%x\n", ((int)*cds_index) % 0xff);
     cds_index++;
   }
 

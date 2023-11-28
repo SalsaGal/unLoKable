@@ -8,7 +8,8 @@ Slice load_buffer(char *path) {
   Slice to_return;
 
   FILE *file = fopen(path, "rb");
-  if (file == NULL) return slice_new(NULL, 0);
+  if (file == NULL)
+    return slice_new(NULL, 0);
   to_return.start = malloc(BUFFER_SIZE);
   to_return.length = fread(to_return.start, sizeof(char), BUFFER_SIZE, file);
 
@@ -35,7 +36,8 @@ char *remove_path(char *path) {
 
 char *remove_extension(char *path) {
   char *to_return = malloc(strlen(path));
-  if (to_return == NULL) return NULL;
+  if (to_return == NULL)
+    return NULL;
   strcpy(to_return, path);
   char *end_of_to_return = to_return + strlen(path);
 
@@ -54,9 +56,9 @@ void make_directory(char *path) {
 #if defined(_WIN32)
   _mkdir(path);
 #elif defined(__linux__)
-  #include <sys/stat.h>
-  #include <sys/types.h>
-  
+#include <sys/stat.h>
+#include <sys/types.h>
+
   struct stat st = {0};
   if (stat(path, &st) == -1) {
     mkdir(path, 0777);

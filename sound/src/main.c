@@ -10,13 +10,12 @@
 #include "../../lib/strings.h"
 #include "../../lib/structures.h"
 
-#define HELP_MESSAGE \
-  "Usage: able [OPTIONS] [SND FILE] [SMP FILE]\n" \
-  "Rips audio from the Legacy of Kain\n" \
-  "  -h  Displays this help message\n" \
-  "  -o  Specifies the path for the output directory, eg `-o song`\n"\
+#define HELP_MESSAGE                                                           \
+  "Usage: able [OPTIONS] [SND FILE] [SMP FILE]\n"                              \
+  "Rips audio from the Legacy of Kain\n"                                       \
+  "  -h  Displays this help message\n"                                         \
+  "  -o  Specifies the path for the output directory, eg `-o song`\n"          \
   "  -v  Displays extra information about files being loaded\n"
-
 
 int main(int argc, char *argv[]) {
   bool verbose = false;
@@ -24,17 +23,17 @@ int main(int argc, char *argv[]) {
   int opt;
   while ((opt = getopt(argc, argv, "hvo:")) != -1) {
     switch (opt) {
-      case 'h':
-        printf(HELP_MESSAGE);
-        return 0;
+    case 'h':
+      printf(HELP_MESSAGE);
+      return 0;
 
-      case 'v':
-        verbose = true;
-        break;
+    case 'v':
+      verbose = true;
+      break;
 
-      case 'o':
-        output_dir = optarg;
-        break;
+    case 'o':
+      output_dir = optarg;
+      break;
     }
   }
 
@@ -115,7 +114,9 @@ int main(int argc, char *argv[]) {
 
     printf("\n");
     for (int i = 0; i < snd.header.numSequences; i++) {
-      printf("Sequence %d: starts at %lu, length is %d\n", i, snd.sequenceSlices[i].start - snd_buffer_start, snd.sequenceSlices[i].length);
+      printf("Sequence %d: starts at %lu, length is %d\n", i,
+             snd.sequenceSlices[i].start - snd_buffer_start,
+             snd.sequenceSlices[i].length);
     }
   }
 
@@ -133,7 +134,8 @@ int main(int argc, char *argv[]) {
       printf(ERROR_OOM);
       return EXIT_FAILURE;
     }
-    sprintf(output_path, "%s/%s_%04d.msq", snd_path_stripped, remove_path(snd_path_stripped), i);
+    sprintf(output_path, "%s/%s_%04d.msq", snd_path_stripped,
+            remove_path(snd_path_stripped), i);
 
     FILE *output = fopen(output_path, "wb");
     if (output == NULL) {
@@ -152,7 +154,8 @@ int main(int argc, char *argv[]) {
       printf(ERROR_OOM);
       return EXIT_FAILURE;
     }
-    sprintf(output_path, "%s/%s_%04d.vag", snd_path_stripped, remove_path(snd_path_stripped), i);
+    sprintf(output_path, "%s/%s_%04d.vag", snd_path_stripped,
+            remove_path(snd_path_stripped), i);
 
     FILE *output = fopen(output_path, "wb");
     if (output == NULL) {
@@ -162,21 +165,54 @@ int main(int argc, char *argv[]) {
     free(output_path);
     int sample_length = smp.waves[i].length;
     unsigned char header[] = {
-      0x56, 0x41, 0x47, 0x70,     // Magic number
-      0, 0, 0, 3,                 // Version number
-      0, 0, 0, 0,               // Padding
-      (sample_length & 0xff000000) >> 24,    // Size
-      (sample_length & 0xff0000) >> 16,
-      (sample_length & 0xff00) >> 8,
-      sample_length & 0xff,
-      0x00, 0x00, 0xAC, 0x44, // Sample rate
-      0, 0, 0, 0,             // Padding
-      0, 0, 0, 0,
-      0, 0, 0, 0,
-      0, 0, 0, 0,             // Name
-      0, 0, 0, 0,
-      0, 0, 0, 0,
-      0, 0, 0, 0,
+        0x56,
+        0x41,
+        0x47,
+        0x70, // Magic number
+        0,
+        0,
+        0,
+        3, // Version number
+        0,
+        0,
+        0,
+        0,                                  // Padding
+        (sample_length & 0xff000000) >> 24, // Size
+        (sample_length & 0xff0000) >> 16,
+        (sample_length & 0xff00) >> 8,
+        sample_length & 0xff,
+        0x00,
+        0x00,
+        0xAC,
+        0x44, // Sample rate
+        0,
+        0,
+        0,
+        0, // Padding
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0, // Name
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
     };
     for (int j = 0; j < 48; j++) {
       fprintf(output, "%c", header[j]);
@@ -192,7 +228,8 @@ int main(int argc, char *argv[]) {
     printf(ERROR_OOM);
     return EXIT_FAILURE;
   }
-  sprintf(vpr_output_path, "%s/%s.vpr", snd_path_stripped, remove_path(snd_path_stripped));
+  sprintf(vpr_output_path, "%s/%s.vpr", snd_path_stripped,
+          remove_path(snd_path_stripped));
   FILE *vpr_output = fopen(vpr_output_path, "wb");
   if (vpr_output == NULL) {
     printf(ERROR_INVALID_FILE_CREATE, vpr_output_path);
@@ -202,14 +239,22 @@ int main(int argc, char *argv[]) {
   for (int i = 0; i < snd.header.numPrograms; i++) {
     SndProgram *program = &snd.programs[i];
     unsigned char toWrite[] = {
-      (unsigned char) (program->numZones >> 8),
-      program->volume,
-      0,
-      0,
-      program->panPos,
-      0, 0, 0, 0,
-      0, 0, 0, 0,
-      0, 0, 0,
+        (unsigned char)(program->numZones >> 8),
+        program->volume,
+        0,
+        0,
+        program->panPos,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
     };
     for (int j = 0; j < 16; j++) {
       fprintf(vpr_output, "%c", toWrite[j]);
@@ -224,7 +269,8 @@ int main(int argc, char *argv[]) {
     printf(ERROR_OOM);
     return EXIT_FAILURE;
   }
-  sprintf(vzn_output_path, "%s/%s.vzn", snd_path_stripped, remove_path(snd_path_stripped));
+  sprintf(vzn_output_path, "%s/%s.vzn", snd_path_stripped,
+          remove_path(snd_path_stripped));
   FILE *vzn_output = fopen(vzn_output_path, "wb");
   if (vzn_output == NULL) {
     printf("Unable to open VZN file");
@@ -242,29 +288,38 @@ int main(int argc, char *argv[]) {
       current_parent_program_streak = 0;
     }
 
-    unsigned char toWrite[] = {
-      zone->priority,
-      zone->mode,
-      zone->volume,
-      zone->panPos,
-      zone->rootKey,
-      zone->pitchFinetuning,
-      zone->noteLow,
-      zone->noteHigh,
-      0, 0, 0, 0,
-      zone->maxPitchRange,
-      zone->maxPitchRange,
-      0, 0,
-      (unsigned char) ((zone->ADSR1 & 0xff00) >> 8),
-      (unsigned char) (zone->ADSR1 & 0xff),
-      (unsigned char) ((zone->ADSR2 & 0xff00) >> 8),
-      (unsigned char) (zone->ADSR2 & 0xff),
-      zone->parentProgram, 0,
-      (unsigned char) ((zone->waveIndex & 0xff00) >> 8),
-      (unsigned char) (zone->waveIndex & 0xff),
-      0, 0, 0, 0,
-      0, 0, 0, 0
-    };
+    unsigned char toWrite[] = {zone->priority,
+                               zone->mode,
+                               zone->volume,
+                               zone->panPos,
+                               zone->rootKey,
+                               zone->pitchFinetuning,
+                               zone->noteLow,
+                               zone->noteHigh,
+                               0,
+                               0,
+                               0,
+                               0,
+                               zone->maxPitchRange,
+                               zone->maxPitchRange,
+                               0,
+                               0,
+                               (unsigned char)((zone->ADSR1 & 0xff00) >> 8),
+                               (unsigned char)(zone->ADSR1 & 0xff),
+                               (unsigned char)((zone->ADSR2 & 0xff00) >> 8),
+                               (unsigned char)(zone->ADSR2 & 0xff),
+                               zone->parentProgram,
+                               0,
+                               (unsigned char)((zone->waveIndex & 0xff00) >> 8),
+                               (unsigned char)(zone->waveIndex & 0xff),
+                               0,
+                               0,
+                               0,
+                               0,
+                               0,
+                               0,
+                               0,
+                               0};
     for (int j = 0; j < 32; j++) {
       fprintf(vzn_output, "%c", toWrite[j]);
     }
@@ -273,6 +328,6 @@ int main(int argc, char *argv[]) {
   for (int i = 0; i < 32 * (16 - current_parent_program_streak); i++) {
     fprintf(vzn_output, "%c", 0);
   }
-  
+
   return EXIT_SUCCESS;
 }
