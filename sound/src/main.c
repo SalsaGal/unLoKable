@@ -129,18 +129,37 @@ int main(int argc, char *argv[]) {
 
   for (int i = 0; i < snd.header.numSequences; i++) {
     char *output_path = malloc(128); // TODO Make this better
+    if (output_path == NULL) {
+      printf(ERROR_OOM);
+      return EXIT_FAILURE;
+    }
     sprintf(output_path, "%s/%s_%04d.msq", snd_path_stripped, remove_path(snd_path_stripped), i);
 
     FILE *output = fopen(output_path, "wb");
+    if (output == NULL) {
+      printf(ERROR_INVALID_FILE_CREATE, output_path);
+      return EXIT_FAILURE;
+    }
+    free(output_path);
     for (int j = 0; j < snd.sequenceSlices[i].length; j++) {
       fprintf(output, "%c", snd.sequenceSlices[i].start[j]);
     }
+    fclose(output);
   }
   for (int i = 0; i < snd.header.numWaves; i++) {
     char *output_path = malloc(128); // TODO Make this better
+    if (output_path == NULL) {
+      printf(ERROR_OOM);
+      return EXIT_FAILURE;
+    }
     sprintf(output_path, "%s/%s_%04d.vag", snd_path_stripped, remove_path(snd_path_stripped), i);
 
     FILE *output = fopen(output_path, "wb");
+    if (output == NULL) {
+      printf(ERROR_INVALID_FILE_CREATE, output_path);
+      return EXIT_FAILURE;
+    };
+    free(output_path);
     int sample_length = smp.waves[i].length;
     unsigned char header[] = {
       0x56, 0x41, 0x47, 0x70,     // Magic number
@@ -165,11 +184,21 @@ int main(int argc, char *argv[]) {
     for (int j = 0; j < smp.waves[i].length; j++) {
       fprintf(output, "%c", smp.waves[i].start[j]);
     }
+    fclose(output);
   }
 
   char *vpr_output_path = malloc(128); // TODO Make this better
+  if (vpr_output_path == NULL) {
+    printf(ERROR_OOM);
+    return EXIT_FAILURE;
+  }
   sprintf(vpr_output_path, "%s/%s.vpr", snd_path_stripped, remove_path(snd_path_stripped));
   FILE *vpr_output = fopen(vpr_output_path, "wb");
+  if (vpr_output == NULL) {
+    printf(ERROR_INVALID_FILE_CREATE, vpr_output_path);
+    return EXIT_FAILURE;
+  }
+  free(vpr_output_path);
   for (int i = 0; i < snd.header.numPrograms; i++) {
     SndProgram *program = &snd.programs[i];
     unsigned char toWrite[] = {
@@ -191,8 +220,16 @@ int main(int argc, char *argv[]) {
   }
 
   char *vzn_output_path = malloc(128); // TODO Make this better
+  if (vzn_output_path == NULL) {
+    printf(ERROR_OOM);
+    return EXIT_FAILURE;
+  }
   sprintf(vzn_output_path, "%s/%s.vzn", snd_path_stripped, remove_path(snd_path_stripped));
   FILE *vzn_output = fopen(vzn_output_path, "wb");
+  if (vzn_output == NULL) {
+    printf("Unable to open VZN file");
+    return EXIT_FAILURE;
+  };
   int current_parent_program = 0;
   int current_parent_program_streak = 0;
   for (int i = 0; i < snd.header.numZones; i++) {
@@ -237,5 +274,5 @@ int main(int argc, char *argv[]) {
     fprintf(vzn_output, "%c", 0);
   }
   
-  return 0;
+  return EXIT_SUCCESS;
 }

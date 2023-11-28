@@ -1,6 +1,7 @@
 #include "structures.h"
 #include "strings.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 Slice slice_new(unsigned char *data, int length) {
   Slice slice;
@@ -121,32 +122,56 @@ SndFile parse_snd_file(unsigned char **file, int file_length) {
   toReturn.header = parse_snd_header(file);
 
   toReturn.programs = (SndProgram *) calloc(toReturn.header.numPrograms, sizeof(SndProgram));
+	if (toReturn.programs == NULL) {
+		printf(ERROR_OOM);
+		exit(EXIT_FAILURE);
+	}
   for (int i = 0; i < toReturn.header.numPrograms; i++) {
     toReturn.programs[i] = parse_program(file);
   }
 
   toReturn.zones = (SndZone *) calloc(toReturn.header.numZones, sizeof(SndZone));
+	if (toReturn.zones == NULL) {
+		printf(ERROR_OOM);
+		exit(EXIT_FAILURE);
+	}
   for (int i = 0; i < toReturn.header.numZones; i++) {
     toReturn.zones[i] = parse_zone(file);
   }
 
   toReturn.waveOffsets = (int *) calloc(toReturn.header.numWaves, sizeof(int));
+	if (toReturn.waveOffsets == NULL) {
+		printf(ERROR_OOM);
+		exit(EXIT_FAILURE);
+	}
   for (int i = 0; i < toReturn.header.numWaves; i++) {
     toReturn.waveOffsets[i] = parse_int_be(file);
   }
 
   toReturn.sequenceOffsets = (int *) calloc(toReturn.header.numSequences, sizeof(int));
+	if (toReturn.sequenceOffsets == NULL) {
+		printf(ERROR_OOM);
+		exit(EXIT_FAILURE);
+	}
   for (int i = 0; i < toReturn.header.numSequences; i++) {
     toReturn.sequenceOffsets[i] = parse_int_be(file);
   }
 
   toReturn.labels = (int *) calloc(toReturn.header.numLabels, sizeof(int));
+	if (toReturn.labels == NULL) {
+		printf(ERROR_OOM);
+		exit(EXIT_FAILURE);
+	}
   for (int i = 0; i < toReturn.header.numLabels; i++) {
     toReturn.labels[i] = parse_int_be(file);
   }
 
 	int sequenceDataSize = end_of_file - *file;
   toReturn.sequenceSlices = (Slice *) calloc(toReturn.header.numSequences, sizeof(Slice));
+	if (toReturn.sequenceSlices == NULL) {
+		printf(ERROR_OOM);
+		exit(EXIT_FAILURE);
+	}
   for (int i = 0; i < toReturn.header.numSequences; i++) {
 		toReturn.sequenceSlices[i].start = *file + toReturn.sequenceOffsets[i];
 		if (i == toReturn.header.numSequences - 1) {
@@ -171,6 +196,10 @@ SmpFile parse_smp_file(unsigned char **file, SndFile *snd, int length) {
 
 	int waveDataSize = end_of_file - *file;
 	toReturn.waves = (Slice *) calloc(snd->header.numWaves, sizeof(Slice));
+	if (toReturn.waves == NULL) {
+		printf(ERROR_OOM);
+		exit(EXIT_FAILURE);
+	}
 	for (int i = 0; i < snd->header.numWaves; i++) {
 		toReturn.waves[i].start = *file + snd->waveOffsets[i];
 		if (i == snd->header.numWaves - 1) {
