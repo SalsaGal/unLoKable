@@ -1,4 +1,5 @@
 #include "../../lib/misc.h"
+#include "../../lib/strings.h"
 #include "../../lib/structures.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,11 +25,19 @@ int main(int argc, char *argv[]) {
   }
 
   int *track_offsets = calloc(header.numTracks, sizeof(int));
+  if (track_offsets == NULL) {
+    printf(ERROR_OOM);
+    return EXIT_FAILURE;
+  }
   for (int i = 0; i < header.numTracks; i++) {
     track_offsets[i] = parse_int_be(&file_buffer);
   }
 
   Slice *track_slices = calloc(header.numTracks, sizeof(Slice));
+  if (track_slices == NULL) {
+    printf(ERROR_OOM);
+    return EXIT_FAILURE;
+  }
   for (int i = 0; i < header.numTracks; i++) {
     track_slices[i].start = file_start + track_offsets[i];
     if (i == header.numTracks - 1) {
@@ -50,8 +59,16 @@ int main(int argc, char *argv[]) {
 
   for (int i = 0; i < header.numTracks; i++) {
     char *output_path = malloc(128); // TODO Make this better
+    if (output_path == NULL) {
+      printf(ERROR_OOM);
+      return EXIT_FAILURE;
+    }
     sprintf(output_path, "%s/%s_%04d.cds", output_dir, remove_path(argv[1]), i);
     FILE *output = fopen(output_path, "wb");
+    if (output == NULL) {
+      printf(ERROR_INVALID_FILE_CREATE, output_path);
+      return EXIT_FAILURE;
+    }
     Slice *track = &track_slices[i];
     unsigned char header_bytes[] = {
       0x70, 0x53, 0x44, 0x43,
