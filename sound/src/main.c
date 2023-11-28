@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
   char *smp_path = argv[optind++];
 
   Slice snd_buffer = load_buffer(snd_path);
-  char *snd_buffer_start = snd_buffer.start;
+  unsigned char *snd_buffer_start = snd_buffer.start;
   Slice smp_buffer = load_buffer(smp_path);
 
   if (snd_buffer.start == NULL) {
@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
 
     FILE *output = fopen(output_path, "wb");
     int sample_length = smp.waves[i].length;
-    char header[] = {
+    unsigned char header[] = {
       0x56, 0x41, 0x47, 0x70,     // Magic number
       0, 0, 0, 3,                 // Version number
       0, 0, 0, 0,               // Padding
@@ -172,8 +172,8 @@ int main(int argc, char *argv[]) {
   FILE *vpr_output = fopen(vpr_output_path, "wb");
   for (int i = 0; i < snd.header.numPrograms; i++) {
     SndProgram *program = &snd.programs[i];
-    char toWrite[] = {
-      (char) (program->numZones >> 8),
+    unsigned char toWrite[] = {
+      (unsigned char) (program->numZones >> 8),
       program->volume,
       0,
       0,
@@ -205,7 +205,7 @@ int main(int argc, char *argv[]) {
       current_parent_program_streak = 0;
     }
 
-    char toWrite[] = {
+    unsigned char toWrite[] = {
       zone->priority,
       zone->mode,
       zone->volume,
@@ -218,13 +218,13 @@ int main(int argc, char *argv[]) {
       zone->maxPitchRange,
       zone->maxPitchRange,
       0, 0,
-      (char) ((zone->ADSR1 & 0xff00) >> 8),
-      (char) (zone->ADSR1 & 0xff),
-      (char) ((zone->ADSR2 & 0xff00) >> 8),
-      (char) (zone->ADSR2 & 0xff),
+      (unsigned char) ((zone->ADSR1 & 0xff00) >> 8),
+      (unsigned char) (zone->ADSR1 & 0xff),
+      (unsigned char) ((zone->ADSR2 & 0xff00) >> 8),
+      (unsigned char) (zone->ADSR2 & 0xff),
       zone->parentProgram, 0,
-      (char) ((zone->waveIndex & 0xff00) >> 8),
-      (char) (zone->waveIndex & 0xff),
+      (unsigned char) ((zone->waveIndex & 0xff00) >> 8),
+      (unsigned char) (zone->waveIndex & 0xff),
       0, 0, 0, 0,
       0, 0, 0, 0
     };

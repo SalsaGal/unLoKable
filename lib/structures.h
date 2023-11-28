@@ -3,27 +3,27 @@
 #include <stdlib.h>
 
 typedef struct {
-  char *start;
+  unsigned char *start;
   int length;
 } Slice;
 
 // TODO Use this more
-Slice slice_new(char *data, int length);
+Slice slice_new(unsigned char *data, int length);
 
 typedef struct {
-  char *start;
+  unsigned char *start;
   int length;
   int capacity;
 } Vec;
 
 Vec vec_new(int capacity);
-void vec_push(Vec *vec, char data);
+void vec_push(Vec *vec, unsigned char data);
 
-int parse_int_le(char **file);
-int parse_int_be(char **file);
-unsigned short int parse_word_le(char **file);
-unsigned short int parse_word_be(char **file);
-unsigned char parse_byte(char **file);
+int parse_int_le(unsigned char **file);
+int parse_int_be(unsigned char **file);
+unsigned short int parse_word_le(unsigned char **file);
+unsigned short int parse_word_be(unsigned char **file);
+unsigned char parse_byte(unsigned char **file);
 
 typedef struct {
   int magicNumber;
@@ -38,7 +38,7 @@ typedef struct {
   int reverbDepth;
 } SndHeader;
 
-SndHeader parse_snd_header(char **file);
+SndHeader parse_snd_header(unsigned char **file);
 
 typedef struct {
   unsigned short int numZones;
@@ -47,7 +47,7 @@ typedef struct {
   unsigned char panPos;
 } SndProgram;
 
-SndProgram parse_program(char **file);
+SndProgram parse_program(unsigned char **file);
 
 typedef struct {
   unsigned char priority;
@@ -65,7 +65,7 @@ typedef struct {
   unsigned short int waveIndex;
 } SndZone;
 
-SndZone parse_zone(char **file);
+SndZone parse_zone(unsigned char **file);
 
 typedef struct {
   SndHeader header;
@@ -77,15 +77,15 @@ typedef struct {
   Slice *sequenceSlices;
 } SndFile;
 
-SndFile parse_snd_file(char **file, int length);
+SndFile parse_snd_file(unsigned char **file, int length);
 
 typedef struct {
-  char magicNumber[4]; // PMSa
+  unsigned char magicNumber[4]; // PMSa
   int bodySize;
   Slice *waves;
 } SmpFile;
 
-SmpFile parse_smp_file(char **file, SndFile *snd, int length);
+SmpFile parse_smp_file(unsigned char **file, SndFile *snd, int length);
 
 typedef struct {
   int msqID;
@@ -96,14 +96,14 @@ typedef struct {
   unsigned short int padding;
 } MsqHeader;
 
-MsqHeader parse_msq_header(char **file);
+MsqHeader parse_msq_header(unsigned char **file);
 
 typedef struct {
   int magic;
   int version;
   unsigned short int ppqn;
-  char quarterNoteTime[3];
+  unsigned char quarterNoteTime[3];
   unsigned short int timeSignature;
 } CdsHeader;
 
-CdsHeader parse_cds_header(char **file);
+CdsHeader parse_cds_header(unsigned char **file);

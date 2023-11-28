@@ -13,9 +13,9 @@ int main(int argc, char *argv[]) {
 
   char *output_dir = argv[2];
   FILE *file = fopen(argv[1], "rb");
-  char *file_buffer = malloc(BUFFER_SIZE);
-  char *file_start = file_buffer;
-  int file_length = fread(file_buffer, sizeof(char), BUFFER_SIZE, file);
+  unsigned char *file_buffer = malloc(BUFFER_SIZE);
+  unsigned char *file_start = file_buffer;
+  int file_length = fread(file_buffer, sizeof(unsigned char), BUFFER_SIZE, file);
 
   MsqHeader header = parse_msq_header(&file_buffer);
   if (header.msqID != 0x614d5351 && header.msqID != 0x61534551) {
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
     sprintf(output_path, "%s/%s_%04d.cds", output_dir, remove_path(argv[1]), i);
     FILE *output = fopen(output_path, "wb");
     Slice *track = &track_slices[i];
-    char header_bytes[] = {
+    unsigned char header_bytes[] = {
       0x70, 0x53, 0x44, 0x43,
       0x0, 0x0, 0x0, 0x1,
       (header.ppqn & 0xff00) >> 8,

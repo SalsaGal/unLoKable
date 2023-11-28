@@ -3,7 +3,7 @@
 #include "../../lib/misc.h"
 #include "../../lib/structures.h"
 
-bool reached_terminator(char *index) {
+bool reached_terminator(unsigned char *index) {
   return (index[0] == 0xff);// && (index[1] == 0x44) && (index[2] == 0x00);
 }
 
@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
   }
 
   Slice cds_buffer = load_buffer(argv[1]);
-  char *cds_index = cds_buffer.start;
+  unsigned char *cds_index = cds_buffer.start;
   CdsHeader header = parse_cds_header(&cds_index);
 
   printf("%x\n", header.magic);

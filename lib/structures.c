@@ -2,7 +2,7 @@
 #include "strings.h"
 #include <stdio.h>
 
-Slice slice_new(char *data, int length) {
+Slice slice_new(unsigned char *data, int length) {
   Slice slice;
   slice.start = data;
   slice.length = length;
@@ -11,13 +11,13 @@ Slice slice_new(char *data, int length) {
 
 Vec vec_new(int capacity) {
   Vec vec;
-  vec.start = (char *) calloc(capacity, sizeof(char));
+  vec.start = (unsigned char *) calloc(capacity, sizeof(char));
   vec.length = 0;
   vec.capacity = capacity;
   return vec;
 }
 
-void vec_push(Vec *vec, char data) {
+void vec_push(Vec *vec, unsigned char data) {
   if (vec->length >= vec->capacity) {
     Vec new_vec = vec_new(vec->capacity * 2);
     // TODO Delete array, memory leak.... whoooops
@@ -31,7 +31,7 @@ void vec_push(Vec *vec, char data) {
   vec->length++;
 }
 
-int parse_int_le(char **file) {
+int parse_int_le(unsigned char **file) {
 	int toReturn = ((*file)[3] & 0xff) * 0x00000001
 		+ ((*file)[2] & 0xff) * 0x00000100
 		+ ((*file)[1] & 0xff) * 0x00010000
@@ -40,7 +40,7 @@ int parse_int_le(char **file) {
 	return toReturn;
 }
 
-int parse_int_be(char **file) {
+int parse_int_be(unsigned char **file) {
 	int toReturn = ((*file)[0] & 0xff) * 0x00000001
 		+ ((*file)[1] & 0xff) * 0x00000100
 		+ ((*file)[2] & 0xff) * 0x00010000
@@ -49,25 +49,25 @@ int parse_int_be(char **file) {
 	return toReturn;
 }
 
-unsigned short int parse_word_le(char **file) {
+unsigned short int parse_word_le(unsigned char **file) {
 	unsigned short int toReturn = ((*file)[0] & 0xff) * 0x0100 + ((*file)[1] & 0xff);
 	*file += 2;
 	return toReturn;
 }
 
-unsigned short int parse_word_be(char **file) {
+unsigned short int parse_word_be(unsigned char **file) {
 	unsigned short int toReturn = ((*file)[1] & 0xff) * 0x0100 + ((*file)[0] & 0xff);
 	*file += 2;
 	return toReturn;
 }
 
-unsigned char parse_byte(char **file) {
+unsigned char parse_byte(unsigned char **file) {
 	unsigned char toReturn = (*file)[0] & 0xff;
 	*file += 1;
 	return toReturn;
 }
 
-SndHeader parse_snd_header(char **file) {
+SndHeader parse_snd_header(unsigned char **file) {
 	SndHeader header;
 	header.magicNumber = parse_int_be(file);
 	if (header.magicNumber != 0x61534e44) {
@@ -86,7 +86,7 @@ SndHeader parse_snd_header(char **file) {
 	return header;
 }
 
-SndProgram parse_program(char **file) {
+SndProgram parse_program(unsigned char **file) {
 	SndProgram program;
 	program.numZones = parse_word_le(file);
 	program.firstTone = parse_word_le(file);
@@ -96,7 +96,7 @@ SndProgram parse_program(char **file) {
 	return program;
 }
 
-SndZone parse_zone(char **file) {
+SndZone parse_zone(unsigned char **file) {
 	SndZone zone;
 	zone.priority = parse_byte(file);
 	zone.parentProgram = parse_byte(file);
@@ -114,8 +114,8 @@ SndZone parse_zone(char **file) {
 	return zone;
 }
 
-SndFile parse_snd_file(char **file, int file_length) {
-	char *end_of_file = *file + file_length;
+SndFile parse_snd_file(unsigned char **file, int file_length) {
+	unsigned char *end_of_file = *file + file_length;
 	
   SndFile toReturn;
   toReturn.header = parse_snd_header(file);
@@ -159,8 +159,8 @@ SndFile parse_snd_file(char **file, int file_length) {
   return toReturn;
 }
 
-SmpFile parse_smp_file(char **file, SndFile *snd, int length) {
-	char *end_of_file = *file + length;
+SmpFile parse_smp_file(unsigned char **file, SndFile *snd, int length) {
+	unsigned char *end_of_file = *file + length;
 
 	SmpFile toReturn;
 	toReturn.magicNumber[0] = parse_byte(file);
@@ -183,7 +183,7 @@ SmpFile parse_smp_file(char **file, SndFile *snd, int length) {
 	return toReturn;
 }
 
-MsqHeader parse_msq_header(char **file) {
+MsqHeader parse_msq_header(unsigned char **file) {
   MsqHeader to_return;
   to_return.msqID = parse_int_be(file);
   to_return.quarterNoteTime = parse_int_be(file);
@@ -194,7 +194,7 @@ MsqHeader parse_msq_header(char **file) {
   return to_return;
 }
 
-CdsHeader parse_cds_header(char **file) {
+CdsHeader parse_cds_header(unsigned char **file) {
   CdsHeader to_return;
   to_return.magic = parse_int_le(file);
   to_return.version = parse_int_le(file);
