@@ -2,7 +2,7 @@
 make
 out/bin/sound tests/ucma.snd tests/ucma.smp
 out/bin/sequence tests/ucma/ucma_0003.msq tests/ucma
-out/bin/cds2seq tests/example.cds
+out/bin/cds2seq tests/all_cases.cds
 
 [clean]
 rm -rf tests/ucma
