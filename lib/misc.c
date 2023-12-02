@@ -67,3 +67,13 @@ void make_directory(char *path) {
   }
 #endif
 }
+
+void clean_path(char *path) {
+#if defined(_WIN32)
+  for (char *c = path; *c != NULL; c++) {
+    if (*c == '/') {
+      *c = '\\';
+    }
+  }
+#endif
+}

@@ -135,6 +135,7 @@ int main(int argc, char *argv[]) {
     }
     sprintf(output_path, "%s/%s_%04d.msq", snd_path_stripped,
             remove_path(snd_path_stripped), i);
+    clean_path(output_path);
 
     FILE *output = fopen(output_path, "wb");
     if (output == NULL) {
@@ -155,6 +156,7 @@ int main(int argc, char *argv[]) {
     }
     sprintf(output_path, "%s/%s_%04d.vag", snd_path_stripped,
             remove_path(snd_path_stripped), i);
+    clean_path(output_path);
 
     FILE *output = fopen(output_path, "wb");
     if (output == NULL) {
@@ -229,6 +231,7 @@ int main(int argc, char *argv[]) {
   }
   sprintf(vpr_output_path, "%s/%s.vpr", snd_path_stripped,
           remove_path(snd_path_stripped));
+  clean_path(vpr_output_path);
   FILE *vpr_output = fopen(vpr_output_path, "wb");
   if (vpr_output == NULL) {
     printf(ERROR_INVALID_FILE_CREATE, vpr_output_path);
@@ -270,6 +273,7 @@ int main(int argc, char *argv[]) {
   }
   sprintf(vzn_output_path, "%s/%s.vzn", snd_path_stripped,
           remove_path(snd_path_stripped));
+  clean_path(vzn_output_path);
   FILE *vzn_output = fopen(vzn_output_path, "wb");
   if (vzn_output == NULL) {
     printf("Unable to open VZN file");

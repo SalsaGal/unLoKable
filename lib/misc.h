@@ -8,3 +8,4 @@ Slice load_buffer(char *path);
 char *remove_path(char *path);
 char *remove_extension(char *path);
 void make_directory(char *path);
+void clean_path(char *path);
