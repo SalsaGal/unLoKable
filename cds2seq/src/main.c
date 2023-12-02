@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
       copy_start = cds_index;
     } else if (reached_loop_terminator(cds_index)) {
       cds_index += 3;
-      if (loop_count == -1) {
+      if (loop_count <= 1) {
         copy_bytes(&output, cds_index - copy_start, copy_start);
       } else {
         for (int i = 0; i < loop_count; i++) {
