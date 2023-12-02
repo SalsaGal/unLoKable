@@ -24,7 +24,7 @@ Slice load_buffer(char *path) {
 char *remove_path(char *path) {
   char *to_return = path + strlen(path);
 
-  while (to_return >= path) {
+  while (to_return > path) {
     if (*to_return == '/' || *to_return == '\\') {
       return to_return + 1;
     }
