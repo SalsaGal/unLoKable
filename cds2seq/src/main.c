@@ -21,6 +21,10 @@ void copy_bytes(Vec *vec, int length, unsigned char data[]) {
   }
 }
 
+void write_byte(FILE *file, unsigned char byte) {
+  fprintf(file, "%c", byte);
+}
+
 int main(int argc, char *argv[]) {
   if (argc != 2) {
     printf("Missing argument for file!\n");
@@ -71,6 +75,17 @@ int main(int argc, char *argv[]) {
   }
 
   FILE *out = fopen("test.bin", "wb");
+
+  // Write header
+  write_byte(out, 0x70);
+  write_byte(out, 0x51);
+  write_byte(out, 0x45);
+  write_byte(out, 0x53);
+  for (unsigned char *i = cds_buffer.start + 4; i < cds_buffer.start + 15; i++) {
+    write_byte(out, *i);
+  }
+
+  // Write body
   for (int i = 0; i < output.length; i++) {
     fprintf(out, "%c", output.start[i]);
   }
