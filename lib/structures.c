@@ -2,6 +2,7 @@
 #include "strings.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 Slice slice_new(unsigned char *data, int length) {
   Slice slice;
@@ -21,11 +22,8 @@ Vec vec_new(int capacity) {
 void vec_push(Vec *vec, unsigned char data) {
   if (vec->length >= vec->capacity) {
     Vec new_vec = vec_new(vec->capacity * 2);
-    // TODO Delete array, memory leak.... whoooops
-    for (int i = 0; i < vec->length; i++) {
-      new_vec.start[i] = vec->start[i];
-      new_vec.length++;
-    }
+    memcpy(new_vec.start, vec->start, vec->length * sizeof(char));
+    new_vec.length = vec->length;
     *vec = new_vec;
   }
   vec->start[vec->length] = data;
