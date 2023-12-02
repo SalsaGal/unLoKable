@@ -1,4 +1,8 @@
+ifdef win
+CC = x86_64-w64-mingw32-gcc
+else
 CC = gcc
+endif
 CC_FLAGS = -Wall -Wextra -Ilib -g -fanalyzer
 
 CDS2SEQ_OBJS = $(addprefix out/cds2seq/,main.o)
