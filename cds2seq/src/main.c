@@ -25,6 +25,12 @@ void write_byte(FILE *file, unsigned char byte) {
   fprintf(file, "%c", byte);
 }
 
+void write_dummy(FILE *file) {
+  write_byte(file, 0xb0);
+  write_byte(file, 0x63);
+  write_byte(file, 0x1e);
+}
+
 int main(int argc, char *argv[]) {
   if (argc != 2) {
     printf("Missing argument for file!\n");
@@ -46,6 +52,7 @@ int main(int argc, char *argv[]) {
   Vec output = vec_new(64);
   unsigned char *copy_start = cds_index;
   short loop_count = -1;
+  int loop_terminator_count = 0;
   while (true) {
     if (reached_loop_count(cds_index)) {
       loop_count = (short) cds_index[3];
@@ -57,9 +64,11 @@ int main(int argc, char *argv[]) {
       cds_index += 3;
       if (loop_count <= 1) {
         copy_bytes(&output, cds_index - copy_start, copy_start);
+        loop_terminator_count++;
       } else {
         for (int i = 0; i < loop_count; i++) {
           copy_bytes(&output, cds_index - copy_start, copy_start);
+          loop_terminator_count++;
         }
       }
       printf("Copied 0x%lx to 0x%lx, loop count %d\n", copy_start - cds_buffer.start, cds_index - cds_buffer.start, loop_count);
@@ -86,8 +95,42 @@ int main(int argc, char *argv[]) {
   }
 
   // Write body
-  for (int i = 0; i < output.length; i++) {
-    fprintf(out, "%c", output.start[i]);
+  int current_loop_terminator = 0;
+  for (unsigned char *c = output.start; c < output.start + output.length; c++) {
+    if (c[0] == 0xff && (c[1] == 0x00 || c[1] == 0x2e || c[1] == 0x31 || c[1] == 0x32) && c[2] == 0x01) {
+      write_dummy(out);
+      c += 3;
+    } else if (c[0] == 0xff && (c[1] == 0x4c || c[1] == 0x4d) && c[2] == 0x02) {
+      write_dummy(out);
+      c += 4;
+    } else if (c[0] == 0xff && c[1] == 0x39 && c[2] == 0x03) {
+      write_dummy(out);
+      c += 5;
+    } else if (c[0] == 0xff && c[1] == 0x49 && c[2] == 0x00) {
+      write_dummy(out);
+      c += 2;
+    } else if (c[0] == 0xff && c[1] == 0x05 && c[2] == 0x03) {
+      write_byte(out, 0xff);
+      write_byte(out, 0x51);
+      c += 2;
+    } else if (c[0] == 0xff && c[1] == 0x2f && c[2] == 0x00 && loop_terminator_count >= 1) {
+      current_loop_terminator++;
+      if (current_loop_terminator == loop_terminator_count) {
+        write_byte(out, 0xff);
+        write_byte(out, 0x2f);
+        write_byte(out, 0x00);
+      } else {
+        write_dummy(out);
+      }
+      c += 2;
+    } else if (c[0] == 0xff && c[1] == 0x44 && c[2] == 0x00 && loop_terminator_count == 0) {
+      write_byte(out, 0xff);
+      write_byte(out, 0x2f);
+      write_byte(out, 0x00);
+      c += 2;
+    } else {
+      write_byte(out, *c);
+    }
   }
   fclose(out);
 
