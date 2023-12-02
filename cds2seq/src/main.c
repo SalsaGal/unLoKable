@@ -83,7 +83,9 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  FILE *out = fopen("test.bin", "wb");
+  char *output_path = malloc(128); // TODO Make this better
+  sprintf(output_path, "%s.seq", remove_extension(argv[1]));
+  FILE *out = fopen(output_path, "wb");
 
   // Write header
   write_byte(out, 0x70);
