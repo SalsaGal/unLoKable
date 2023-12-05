@@ -16,7 +16,6 @@
   "  -o  Specifies the path for the output directory, eg `-o song`\n"
 
 int main(int argc, char *argv[]) {
-  bool verbose = false;
   char *output_dir = NULL;
   int opt;
   while ((opt = getopt(argc, argv, "hvo:")) != -1) {
@@ -40,7 +39,6 @@ int main(int argc, char *argv[]) {
   char *smp_path = argv[optind++];
 
   Slice snd_buffer = load_buffer(snd_path);
-  unsigned char *snd_buffer_start = snd_buffer.start;
   Slice smp_buffer = load_buffer(smp_path);
 
   if (snd_buffer.start == NULL) {
@@ -62,9 +60,17 @@ int main(int argc, char *argv[]) {
   }
   make_directory(output_folder_path);
   char *samples_folder_path = malloc(128); // TODO fix this lemao
+  if (samples_folder_path == NULL) {
+    printf(ERROR_OOM);
+    return EXIT_FAILURE;
+  }
   sprintf(samples_folder_path, "%s/samples", output_folder_path);
   make_directory(samples_folder_path);
   char *sequences_folder_path = malloc(128); // TODO fix this lemao
+  if (sequences_folder_path == NULL) {
+    printf(ERROR_OOM);
+    return EXIT_FAILURE;
+  }
   sprintf(sequences_folder_path, "%s/sequences", output_folder_path);
   make_directory(sequences_folder_path);
 
@@ -259,6 +265,22 @@ int main(int argc, char *argv[]) {
   for (int i = 0; i < 32 * (16 - current_parent_program_streak); i++) {
     fprintf(vbi_output, "%c", 0);
   }
+
+  char *snd_info_output_path = malloc(128); // TODO Make this better
+  if (snd_info_output_path == NULL) {
+    printf(ERROR_OOM);
+    return EXIT_FAILURE;
+  }
+  sprintf(snd_info_output_path, "%s/%s_info.txt", output_folder_path,
+          remove_path(output_folder_path));
+  clean_path(snd_info_output_path);
+  FILE *snd_info_output = fopen(snd_info_output_path, "w");
+  if (snd_info_output == NULL) {
+    printf(ERROR_OOM);
+    return EXIT_FAILURE;
+  }
+  fprintf(snd_info_output, "Number of programs: %d\nNumber of zones: %d\n", snd.header.numPrograms, snd.header.numZones);
+  fclose(snd_info_output);
 
   return EXIT_SUCCESS;
 }
