@@ -6,13 +6,17 @@ endif
 CC_FLAGS = -Wall -Wextra -Ilib -g -fanalyzer
 
 CDS2SEQ_OBJS = $(addprefix out/cds2seq/,main.o)
+DEMUS_OBJS = $(addprefix out/demus/,main.o)
 LIB_OBJS = $(addprefix out/lib/,structures.o misc.o)
 SOUND_OBJS = $(addprefix out/sound/,main.o)
 SEQUENCE_OBJS = $(addprefix out/sequence/,main.o)
 
-full: out/bin/cds2seq out/bin/sequence out/bin/sound
+full: out/bin/cds2seq out/bin/demus out/bin/sequence out/bin/sound
 
 out/bin/cds2seq: $(LIB_OBJS) $(CDS2SEQ_OBJS)
+	$(CC) -o $@ $^ $(CC_FLAGS)
+
+out/bin/demus: $(LIB_OBJS) $(DEMUS_OBJS)
 	$(CC) -o $@ $^ $(CC_FLAGS)
 
 out/bin/sequence: $(LIB_OBJS) $(SEQUENCE_OBJS)
@@ -22,6 +26,9 @@ out/bin/sound: $(LIB_OBJS) $(SOUND_OBJS)
 	$(CC) -o $@ $^ $(CC_FLAGS)
 
 out/cds2seq/%.o: cds2seq/src/%.c
+	$(CC) -o $@ $< -c $(CC_FLAGS)
+
+out/demus/%.o: demus/src/%.c
 	$(CC) -o $@ $< -c $(CC_FLAGS)
 
 out/sound/%.o: sound/src/%.c
@@ -38,4 +45,4 @@ clean:
 	rm out/bin/*
 
 setup:
-	mkdir out out/bin out/cds2seq out/sound out/sequence out/lib
+	mkdir out out/bin out/cds2seq out/demus out/sound out/sequence out/lib
