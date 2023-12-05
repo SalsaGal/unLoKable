@@ -25,3 +25,19 @@ MsqTable parse_msq_table(unsigned char **file) {
   table.msqOffset = parse_int_be(file);
   return table;
 }
+
+WaveEntry parse_wave_entry(unsigned char **file) {
+  WaveEntry entry;
+  for (int i = 0; i < 20; i++) {
+    entry.name[i] = parse_byte(file);
+  }
+	entry.offset = parse_int_be(file);
+	entry.loopBegin = parse_int_be(file);
+	entry.size = parse_int_be(file);
+	entry.loopEnd = parse_int_be(file);
+	entry.sampleRate = parse_int_be(file);
+	entry.originalPitch = parse_int_be(file); /* to re-define and re-align */
+	entry.loopInfo = parse_int_be(file);
+	entry.sndHandle = parse_int_be(file);
+  return entry;
+}
