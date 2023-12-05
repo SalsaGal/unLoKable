@@ -58,6 +58,11 @@ int main(int argc, char *argv[]) {
 	printf("numWaves: %d\n", header.numWaves);
 	printf("numPrograms: %d\n", header.numPrograms);
 	printf("numPresets: %d\n", header.numPresets);
+  MsqTable *msq_tables = calloc(header.numSequences, sizeof(MsqTable));
+  for (int i = 0; i < header.numSequences; i++) {
+    msq_tables[i] = parse_msq_table(&mus_buffer_cursor);
+    printf("MSQ table #%d: %x, %x\n", i, msq_tables[i].msqIndex, msq_tables[i].msqOffset);
+  }
 
   return EXIT_SUCCESS;
 }

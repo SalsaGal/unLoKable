@@ -22,6 +22,8 @@ typedef struct {
 		int msqOffset;
 } MsqTable;
 
+MsqTable parse_msq_table(unsigned char **file);
+
 typedef struct {
 		char name[20];
 		int offset;

@@ -18,3 +18,10 @@ MusHeader parse_mus_header(unsigned char **file) {
 	to_return.numPresets = parse_int_be(file);
   return to_return;
 }
+
+MsqTable parse_msq_table(unsigned char **file) {
+  MsqTable table;
+  table.msqIndex = parse_int_be(file);
+  table.msqOffset = parse_int_be(file);
+  return table;
+}
