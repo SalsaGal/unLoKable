@@ -4,7 +4,7 @@
 
 MusHeader parse_mus_header(unsigned char **file) {
   MusHeader to_return;
-	to_return.ID = parse_int_be(file);
+	to_return.ID = parse_int_le(file);
 	to_return.headerSize = parse_int_be(file);
 	to_return.versionNumber = parse_int_be(file);
 	to_return.reverbVolume = parse_int_be(file);

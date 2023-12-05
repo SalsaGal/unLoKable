@@ -42,6 +42,10 @@ int main(int argc, char *argv[]) {
   unsigned char *mus_buffer_cursor = mus_buffer.start;
 
   MusHeader header = parse_mus_header(&mus_buffer_cursor);
+  if (header.ID != 0x4D757321) {
+    printf("Incorrect magic number!\n");
+    return EXIT_FAILURE;
+  }
 	printf("ID: %d\n", header.ID);
 	printf("headerSize: %d\n", header.headerSize);
 	printf("versionNumber: %d\n", header.versionNumber);
