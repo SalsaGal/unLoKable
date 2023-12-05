@@ -63,6 +63,11 @@ int main(int argc, char *argv[]) {
     msq_tables[i] = parse_msq_table(&mus_buffer_cursor);
     printf("MSQ table #%d: %x, %x\n", i, msq_tables[i].msqIndex, msq_tables[i].msqOffset);
   }
+  int *layers = calloc(header.numPresets + header.numPrograms, sizeof(int));
+  for (int i = 0; i < header.numPresets + header.numPrograms; i++) {
+    layers[i] = parse_int_be(&mus_buffer_cursor);
+    printf("Layer #%d: %x\n", i, layers[i]);
+  }
 
   return EXIT_SUCCESS;
 }
