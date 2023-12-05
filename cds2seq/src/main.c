@@ -118,6 +118,10 @@ int main(int argc, char *argv[]) {
       write_byte(out, 0xff);
       write_byte(out, 0x51);
       c += 2;
+    } else if (c[0] == 0xff && c[1] == 0xf0) {
+      unsigned char text_length = c[2];
+      write_dummy(out);
+      c += 2 + text_length;
     } else if (c[0] == 0xff && c[1] == 0x2f && c[2] == 0x00 && loop_terminator_count >= 1) {
       current_loop_terminator++;
       if (current_loop_terminator == loop_terminator_count) {
