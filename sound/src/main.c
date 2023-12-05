@@ -165,20 +165,20 @@ int main(int argc, char *argv[]) {
     fclose(output);
   }
 
-  char *vpr_output_path = malloc(128); // TODO Make this better
-  if (vpr_output_path == NULL) {
+  char *vbi_output_path = malloc(128); // TODO Make this better
+  if (vbi_output_path == NULL) {
     printf(ERROR_OOM);
     return EXIT_FAILURE;
   }
-  sprintf(vpr_output_path, "%s/%s.vpr", output_folder_path,
+  sprintf(vbi_output_path, "%s/%s.vbi", output_folder_path,
           remove_path(output_folder_path));
-  clean_path(vpr_output_path);
-  FILE *vpr_output = fopen(vpr_output_path, "wb");
-  if (vpr_output == NULL) {
-    printf(ERROR_INVALID_FILE_CREATE, vpr_output_path);
+  clean_path(vbi_output_path);
+  FILE *vbi_output = fopen(vbi_output_path, "wb");
+  if (vbi_output == NULL) {
+    printf(ERROR_INVALID_FILE_CREATE, vbi_output_path);
     return EXIT_FAILURE;
   }
-  free(vpr_output_path);
+  free(vbi_output_path);
   for (int i = 0; i < snd.header.numPrograms; i++) {
     SndProgram *program = &snd.programs[i];
     unsigned char toWrite[] = {
@@ -200,33 +200,20 @@ int main(int argc, char *argv[]) {
         0,
     };
     for (int j = 0; j < 16; j++) {
-      fprintf(vpr_output, "%c", toWrite[j]);
+      fprintf(vbi_output, "%c", toWrite[j]);
     }
   }
   for (int i = 0; i < 16 * (128 - snd.header.numPrograms); i++) {
-    fprintf(vpr_output, "%c", 0);
+    fprintf(vbi_output, "%c", 0);
   }
 
-  char *vzn_output_path = malloc(128); // TODO Make this better
-  if (vzn_output_path == NULL) {
-    printf(ERROR_OOM);
-    return EXIT_FAILURE;
-  }
-  sprintf(vzn_output_path, "%s/%s.vzn", output_folder_path,
-          remove_path(output_folder_path));
-  clean_path(vzn_output_path);
-  FILE *vzn_output = fopen(vzn_output_path, "wb");
-  if (vzn_output == NULL) {
-    printf("Unable to open VZN file");
-    return EXIT_FAILURE;
-  };
   int current_parent_program = 0;
   int current_parent_program_streak = 0;
   for (int i = 0; i < snd.header.numZones; i++) {
     SndZone *zone = &snd.zones[i];
     if (zone->parentProgram != current_parent_program) {
       for (int j = 0; j < 32 * (16 - current_parent_program_streak); j++) {
-        fprintf(vzn_output, "%c", 0);
+        fprintf(vbi_output, "%c", 0);
       }
       current_parent_program = zone->parentProgram;
       current_parent_program_streak = 0;
@@ -265,12 +252,12 @@ int main(int argc, char *argv[]) {
                                0,
                                0};
     for (int j = 0; j < 32; j++) {
-      fprintf(vzn_output, "%c", toWrite[j]);
+      fprintf(vbi_output, "%c", toWrite[j]);
     }
     current_parent_program_streak++;
   }
   for (int i = 0; i < 32 * (16 - current_parent_program_streak); i++) {
-    fprintf(vzn_output, "%c", 0);
+    fprintf(vbi_output, "%c", 0);
   }
 
   return EXIT_SUCCESS;
