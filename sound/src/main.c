@@ -13,8 +13,7 @@
   "Usage: able [OPTIONS] [SND FILE] [SMP FILE]\n"                              \
   "Rips audio from the Legacy of Kain\n"                                       \
   "  -h  Displays this help message\n"                                         \
-  "  -o  Specifies the path for the output directory, eg `-o song`\n"          \
-  "  -v  Displays extra information about files being loaded\n"
+  "  -o  Specifies the path for the output directory, eg `-o song`\n"
 
 int main(int argc, char *argv[]) {
   bool verbose = false;
@@ -25,10 +24,6 @@ int main(int argc, char *argv[]) {
     case 'h':
       printf(HELP_MESSAGE);
       return 0;
-
-    case 'v':
-      verbose = true;
-      break;
 
     case 'o':
       output_dir = optarg;
@@ -59,73 +54,19 @@ int main(int argc, char *argv[]) {
   SndFile snd = parse_snd_file(&snd_buffer.start, snd_buffer.length);
   SmpFile smp = parse_smp_file(&smp_buffer.start, &snd, smp_buffer.length);
 
-  if (verbose) {
-    printf("HEADER\n");
-    printf("headerSize: %d\n", snd.header.headerSize);
-    printf("bankVersion: %d\n", snd.header.bankVersion);
-    printf("numPrograms: %d\n", snd.header.numPrograms);
-    printf("numZones: %d\n", snd.header.numZones);
-    printf("numWaves: %d\n", snd.header.numWaves);
-    printf("numSequences: %d\n", snd.header.numSequences);
-    printf("numLabels: %d\n", snd.header.numLabels);
-    printf("reverbMode: %d\n", snd.header.reverbMode);
-    printf("reverbDepth: %d\n", snd.header.reverbDepth);
-
-    for (int i = 0; i < snd.header.numPrograms; i++) {
-      printf("\nPROGRAM %d\n", i);
-      printf("numZones: %d\n", snd.programs[i].numZones);
-      printf("firstTone: %d\n", snd.programs[i].firstTone);
-      printf("volume: %d\n", snd.programs[i].volume);
-      printf("panPos: %d\n", snd.programs[i].panPos);
-    }
-
-    for (int i = 0; i < snd.header.numZones; i++) {
-      printf("\nZONE %d\n", i);
-      printf("priority: %d\n", snd.zones[i].priority);
-      printf("parentProgram: %d\n", snd.zones[i].parentProgram);
-      printf("volume: %d\n", snd.zones[i].volume);
-      printf("panPos: %d\n", snd.zones[i].panPos);
-      printf("rootKey: %d\n", snd.zones[i].rootKey);
-      printf("pitchFinetuning: %d\n", snd.zones[i].pitchFinetuning);
-      printf("noteLow: %d\n", snd.zones[i].noteLow);
-      printf("noteHigh: %d\n", snd.zones[i].noteHigh);
-      printf("mode: %d\n", snd.zones[i].mode);
-      printf("maxPitchRange: %d\n", snd.zones[i].maxPitchRange);
-      printf("ADSR1: %d\n", snd.zones[i].ADSR1);
-      printf("ADSR2: %d\n", snd.zones[i].ADSR2);
-      printf("waveIndex: %d\n", snd.zones[i].waveIndex);
-    }
-
-    printf("\n");
-    for (int i = 0; i < snd.header.numWaves; i++) {
-      printf("Wave Offset %d: %d\n", i, snd.waveOffsets[i]);
-    }
-
-    printf("\n");
-    for (int i = 0; i < snd.header.numSequences; i++) {
-      printf("Sequence Offset %d: %d\n", i, snd.sequenceOffsets[i]);
-    }
-
-    printf("\n");
-    for (int i = 0; i < snd.header.numLabels; i++) {
-      printf("Label %d: %d\n", i, snd.labels[i]);
-    }
-
-    printf("\n");
-    for (int i = 0; i < snd.header.numSequences; i++) {
-      printf("Sequence %d: starts at %lu, length is %d\n", i,
-             snd.sequenceSlices[i].start - snd_buffer_start,
-             snd.sequenceSlices[i].length);
-    }
-  }
-
-  char *snd_path_stripped;
+  char *output_folder_path;
   if (output_dir) {
-    snd_path_stripped = output_dir;
+    output_folder_path = output_dir;
   } else {
-    snd_path_stripped = remove_extension(snd_path);
+    output_folder_path = remove_extension(snd_path);
   }
-  make_directory(snd_path_stripped);
+  make_directory(output_folder_path);
+  char *samples_folder_path = malloc(128); // TODO fix this lemao
+  sprintf(samples_folder_path, "%s/samples", output_folder_path);
+  make_directory(samples_folder_path);
+  char *sequences_folder_path = malloc(128); // TODO fix this lemao
+  sprintf(sequences_folder_path, "%s/sequences", output_folder_path);
+  make_directory(sequences_folder_path);
 
   for (int i = 0; i < snd.header.numSequences; i++) {
     char *output_path = malloc(128); // TODO Make this better
@@ -133,8 +74,8 @@ int main(int argc, char *argv[]) {
       printf(ERROR_OOM);
       return EXIT_FAILURE;
     }
-    sprintf(output_path, "%s/%s_%04d.msq", snd_path_stripped,
-            remove_path(snd_path_stripped), i);
+    sprintf(output_path, "%s/%s_%04d.msq", sequences_folder_path,
+            remove_path(output_folder_path), i);
     clean_path(output_path);
 
     FILE *output = fopen(output_path, "wb");
@@ -154,8 +95,8 @@ int main(int argc, char *argv[]) {
       printf(ERROR_OOM);
       return EXIT_FAILURE;
     }
-    sprintf(output_path, "%s/%s_%04d.vag", snd_path_stripped,
-            remove_path(snd_path_stripped), i);
+    sprintf(output_path, "%s/%s_%04d.vag", samples_folder_path,
+            remove_path(output_folder_path), i);
     clean_path(output_path);
 
     FILE *output = fopen(output_path, "wb");
@@ -229,8 +170,8 @@ int main(int argc, char *argv[]) {
     printf(ERROR_OOM);
     return EXIT_FAILURE;
   }
-  sprintf(vpr_output_path, "%s/%s.vpr", snd_path_stripped,
-          remove_path(snd_path_stripped));
+  sprintf(vpr_output_path, "%s/%s.vpr", output_folder_path,
+          remove_path(output_folder_path));
   clean_path(vpr_output_path);
   FILE *vpr_output = fopen(vpr_output_path, "wb");
   if (vpr_output == NULL) {
@@ -271,8 +212,8 @@ int main(int argc, char *argv[]) {
     printf(ERROR_OOM);
     return EXIT_FAILURE;
   }
-  sprintf(vzn_output_path, "%s/%s.vzn", snd_path_stripped,
-          remove_path(snd_path_stripped));
+  sprintf(vzn_output_path, "%s/%s.vzn", output_folder_path,
+          remove_path(output_folder_path));
   clean_path(vzn_output_path);
   FILE *vzn_output = fopen(vzn_output_path, "wb");
   if (vzn_output == NULL) {
