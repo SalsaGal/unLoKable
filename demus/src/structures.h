@@ -15,6 +15,8 @@ typedef struct {
 		int numPresets;
 } MusHeader;
 
+MusHeader parse_mus_header(unsigned char **file);
+
 typedef struct {
 		int msqIndex;
 		int msqOffset;
@@ -91,7 +93,7 @@ typedef struct {
 		unsigned short int version;
 		unsigned short int numTracks;
 		unsigned short int padding;
-} MsqHeader;
+} MsqHeaderV1_6;
 
 /*
 typedef struct vagHeader {

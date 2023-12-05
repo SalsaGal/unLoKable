@@ -1,4 +1,7 @@
+#include "../../lib/misc.h"
+#include "../../lib/structures.h"
 #include "../../lib/strings.h"
+#include "structures.h"
 
 #include <getopt.h>
 #include <stdbool.h>
@@ -32,6 +35,25 @@ int main(int argc, char *argv[]) {
 
   char *mus_path = argv[optind++];
   char *sam_path = argv[optind++];
+
+  Slice mus_buffer = load_buffer(mus_path);
+  Slice sam_buffer = load_buffer(sam_path);
+
+  unsigned char *mus_buffer_cursor = mus_buffer.start;
+
+  MusHeader header = parse_mus_header(&mus_buffer_cursor);
+	printf("ID: %d\n", header.ID);
+	printf("headerSize: %d\n", header.headerSize);
+	printf("versionNumber: %d\n", header.versionNumber);
+	printf("reverbVolume: %d\n", header.reverbVolume);
+	printf("reverbType: %d\n", header.reverbType);
+	printf("reverbMultiply: %d\n", header.reverbMultiply);
+	printf("numSequences: %d\n", header.numSequences);
+	printf("numLabels: %d\n", header.numLabels);
+	printf("offsetToLabelsOffsetsTable: %d\n", header.offsetToLabelsOffsetsTable);
+	printf("numWaves: %d\n", header.numWaves);
+	printf("numPrograms: %d\n", header.numPrograms);
+	printf("numPresets: %d\n", header.numPresets);
 
   return EXIT_SUCCESS;
 }

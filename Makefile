@@ -6,7 +6,7 @@ endif
 CC_FLAGS = -Wall -Wextra -Ilib -g -fanalyzer
 
 CDS2SEQ_OBJS = $(addprefix out/cds2seq/,main.o)
-DEMUS_OBJS = $(addprefix out/demus/,main.o)
+DEMUS_OBJS = $(addprefix out/demus/,main.o structures.o)
 LIB_OBJS = $(addprefix out/lib/,structures.o misc.o)
 SOUND_OBJS = $(addprefix out/sound/,main.o)
 SEQUENCE_OBJS = $(addprefix out/sequence/,main.o)
