@@ -13,16 +13,22 @@
   "Usage: able [OPTIONS] [SND FILE] [SMP FILE]\n"                              \
   "Rips audio from the Legacy of Kain\n"                                       \
   "  -h  Displays this help message\n"                                         \
+  "  -d  Output Dreamcast style headers\n"                                     \
   "  -o  Specifies the path for the output directory, eg `-o song`\n"
 
 int main(int argc, char *argv[]) {
   char *output_dir = NULL;
+  bool dreamcast_style = false;
   int opt;
-  while ((opt = getopt(argc, argv, "hvo:")) != -1) {
+  while ((opt = getopt(argc, argv, "hdo:")) != -1) {
     switch (opt) {
     case 'h':
       printf(HELP_MESSAGE);
       return 0;
+
+    case 'd':
+      dreamcast_style = true;
+      break;
 
     case 'o':
       output_dir = optarg;
@@ -101,8 +107,8 @@ int main(int argc, char *argv[]) {
       printf(ERROR_OOM);
       return EXIT_FAILURE;
     }
-    sprintf(output_path, "%s/%s_%04d.vag", samples_folder_path,
-            remove_path(output_folder_path), i);
+    sprintf(output_path, "%s/%s_%04d.%s", samples_folder_path,
+            remove_path(output_folder_path), i, dreamcast_style ? "dcs" : "vag");
     clean_path(output_path);
 
     FILE *output = fopen(output_path, "wb");
@@ -162,8 +168,10 @@ int main(int argc, char *argv[]) {
         0,
         0,
     };
-    for (int j = 0; j < 48; j++) {
-      fprintf(output, "%c", header[j]);
+    if (!dreamcast_style) {
+      for (int j = 0; j < 48; j++) {
+        fprintf(output, "%c", header[j]);
+      }
     }
     for (int j = 0; j < smp.waves[i].length; j++) {
       fprintf(output, "%c", smp.waves[i].start[j]);
