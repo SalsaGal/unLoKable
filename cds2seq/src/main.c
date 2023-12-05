@@ -99,16 +99,19 @@ int main(int argc, char *argv[]) {
   // Write body
   int current_loop_terminator = 0;
   for (unsigned char *c = output.start; c < output.start + output.length; c++) {
-    if (c[0] == 0xff && (c[1] == 0x00 || c[1] == 0x2e || c[1] == 0x31 || c[1] == 0x32) && c[2] == 0x01) {
+    if (c[0] == 0xff && (c[1] == 0x00 || c[1] == 0x01 || c[1] == 0x02 || c[1] == 0x06 || c[1] == 0x07 || c[1] == 0x0e || c[1] == 0x10 || c[1] == 0x1a || c[1] == 0x1c || c[1] == 0x24 || c[1] == 0x2e || c[1] == 0x31 || c[1] == 0x32) && c[2] == 0x01) {
       write_dummy(out);
       c += 3;
-    } else if (c[0] == 0xff && (c[1] == 0x4c || c[1] == 0x4d) && c[2] == 0x02) {
+    } else if (c[0] == 0xff && (c[1] == 0x14 || c[1] == 0x15 || c[1] == 0x18 || c[1] == 0x33 || c[1] == 0x34 || c[1] == 0x35 || c[1] == 0x36 || c[1] == 0x4c || c[1] == 0x4d) && c[2] == 0x02) {
       write_dummy(out);
       c += 4;
-    } else if (c[0] == 0xff && c[1] == 0x39 && c[2] == 0x03) {
+    } else if (c[0] == 0xff && (c[1] >= 0x39 && c[1] <= 0x3f) && c[2] == 0x03) {
       write_dummy(out);
       c += 5;
-    } else if (c[0] == 0xff && c[1] == 0x49 && c[2] == 0x00) {
+    } else if (c[0] == 0xff && c[1] == 0xf1 && c[2] == 0x04) {
+      write_dummy(out);
+      c += 6;
+    } else if (c[0] == 0xff && (c[1] == 0x49) && c[2] == 0x00) {
       write_dummy(out);
       c += 2;
     } else if (c[0] == 0xff && c[1] == 0x05 && c[2] == 0x03) {
