@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
     } else if (c[0] == 0xff && c[1] == 0xf1 && c[2] == 0x04) {
       write_dummy(out);
       c += 6;
-    } else if (c[0] == 0xff && (c[1] == 0x08 || c[1] == 0x09 || c[1] == 0x41 || c[1] == 0x42 || c[1] == 0x43 || c[1] == 0x49) && c[2] == 0x00 && c[3] != 0xff) {
+    } else if (c[0] == 0xff && (c[1] == 0x03 || c[1] == 0x08 || c[1] == 0x09 || c[1] == 0x41 || c[1] == 0x42 || c[1] == 0x43 || c[1] == 0x49) && c[2] == 0x00 && c[3] != 0xff) {
       write_dummy(out);
       c += 2;
     } else if (c[0] == 0xff && c[1] == 0x05 && c[2] == 0x03) {
