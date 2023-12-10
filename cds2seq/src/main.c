@@ -25,10 +25,12 @@ void write_byte(FILE *file, unsigned char byte) {
   fprintf(file, "%c", byte);
 }
 
-void write_dummy(FILE *file) {
-  write_byte(file, 0xb0);
-  write_byte(file, 0x63);
-  write_byte(file, 0x1e);
+void write_dummy(FILE *file, unsigned char note_times[3]) {
+  write_byte(file, 0xff);
+  write_byte(file, 0x51);
+  write_byte(file, note_times[0]);
+  write_byte(file, note_times[1]);
+  write_byte(file, note_times[2]);
 }
 
 int main(int argc, char *argv[]) {
@@ -100,19 +102,19 @@ int main(int argc, char *argv[]) {
   int current_loop_terminator = 0;
   for (unsigned char *c = output.start; c < output.start + output.length; c++) {
     if (c[0] == 0xff && (c[1] == 0x00 || c[1] == 0x01 || c[1] == 0x02 || c[1] == 0x06 || c[1] == 0x07 || c[1] == 0x0e || c[1] == 0x10 || c[1] == 0x1a || c[1] == 0x1c || c[1] == 0x24 || c[1] == 0x2e || c[1] == 0x31 || c[1] == 0x32) && c[2] == 0x01) {
-      write_dummy(out);
+      write_dummy(out, header.quarterNoteTime);
       c += 3;
     } else if (c[0] == 0xff && (c[1] == 0x14 || c[1] == 0x15 || c[1] == 0x18 || c[1] == 0x33 || c[1] == 0x34 || c[1] == 0x35 || c[1] == 0x36 || c[1] == 0x4c || c[1] == 0x4d) && c[2] == 0x02) {
-      write_dummy(out);
+      write_dummy(out, header.quarterNoteTime);
       c += 4;
     } else if (c[0] == 0xff && (c[1] >= 0x39 && c[1] <= 0x3f) && c[2] == 0x03) {
-      write_dummy(out);
+      write_dummy(out, header.quarterNoteTime);
       c += 5;
     } else if (c[0] == 0xff && c[1] == 0xf1 && c[2] == 0x04) {
-      write_dummy(out);
+      write_dummy(out, header.quarterNoteTime);
       c += 6;
     } else if (c[0] == 0xff && (c[1] == 0x03 || c[1] == 0x08 || c[1] == 0x09 || c[1] == 0x41 || c[1] == 0x42 || c[1] == 0x43 || c[1] == 0x49) && c[2] == 0x00 && c[3] != 0xff) {
-      write_dummy(out);
+      write_dummy(out, header.quarterNoteTime);
       c += 2;
     } else if (c[0] == 0xff && c[1] == 0x05 && c[2] == 0x03) {
       write_byte(out, 0xff);
@@ -120,7 +122,7 @@ int main(int argc, char *argv[]) {
       c += 2;
     } else if (c[0] == 0xff && c[1] == 0xf0) {
       unsigned char text_length = c[2];
-      write_dummy(out);
+      write_dummy(out, header.quarterNoteTime);
       c += 2 + text_length;
     } else if (c[0] == 0xff && c[1] == 0x2f && c[2] == 0x00 && loop_terminator_count >= 1) {
       current_loop_terminator++;
@@ -129,7 +131,7 @@ int main(int argc, char *argv[]) {
         write_byte(out, 0x2f);
         write_byte(out, 0x00);
       } else {
-        write_dummy(out);
+        write_dummy(out, header.quarterNoteTime);
       }
       c += 2;
     } else if (c[0] == 0xff && c[1] == 0x44 && c[2] == 0x00 && loop_terminator_count == 0) {
