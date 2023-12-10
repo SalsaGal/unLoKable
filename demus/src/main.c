@@ -68,6 +68,19 @@ int main(int argc, char *argv[]) {
     layers[i] = parse_int_be(&mus_buffer_cursor);
     printf("Layer #%d: %x\n", i, layers[i]);
   }
+  WaveEntry *wave_entries = calloc(header.numWaves, sizeof(WaveEntry));
+  for (int i = 0; i < header.numWaves; i++) {
+    wave_entries[i] = parse_wave_entry(&mus_buffer_cursor);
+    printf("Wave entry #%d \"%.20s\":\n", i, wave_entries[i].name);
+		printf("offset: %x\n", wave_entries[i].offset);
+		printf("loopBegin: %x\n", wave_entries[i].loopBegin);
+		printf("size: %x\n", wave_entries[i].size);
+		printf("loopEnd: %x\n", wave_entries[i].loopEnd);
+		printf("sampleRate: %x\n", wave_entries[i].sampleRate);
+		printf("originalPitch: %x\n", wave_entries[i].originalPitch);
+		printf("loopInfo: %x\n", wave_entries[i].loopInfo);
+		printf("sndHandle: %x\n", wave_entries[i].sndHandle);
+  }
 
   return EXIT_SUCCESS;
 }

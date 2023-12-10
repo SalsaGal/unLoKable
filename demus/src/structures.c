@@ -26,10 +26,36 @@ MsqTable parse_msq_table(unsigned char **file) {
   return table;
 }
 
+bool is_valid_char(unsigned char c) {
+  switch (c) {
+    case 34:
+    case 36:
+    case 42:
+    case 47:
+    case 58:
+    case 59:
+    case 60:
+    case 62:
+    case 63:
+    case 92:
+    case 94:
+    case 96:
+      return false;
+
+    default:
+      return (c >= 32) && (c < 127);
+  }
+}
+
 WaveEntry parse_wave_entry(unsigned char **file) {
   WaveEntry entry;
+  bool encountered_garbage = false;
   for (int i = 0; i < 20; i++) {
-    entry.name[i] = parse_byte(file);
+    unsigned char c = parse_byte(file);
+    if (!encountered_garbage && !is_valid_char(c)) {
+      encountered_garbage = true;
+    }
+    entry.name[i] = encountered_garbage ? 0 : c;
   }
 	entry.offset = parse_int_be(file);
 	entry.loopBegin = parse_int_be(file);
