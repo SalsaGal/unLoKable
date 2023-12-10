@@ -7,12 +7,11 @@
 #define BUFFER_SIZE 1024 * 1024
 
 int main(int argc, char *argv[]) {
-  if (argc != 3) {
+  if (argc != 2) {
     printf("Missing argument for file!\n");
     return 1;
   }
 
-  char *output_dir = argv[2];
   FILE *file = fopen(argv[1], "rb");
   unsigned char *file_buffer = malloc(BUFFER_SIZE);
   unsigned char *file_start = file_buffer;
@@ -58,13 +57,14 @@ int main(int argc, char *argv[]) {
     printf("Track #%d: %x, %x\n", i, track_offsets[i], track_slices[i].length);
   }
 
+  make_directory(remove_extension(argv[1]));
   for (int i = 0; i < header.numTracks; i++) {
     char *output_path = malloc(128); // TODO Make this better
     if (output_path == NULL) {
       printf(ERROR_OOM);
       return EXIT_FAILURE;
     }
-    sprintf(output_path, "%s/%s_%04d.cds", output_dir, remove_extension(remove_path(argv[1])), i);
+    sprintf(output_path, "%s/%s_%04d.cds", remove_extension(argv[1]), remove_extension(remove_path(argv[1])), i);
     clean_path(output_path);
     FILE *output = fopen(output_path, "wb");
     if (output == NULL) {
