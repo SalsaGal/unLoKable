@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
       printf(ERROR_OOM);
       return EXIT_FAILURE;
     }
-    sprintf(output_path, "%s/%s_%04d.cds", output_dir, remove_path(argv[1]), i);
+    sprintf(output_path, "%s/%s_%04d.cds", output_dir, remove_extension(remove_path(argv[1])), i);
     clean_path(output_path);
     FILE *output = fopen(output_path, "wb");
     if (output == NULL) {
