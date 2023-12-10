@@ -62,7 +62,7 @@ WaveEntry parse_wave_entry(unsigned char **file, bool pc_style) {
 	entry.size = parse_int_be(file) * (pc_style ? 1 : 2);
 	entry.loopEnd = parse_int_be(file);
 	entry.sampleRate = parse_int_be(file);
-	entry.originalPitch = parse_int_be(file); /* to re-define and re-align */
+	entry.originalPitch = parse_int_be(file) >> 8;
 	entry.loopInfo = parse_int_be(file);
 	entry.sndHandle = parse_int_be(file);
   return entry;
