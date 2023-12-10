@@ -47,7 +47,7 @@ bool is_valid_char(unsigned char c) {
   }
 }
 
-WaveEntry parse_wave_entry(unsigned char **file) {
+WaveEntry parse_wave_entry(unsigned char **file, bool pc_style) {
   WaveEntry entry;
   bool encountered_garbage = false;
   for (int i = 0; i < 20; i++) {
@@ -59,7 +59,7 @@ WaveEntry parse_wave_entry(unsigned char **file) {
   }
 	entry.offset = parse_int_be(file);
 	entry.loopBegin = parse_int_be(file);
-	entry.size = parse_int_be(file);
+	entry.size = parse_int_be(file) * (pc_style ? 1 : 2);
 	entry.loopEnd = parse_int_be(file);
 	entry.sampleRate = parse_int_be(file);
 	entry.originalPitch = parse_int_be(file); /* to re-define and re-align */

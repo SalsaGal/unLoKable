@@ -10,13 +10,17 @@
 
 int main(int argc, char *argv[]) {
   char *output_dir = NULL;
-  bool pc_style = false;
+  bool pc_style = true;
   int opt;
-  while ((opt = getopt(argc, argv, "hpo:")) != -1) {
+  while ((opt = getopt(argc, argv, "hcpo:")) != -1) {
     switch (opt) {
     case 'h':
       printf("TODO Help");
       return 0;
+
+    case 'c':
+      pc_style = false;
+      break;
 
     case 'p':
       pc_style = true;
@@ -70,7 +74,7 @@ int main(int argc, char *argv[]) {
   }
   WaveEntry *wave_entries = calloc(header.numWaves, sizeof(WaveEntry));
   for (int i = 0; i < header.numWaves; i++) {
-    wave_entries[i] = parse_wave_entry(&mus_buffer_cursor);
+    wave_entries[i] = parse_wave_entry(&mus_buffer_cursor, pc_style);
     printf("Wave entry #%d \"%.20s\":\n", i, wave_entries[i].name);
 		printf("offset: %x\n", wave_entries[i].offset);
 		printf("loopBegin: %x\n", wave_entries[i].loopBegin);

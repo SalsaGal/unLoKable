@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdbool.h>
+
 typedef struct {
 		int ID;
 		int headerSize;
@@ -36,7 +38,7 @@ typedef struct {
 		int sndHandle;
 } WaveEntry;
 
-WaveEntry parse_wave_entry(unsigned char **file);
+WaveEntry parse_wave_entry(unsigned char **file, bool pc_style);
 
 typedef struct {
 		float delay;
