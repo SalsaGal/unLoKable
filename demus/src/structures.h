@@ -76,6 +76,8 @@ typedef struct {
 		int numZones;		
 } ProgramEntry;
 
+ProgramEntry parse_program_entry(unsigned char **file);
+
 typedef struct {
 		int rootKey; /* usually padded as 0xFFFFFFFF. Copy the value from the "rootKey" variable from the "programZone" structure */
 		char noteLow;

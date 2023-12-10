@@ -47,16 +47,20 @@ bool is_valid_char(unsigned char c) {
   }
 }
 
-WaveEntry parse_wave_entry(unsigned char **file, bool pc_style) {
-  WaveEntry entry;
+void parse_name(unsigned char **file, char buffer[20]) {
   bool encountered_garbage = false;
   for (int i = 0; i < 20; i++) {
     unsigned char c = parse_byte(file);
     if (!encountered_garbage && !is_valid_char(c)) {
       encountered_garbage = true;
     }
-    entry.name[i] = encountered_garbage ? 0 : c;
+    buffer[i] = encountered_garbage ? 0 : c;
   }
+}
+
+WaveEntry parse_wave_entry(unsigned char **file, bool pc_style) {
+  WaveEntry entry;
+  parse_name(file, entry.name);
 	entry.offset = parse_int_be(file);
 	entry.loopBegin = parse_int_be(file);
 	entry.size = parse_int_be(file) * (pc_style ? 1 : 2);
@@ -65,5 +69,12 @@ WaveEntry parse_wave_entry(unsigned char **file, bool pc_style) {
 	entry.originalPitch = parse_int_be(file) >> 8;
 	entry.loopInfo = parse_int_be(file);
 	entry.sndHandle = parse_int_be(file);
+  return entry;
+}
+
+ProgramEntry parse_program_entry(unsigned char **file) {
+  ProgramEntry entry;
+  parse_name(file, entry.name);
+  entry.numZones = parse_int_be(file);
   return entry;
 }

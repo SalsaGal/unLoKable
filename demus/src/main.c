@@ -85,6 +85,18 @@ int main(int argc, char *argv[]) {
 		printf("loopInfo: %x\n", wave_entries[i].loopInfo);
 		printf("sndHandle: %x\n", wave_entries[i].sndHandle);
   }
+  ProgramEntry *program_entries = calloc(header.numPrograms, sizeof(ProgramEntry));
+  for (int i = 0; i < header.numPrograms; i++) {
+    // Load program entry
+    program_entries[i] = parse_program_entry(&mus_buffer_cursor);
+    printf("Program entry \"%s\", %d\n", program_entries[i].name, program_entries[i].numZones);
+
+    // Load program zone
+    for (int j = 0; j < program_entries[i].numZones * 104; j++) {
+      // TODO actually parse
+      parse_byte(&mus_buffer_cursor);
+    }
+  }
 
   return EXIT_SUCCESS;
 }
