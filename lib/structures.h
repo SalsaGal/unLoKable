@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdbool.h>
 #include <stdlib.h>
 
 typedef struct {
@@ -65,7 +66,7 @@ typedef struct {
   unsigned short int waveIndex;
 } SndZone;
 
-SndZone parse_zone(unsigned char **file);
+SndZone parse_zone(unsigned char **file, bool cents_tuning);
 
 typedef struct {
   SndHeader header;
@@ -77,7 +78,7 @@ typedef struct {
   Slice *sequenceSlices;
 } SndFile;
 
-SndFile parse_snd_file(unsigned char **file, int length);
+SndFile parse_snd_file(unsigned char **file, int file_length, bool cents_tuning);
 
 typedef struct {
   unsigned char magicNumber[4]; // PMSa

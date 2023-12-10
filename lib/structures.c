@@ -1,5 +1,6 @@
 #include "structures.h"
 #include "strings.h"
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -95,14 +96,14 @@ SndProgram parse_program(unsigned char **file) {
   return program;
 }
 
-SndZone parse_zone(unsigned char **file) {
+SndZone parse_zone(unsigned char **file, bool cents_tuning) {
   SndZone zone;
   zone.priority = parse_byte(file);
   zone.parentProgram = parse_byte(file);
   zone.volume = parse_byte(file);
   zone.panPos = parse_byte(file);
   zone.rootKey = parse_byte(file);
-  zone.pitchFinetuning = (char)(((float)parse_byte(file)) / 127.0 * 99.0);
+  zone.pitchFinetuning = cents_tuning ? (char)(((float)parse_byte(file)) * 100.0 / 128.0) : parse_byte(file);
   zone.noteLow = parse_byte(file);
   zone.noteHigh = parse_byte(file);
   zone.mode = parse_byte(file);
@@ -113,7 +114,7 @@ SndZone parse_zone(unsigned char **file) {
   return zone;
 }
 
-SndFile parse_snd_file(unsigned char **file, int file_length) {
+SndFile parse_snd_file(unsigned char **file, int file_length, bool cents_tuning) {
   unsigned char *end_of_file = *file + file_length;
 
   SndFile toReturn;
@@ -135,7 +136,7 @@ SndFile parse_snd_file(unsigned char **file, int file_length) {
     exit(EXIT_FAILURE);
   }
   for (int i = 0; i < toReturn.header.numZones; i++) {
-    toReturn.zones[i] = parse_zone(file);
+    toReturn.zones[i] = parse_zone(file, cents_tuning);
   }
 
   toReturn.waveOffsets = (int *)calloc(toReturn.header.numWaves, sizeof(int));

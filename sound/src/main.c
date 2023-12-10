@@ -14,13 +14,15 @@
   "Rips audio from the Legacy of Kain\n"                                       \
   "  -h  Displays this help message\n"                                         \
   "  -d  Output Dreamcast style headers\n"                                     \
+  "  -c  Converts pitch fine tuning values to cents\n"                         \
   "  -o  Specifies the path for the output directory, eg `-o song`\n"
 
 int main(int argc, char *argv[]) {
   char *output_dir = NULL;
   bool dreamcast_style = false;
+  bool cents_tuning = false;
   int opt;
-  while ((opt = getopt(argc, argv, "hdo:")) != -1) {
+  while ((opt = getopt(argc, argv, "hdco:")) != -1) {
     switch (opt) {
     case 'h':
       printf(HELP_MESSAGE);
@@ -28,6 +30,10 @@ int main(int argc, char *argv[]) {
 
     case 'd':
       dreamcast_style = true;
+      break;
+
+    case 'c':
+      cents_tuning = true;
       break;
 
     case 'o':
@@ -55,7 +61,7 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  SndFile snd = parse_snd_file(&snd_buffer.start, snd_buffer.length);
+  SndFile snd = parse_snd_file(&snd_buffer.start, snd_buffer.length, cents_tuning);
   SmpFile smp = parse_smp_file(&smp_buffer.start, &snd, smp_buffer.length);
 
   char *output_folder_path;
