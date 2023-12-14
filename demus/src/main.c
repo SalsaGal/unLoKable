@@ -130,5 +130,18 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  Slice *sequences = calloc(header.numSequences, sizeof(Slice));
+  for (int i = 0; i < header.numSequences; i++) {
+    sequences[i].start = mus_buffer.start + msq_tables[i].msqOffset;
+    if (i > 0) {
+      sequences[i - 1].length = sequences[i].start - sequences[i - 1].start;
+    }
+  }
+  sequences[header.numSequences - 1].length = (mus_buffer.start + header.offsetToLabelsOffsetsTable) - sequences[header.numSequences - 1].start;
+
+  for (int i = 0; i < header.numSequences; i++) {
+    printf("Sequence #%i: 0x%x + 0x%x\n", i, sequences[i].start, sequences[i].length);
+  }
+
   return EXIT_SUCCESS;
 }
