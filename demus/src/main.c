@@ -8,6 +8,11 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+void write_byte(FILE *file, unsigned char byte) {
+  fprintf(file, "%c", byte);
+}
 
 int main(int argc, char *argv[]) {
   char *output_dir = NULL;
@@ -141,6 +146,23 @@ int main(int argc, char *argv[]) {
 
   for (int i = 0; i < header.numSequences; i++) {
     printf("Sequence #%i: 0x%x + 0x%x\n", i, sequences[i].start, sequences[i].length);
+  }
+
+  make_directory(remove_extension(mus_path));
+  char *sequences_path = calloc(strlen(remove_extension(mus_path)) + 10, sizeof(char));
+  sprintf(sequences_path, "%s/sequences", remove_extension(mus_path));
+  clean_path(sequences_path);
+  make_directory(sequences_path);
+
+  for (int i = 0; i < header.numSequences; i++) {
+    // overland_0003.msq
+    char *msq_path = calloc(strlen(remove_extension(mus_path)) + strlen(remove_extension(remove_path(mus_path))) + 20, sizeof(char));
+    sprintf(msq_path, "%s/sequences/%s_%04d.msq", remove_extension(mus_path), remove_extension(remove_path(mus_path)), i);
+
+    FILE *msq_out = fopen(msq_path, "wb");
+    for (unsigned char *c = sequences[i].start; c < sequences[i].start + sequences[i].length; c++) {
+      write_byte(msq_out, *c);
+    }
   }
 
   return EXIT_SUCCESS;
