@@ -3,7 +3,7 @@ make
 # out/bin/sound tests/ucma.snd tests/ucma.smp
 # out/bin/sequence tests/ucma/sequences/ucma_0003.msq
 # out/bin/cds2seq tests/all_cases.cds
-out/bin/demus tests/overland.mus tests/overland.sam
+out/bin/demus tests/overland.mus tests/overland.sam > out/output.txt
 
 [clean]
 rm -rf tests/ucma
