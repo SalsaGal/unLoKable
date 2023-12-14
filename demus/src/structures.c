@@ -102,7 +102,7 @@ ProgramZone parse_program_zone(unsigned char **file) {
   zone.vibDelay = parse_float_be(file);
   zone.vibFrequency = parse_float_be(file);
   zone.vibToPitch = parse_float_be(file);
-  zone.rootKey = parse_int_be(file); /* usually padded as 0xFFFFFFFF. Copy the value from the "originalPitch" variable from the "waveEntry" structure */
+  zone.rootKey = parse_int_be(file);
   zone.noteLow = parse_byte(file);
   zone.noteHigh = parse_byte(file);
   zone.velocityLow = parse_byte(file);
@@ -112,4 +112,24 @@ ProgramZone parse_program_zone(unsigned char **file) {
   zone.modulEnv = parse_envelope(file);
   zone.modulEnvToPitch = parse_float_be(file);
   return zone;
+}
+
+PresetZone parse_preset_zone(unsigned char **file) {
+  PresetZone zone;
+  zone.rootKey = parse_int_be(file);
+  zone.noteLow = parse_byte(file);
+  zone.noteHigh = parse_byte(file);
+  zone.velocityLow = parse_byte(file);
+  zone.velocityHigh = parse_byte(file);
+  zone.programIndex = parse_int_be(file);
+  return zone;
+}
+
+PresetEntry parse_preset_entry(unsigned char **file) {
+  PresetEntry entry;
+  parse_name(file, entry.name);
+	entry.MIDIBankNumber = parse_int_be(file);
+	entry.MIDIPresetNumber = parse_int_be(file);
+	entry.numZones = parse_int_be(file);
+  return entry;
 }

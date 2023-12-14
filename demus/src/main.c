@@ -3,6 +3,7 @@
 #include "../../lib/strings.h"
 #include "structures.h"
 
+#include <bits/pthreadtypes.h>
 #include <getopt.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -97,13 +98,35 @@ int main(int argc, char *argv[]) {
     for (int j = 0; j < program_entries[i].numZones; j++) {
       program_zones[i][j] = parse_program_zone(&mus_buffer_cursor);
       printf("Program zone set #%d, zone #%d\n", i, j);
-  		printf("pitchFinetuning: %d\n", program_zones[i][j].pitchFinetuning);
-  		printf("reverb: %d\n", program_zones[i][j].reverb);
-  		printf("panPosition: %f\n", program_zones[i][j].panPosition);
-  		printf("keynumHold: %d\n", program_zones[i][j].keynumHold);
-  		printf("keynumDecay: %d\n", program_zones[i][j].keynumDecay);
-  		printf("envelope.delay: %f\n", program_zones[i][j].volumeEnv.delay);
-  		printf("envelope.attack: %f\n", program_zones[i][j].volumeEnv.attack);
+  		printf("\tpitchFinetuning: %d\n", program_zones[i][j].pitchFinetuning);
+  		printf("\treverb: %d\n", program_zones[i][j].reverb);
+  		printf("\tpanPosition: %f\n", program_zones[i][j].panPosition);
+  		printf("\tkeynumHold: %d\n", program_zones[i][j].keynumHold);
+  		printf("\tkeynumDecay: %d\n", program_zones[i][j].keynumDecay);
+      printf("\tmodulEnvToPitch: %f\n", program_zones[i][j].modulEnvToPitch);
+  		printf("\tenvelope.delay: %f\n", program_zones[i][j].volumeEnv.delay);
+  		printf("\tenvelope.attack: %f\n", program_zones[i][j].volumeEnv.attack);
+    }
+  }
+
+  PresetEntry *preset_entries = calloc(header.numPresets, sizeof(PresetEntry));
+  PresetZone **preset_zones = calloc(header.numPresets, sizeof(PresetZone *));
+  for (int i = 0; i < header.numPresets; i++) {
+    // Load preset entry
+    preset_entries[i] = parse_preset_entry(&mus_buffer_cursor);
+    printf("Preset zone \"%s\", %d\n", preset_entries[i].name, preset_entries[i].numZones);
+    printf("\tZone count: %d\n", preset_entries[i].numZones);
+
+    // Load preset zone
+    preset_zones[i] = calloc(preset_entries[i].numZones, sizeof(PresetZone));
+    for (int j = 0; j < preset_entries[i].numZones; j++) {
+      printf("Preset zone set #%d, zone #%d\n", i, j);
+      preset_zones[i][j] = parse_preset_zone(&mus_buffer_cursor);
+  		printf("\tnoteLow: %x\n", preset_zones[i][j].noteLow);
+  		printf("\tnoteHigh: %x\n", preset_zones[i][j].noteHigh);
+  		printf("\tvelocityLow: %x\n", preset_zones[i][j].velocityLow);
+  		printf("\tvelocityHigh: %x\n", preset_zones[i][j].velocityHigh);
+  		printf("\tprogramIndex: %x\n", preset_zones[i][j].programIndex);
     }
   }
 

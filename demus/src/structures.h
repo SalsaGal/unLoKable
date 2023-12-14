@@ -83,7 +83,7 @@ typedef struct {
 ProgramEntry parse_program_entry(unsigned char **file);
 
 typedef struct {
-		int rootKey; /* usually padded as 0xFFFFFFFF. Copy the value from the "rootKey" variable from the "programZone" structure */
+		int rootKey; // usually padded as 0xFFFFFFFF. Copy the value from the "rootKey" variable from the "programZone" structure
 		unsigned char noteLow;
 		unsigned char noteHigh;
 		unsigned char velocityLow;
@@ -91,12 +91,16 @@ typedef struct {
 		int programIndex;
 } PresetZone;
 
+PresetZone parse_preset_zone(unsigned char **file);
+
 typedef struct {
 		char name[20];
 		int MIDIBankNumber;
 		int MIDIPresetNumber;
 		int numZones;
 } PresetEntry;
+
+PresetEntry parse_preset_entry(unsigned char **file);
 
 typedef struct {
 		int msqID;
