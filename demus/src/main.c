@@ -86,15 +86,24 @@ int main(int argc, char *argv[]) {
 		printf("sndHandle: %x\n", wave_entries[i].sndHandle);
   }
   ProgramEntry *program_entries = calloc(header.numPrograms, sizeof(ProgramEntry));
+  ProgramZone **program_zones = calloc(header.numPrograms, sizeof(ProgramZone *));
   for (int i = 0; i < header.numPrograms; i++) {
     // Load program entry
     program_entries[i] = parse_program_entry(&mus_buffer_cursor);
     printf("Program entry \"%s\", %d\n", program_entries[i].name, program_entries[i].numZones);
 
     // Load program zone
-    for (int j = 0; j < program_entries[i].numZones * 104; j++) {
-      // TODO actually parse
-      parse_byte(&mus_buffer_cursor);
+    program_zones[i] = calloc(program_entries[i].numZones, sizeof(ProgramZone));
+    for (int j = 0; j < program_entries[i].numZones; j++) {
+      program_zones[i][j] = parse_program_zone(&mus_buffer_cursor);
+      printf("Program zone set #%d, zone #%d\n", i, j);
+  		printf("pitchFinetuning: %d\n", program_zones[i][j].pitchFinetuning);
+  		printf("reverb: %d\n", program_zones[i][j].reverb);
+  		printf("panPosition: %f\n", program_zones[i][j].panPosition);
+  		printf("keynumHold: %d\n", program_zones[i][j].keynumHold);
+  		printf("keynumDecay: %d\n", program_zones[i][j].keynumDecay);
+  		printf("envelope.delay: %f\n", program_zones[i][j].volumeEnv.delay);
+  		printf("envelope.attack: %f\n", program_zones[i][j].volumeEnv.attack);
     }
   }
 

@@ -49,6 +49,8 @@ typedef struct {
 		float release;
 } Envelope;
 
+Envelope parse_envelope(unsigned char **file);
+
 typedef struct {
 		int pitchFinetuning;
 		int reverb;
@@ -61,15 +63,17 @@ typedef struct {
 		float vibFrequency;
 		float vibToPitch;
 		int rootKey; /* usually padded as 0xFFFFFFFF. Copy the value from the "originalPitch" variable from the "waveEntry" structure */
-		char noteLow;
-		char noteHigh;
-		char velocityLow;
-		char velocityHigh;
+		unsigned char noteLow;
+		unsigned char noteHigh;
+		unsigned char velocityLow;
+		unsigned char velocityHigh;
 		int waveIndex;
 		float basePriority;
 		Envelope modulEnv;
 		float modulEnvToPitch;
 } ProgramZone;
+
+ProgramZone parse_program_zone(unsigned char **file);
 
 typedef struct {
 		char name[20];
@@ -80,10 +84,10 @@ ProgramEntry parse_program_entry(unsigned char **file);
 
 typedef struct {
 		int rootKey; /* usually padded as 0xFFFFFFFF. Copy the value from the "rootKey" variable from the "programZone" structure */
-		char noteLow;
-		char noteHigh;
-		char velocityLow;
-		char velocityHigh;
+		unsigned char noteLow;
+		unsigned char noteHigh;
+		unsigned char velocityLow;
+		unsigned char velocityHigh;
 		int programIndex;
 } PresetZone;
 

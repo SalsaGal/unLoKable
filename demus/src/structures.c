@@ -78,3 +78,38 @@ ProgramEntry parse_program_entry(unsigned char **file) {
   entry.numZones = parse_int_be(file);
   return entry;
 }
+
+Envelope parse_envelope(unsigned char **file) {
+  Envelope envelope;
+	envelope.delay = parse_float_be(file);
+	envelope.attack = parse_float_be(file);
+	envelope.hold = parse_float_be(file);
+	envelope.decay = parse_float_be(file);
+	envelope.sustain = parse_float_be(file);
+	envelope.release = parse_float_be(file);
+  return envelope;
+}
+
+ProgramZone parse_program_zone(unsigned char **file) {
+  ProgramZone zone;
+  zone.pitchFinetuning = parse_int_be(file);
+  zone.reverb = parse_int_be(file);
+  zone.panPosition = parse_float_be(file);
+  zone.keynumHold = parse_int_be(file);
+  zone.keynumDecay = parse_int_be(file);
+  zone.volumeEnv = parse_envelope(file);
+  zone.volumeEnvAtten = parse_float_be(file);
+  zone.vibDelay = parse_float_be(file);
+  zone.vibFrequency = parse_float_be(file);
+  zone.vibToPitch = parse_float_be(file);
+  zone.rootKey = parse_int_be(file); /* usually padded as 0xFFFFFFFF. Copy the value from the "originalPitch" variable from the "waveEntry" structure */
+  zone.noteLow = parse_byte(file);
+  zone.noteHigh = parse_byte(file);
+  zone.velocityLow = parse_byte(file);
+  zone.velocityHigh = parse_byte(file);
+  zone.waveIndex = parse_int_be(file);
+  zone.basePriority = parse_float_be(file);
+  zone.modulEnv = parse_envelope(file);
+  zone.modulEnvToPitch = parse_float_be(file);
+  return zone;
+}

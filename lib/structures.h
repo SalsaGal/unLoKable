@@ -20,6 +20,7 @@ typedef struct {
 Vec vec_new(int capacity);
 void vec_push(Vec *vec, unsigned char data);
 
+float parse_float_be(unsigned char **file);
 int parse_int_le(unsigned char **file);
 int parse_int_be(unsigned char **file);
 unsigned short int parse_word_le(unsigned char **file);

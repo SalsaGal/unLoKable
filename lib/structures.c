@@ -31,6 +31,11 @@ void vec_push(Vec *vec, unsigned char data) {
   vec->length++;
 }
 
+float parse_float_be(unsigned char **file) {
+  int i = parse_int_be(file);
+  return *(float *)&i;
+}
+
 int parse_int_le(unsigned char **file) {
   int toReturn =
       ((*file)[3] & 0xff) * 0x00000001 + ((*file)[2] & 0xff) * 0x00000100 +
