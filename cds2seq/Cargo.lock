@@ -5,3 +5,12 @@ version = 3
 [[package]]
 name = "cds2seq"
 version = "0.1.0"
+dependencies = [
+ "dbg_hex",
+]
+
+[[package]]
+name = "dbg_hex"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2f74abed44e4dbc4d0548b565869c66c9c6d6d84011a8c14cee2cacfdada3d60"
