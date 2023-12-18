@@ -165,5 +165,27 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  Slice *waves = calloc(header.numWaves, sizeof(Slice));
+  for (int i = 0; i < header.numWaves; i++) {
+    waves[i].start = sam_buffer.start + wave_entries[i].offset;
+    waves[i].length = wave_entries[i].size;
+    printf("Wave #%d: 0x%x + 0x%x\n", i, waves[i].start, waves[i].length);
+  }
+
+  char *samples_path = calloc(strlen(remove_extension(mus_path)) + 8, sizeof(char));
+  sprintf(samples_path, "%s/samples", remove_extension(mus_path));
+  clean_path(samples_path);
+  make_directory(samples_path);
+
+  for (int i = 0; i < header.numWaves; i++) {
+    char *msq_path = calloc(strlen(remove_extension(mus_path)) + strlen(remove_extension(remove_path(mus_path))) + 20, sizeof(char));
+    sprintf(msq_path, "%s/samples/%s_%04d.bin", remove_extension(mus_path), remove_extension(remove_path(mus_path)), i);
+
+    FILE *msq_out = fopen(msq_path, "wb");
+    for (unsigned char *c = waves[i].start; c < waves[i].start + waves[i].length; c++) {
+      write_byte(msq_out, *c);
+    }
+  }
+
   return EXIT_SUCCESS;
 }

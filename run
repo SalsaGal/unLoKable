@@ -4,7 +4,7 @@ make
 # out/bin/sequence tests/ucma/sequences/ucma_0003.msq
 # out/bin/cds2seq tests/all_cases.cds
 rm out/output.txt
-out/bin/demus tests/overland.mus tests/overland.sam > out/output.txt
+out/bin/demus -c tests/overland.mus tests/overland.sam > out/output.txt
 bat out/output.txt
 
 [clean]
