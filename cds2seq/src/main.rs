@@ -40,4 +40,44 @@ fn main() {
     assert_eq!(0x51455361, header.magic, "invalid magic number");
 
     dbg_hex!(&header);
+
+    let body = content_iter.collect::<Vec<_>>();
+    let tokens = parse_file(&body);
+    dbg_hex!(tokens);
+}
+
+#[derive(Debug)]
+enum Tokens<'a> {
+    /// `FF2E01XX` with `XX` being loop count.
+    LoopStart(u8),
+    /// Data without any sentinel values.
+    Data(&'a [u8]),
+    /// `FF2F00`.
+    LoopFinish,
+}
+
+fn parse_file(bytes: &[u8]) -> Vec<Tokens> {
+    let mut i = 0;
+    let mut tokens = vec![];
+    while i < bytes.len() {
+        if bytes[i] == 0xff {
+            if bytes[i + 1] == 0x2e && bytes[i + 2] == 0x01 {
+                tokens.push(Tokens::LoopStart(bytes[i + 3]));
+                i += 4;
+                continue;
+            } else if bytes[i + 1] == 0x2f && bytes[i + 2] == 0 {
+                tokens.push(Tokens::LoopFinish);
+                i += 3;
+                continue;
+            }
+        }
+        if let Some(Tokens::Data(data)) = tokens.last_mut() {
+            *data = &bytes[i - data.len()..=i];
+        } else {
+            tokens.push(Tokens::Data(&bytes[i..i + 1]));
+        }
+        i += 1;
+    }
+
+    tokens
 }
