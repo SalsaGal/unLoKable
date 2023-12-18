@@ -39,7 +39,7 @@ fn main() {
         ppqn: u16::from_be_bytes([content_iter.next().unwrap(), content_iter.next().unwrap()]),
         version: u16::from_be_bytes([content_iter.next().unwrap(), content_iter.next().unwrap()]),
     };
-    assert_eq!(0x51455361, header.magic, "invalid magic number");
+    assert_eq!(0x5145_5361, header.magic, "invalid magic number");
 
     dbg_hex!(&header);
 
@@ -106,7 +106,7 @@ fn parse_file(bytes: &[u8]) -> Vec<Token> {
         if let Some(Token::Data(data)) = tokens.last_mut() {
             *data = &bytes[i - data.len()..=i];
         } else {
-            tokens.push(Token::Data(&bytes[i..i + 1]));
+            tokens.push(Token::Data(&bytes[i..=i]));
         }
         i += 1;
     }
@@ -166,7 +166,7 @@ fn lex_file(tokens: Vec<Token>) -> Vec<Lexeme> {
                 }
             }
             Either::Left(Token::Data(data)) => {
-                lexemes[i] = Either::Right(Lexeme::Data(data.to_vec()))
+                lexemes[i] = Either::Right(Lexeme::Data(data.to_vec()));
             }
             Either::Left(Token::LoopStart(_)) | Either::Right(_) => {}
         }
