@@ -1,5 +1,6 @@
 use dbg_hex::dbg_hex;
 use either::Either;
+use std::io::Write;
 use std::{fs::File, io::Read, path::PathBuf};
 
 #[derive(Debug)]
@@ -16,7 +17,7 @@ fn main() {
             .nth(1)
             .expect("argument needs to be supplied"),
     );
-    let mut file = File::open(path).expect("file cannot be opened");
+    let mut file = File::open(&path).expect("file cannot be opened");
     let mut contents = vec![];
     file.read_to_end(&mut contents).expect("file not readable");
 
@@ -48,8 +49,32 @@ fn main() {
 
     let lexemes = lex_file(tokens);
     dbg_hex!(&lexemes);
-    for lexeme in lexemes {
+    for lexeme in &lexemes {
         lexeme.visualise(0);
+    }
+
+    let mut output = File::create(path.with_file_name(format!(
+        "{}_expanded.bin",
+        path.file_stem().unwrap().to_string_lossy()
+    )))
+    .unwrap();
+    for lexeme in &lexemes {
+        write_lexeme(&mut output, lexeme);
+    }
+}
+
+fn write_lexeme(file: &mut File, lexeme: &Lexeme) {
+    match lexeme {
+        Lexeme::Data(data) => file.write_all(data).unwrap(),
+        Lexeme::Loop(count, lexemes) => {
+            file.write_all(&[0xff, 0x2e, 0x01, 0x00]).unwrap();
+            for _ in 0..(*count).max(1) {
+                for lexeme in lexemes {
+                    write_lexeme(file, lexeme);
+                }
+                file.write_all(&[0xff, 0x2f, 0x00]).unwrap();
+            }
+        }
     }
 }
 
