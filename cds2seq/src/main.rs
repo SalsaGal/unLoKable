@@ -40,14 +40,17 @@ fn main() {
     };
     assert_eq!(0x51455361, header.magic, "invalid magic number");
 
-    // dbg_hex!(&header);
+    dbg_hex!(&header);
 
     let body = content_iter.collect::<Vec<_>>();
     let tokens = parse_file(&body);
-    // dbg_hex!(&tokens);
+    dbg_hex!(&tokens);
 
     let lexemes = lex_file(tokens);
     dbg_hex!(&lexemes);
+    for lexeme in lexemes {
+        lexeme.visualise(0);
+    }
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -92,6 +95,25 @@ enum Lexeme {
     Data(Vec<u8>),
 }
 
+impl Lexeme {
+    fn visualise(&self, depth: usize) {
+        match self {
+            Self::Loop(count, children) => {
+                println!("{}Loop: {}x", "\t".repeat(depth), count);
+                for child in children {
+                    child.visualise(depth + 1);
+                }
+            }
+            Self::Data(data) => println!(
+                "{}Data: {:#04x} .. {:#04x}",
+                "\t".repeat(depth),
+                data[0],
+                data.last().unwrap(),
+            ),
+        }
+    }
+}
+
 fn lex_file(tokens: Vec<Token>) -> Vec<Lexeme> {
     let mut lexemes: Vec<Either<Token, Lexeme>> =
         tokens.iter().copied().map(Either::Left).collect::<Vec<_>>();
@@ -106,6 +128,7 @@ fn lex_file(tokens: Vec<Token>) -> Vec<Lexeme> {
                 loop {
                     match lexemes[j] {
                         Either::Left(Token::LoopStart(count)) => {
+                            loop_body.reverse();
                             lexemes[j] =
                                 Either::Right(Lexeme::Loop(count, std::mem::take(&mut loop_body)));
                             i = j;
