@@ -61,6 +61,7 @@ fn main() {
     let mut i = 0;
     while i < output.len() {
         let mut chunk = output.iter().skip(i).take(4);
+        // TODO this might crash
         if *chunk.next().unwrap() == 0xff
             && *chunk.next().unwrap() == 0x32
             && *chunk.next().unwrap() == 0x01
@@ -72,12 +73,49 @@ fn main() {
         }
     }
 
+    dictionary(&mut output, header.quarter_note_time);
+
     let mut output_file = File::create(path.with_file_name(format!(
         "{}_expanded.bin",
         path.file_stem().unwrap().to_string_lossy()
     )))
     .unwrap();
     output_file.write_all(&output).unwrap();
+}
+
+fn dictionary(file: &mut Vec<u8>, quarter_note_time: u32) {
+    const MAGIC: u16 = 0x51ff;
+
+    let mut i = 0;
+    while i < file.len() {
+        let message = [file.get(i), file.get(i + 1), file.get(i + 2)]
+            .into_iter()
+            .flatten()
+            .copied()
+            .collect::<Vec<_>>();
+        if message.len() != 3 {
+            break;
+        }
+
+        let length = match [message[0], message[1], message[2]] {
+            [0xff, 0xf1, 0x04] => Some(7),
+            _ => None,
+        };
+
+        if let Some(length) = length {
+            file.splice(
+                i..i + length,
+                MAGIC
+                    .to_ne_bytes()
+                    .iter()
+                    .chain(quarter_note_time.to_ne_bytes().iter().skip(1))
+                    .copied(),
+            );
+            i += length;
+        } else {
+            i += 1;
+        }
+    }
 }
 
 fn write_lexeme(file: &mut Vec<u8>, lexeme: &Lexeme) {
