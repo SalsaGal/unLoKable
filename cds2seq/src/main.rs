@@ -86,6 +86,9 @@ fn main() {
 fn dictionary(file: &mut Vec<u8>, quarter_note_time: u32) {
     const MAGIC: u16 = 0x51ff;
 
+    let loop_terminator_count = file.windows(3).filter(|x| *x == [0xff, 0x2f, 0x00]).count();
+    let mut loop_terminator_index = 0;
+
     let mut i = 0;
     while i < file.len() {
         let message = [file.get(i), file.get(i + 1), file.get(i + 2)]
@@ -97,9 +100,41 @@ fn dictionary(file: &mut Vec<u8>, quarter_note_time: u32) {
             break;
         }
 
-        let length = match [message[0], message[1], message[2]] {
-            [0xff, 0xf1, 0x04] => Some(7),
-            _ => None,
+        let length = if message[0] == 0xff {
+            match [message[1], message[2]] {
+                [0xf1, 0x04] => Some(7),
+                [0x39..=0x3f, 0x03] => Some(6),
+                [0x4c | 0x4d | 0x14 | 0x15 | 0x18 | 0x33..=0x36, 0x02] => Some(5),
+                [0x00 | 0x0e | 0x01 | 0x1a | 0x1c | 0x02 | 0x2e | 0x06 | 0x07 | 0x10 | 0x24
+                | 0x31, 0x01] => Some(4),
+                [0x03 | 0x08 | 0x09 | 0x41..=0x43 | 0x49, 0x00] => match file.get(i + 3) {
+                    Some(0xff) => None,
+                    _ => Some(3),
+                },
+                [0x05, 0x03] => {
+                    file.splice(i..i + 3, [0xff, 0x51]);
+                    i += 3;
+                    None
+                }
+                [0x2f, 0x00] => {
+                    loop_terminator_index += 1;
+                    if loop_terminator_count > 1 && loop_terminator_index < loop_terminator_count {
+                        Some(3)
+                    } else {
+                        None
+                    }
+                }
+                [0x44, 0x00] => {
+                    if loop_terminator_count == 0 {
+                        file[i + 1] = 0x2f;
+                    }
+                    i += 3;
+                    None
+                }
+                _ => None,
+            }
+        } else {
+            None
         };
 
         if let Some(length) = length {
