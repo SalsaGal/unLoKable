@@ -53,17 +53,34 @@ fn main() {
         lexeme.visualise(0);
     }
 
-    let mut output = File::create(path.with_file_name(format!(
+    let mut output = vec![];
+    for lexeme in &lexemes {
+        write_lexeme(&mut output, lexeme);
+    }
+
+    let mut i = 0;
+    while i < output.len() {
+        let mut chunk = output.iter().skip(i).take(4);
+        if *chunk.next().unwrap() == 0xff
+            && *chunk.next().unwrap() == 0x32
+            && *chunk.next().unwrap() == 0x01
+        {
+            output.splice(i..i + 4, [0xff, 0x2f, 0x00]);
+            i += 3;
+        } else {
+            i += 1;
+        }
+    }
+
+    let mut output_file = File::create(path.with_file_name(format!(
         "{}_expanded.bin",
         path.file_stem().unwrap().to_string_lossy()
     )))
     .unwrap();
-    for lexeme in &lexemes {
-        write_lexeme(&mut output, lexeme);
-    }
+    output_file.write_all(&output).unwrap();
 }
 
-fn write_lexeme(file: &mut File, lexeme: &Lexeme) {
+fn write_lexeme(file: &mut Vec<u8>, lexeme: &Lexeme) {
     match lexeme {
         Lexeme::Data(data) => file.write_all(data).unwrap(),
         Lexeme::Loop(count, lexemes) => {
