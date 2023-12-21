@@ -18,43 +18,7 @@ fn main() {
     let mut contents = vec![];
     file.read_to_end(&mut contents).expect("file not readable");
 
-    let mut content_iter = contents.iter().copied();
-
-    let header = Header::load(&mut content_iter);
-    dbg_hex!(&header);
-    assert_eq!(0x5145_5361, header.magic, "invalid magic number");
-
-    let body = content_iter.collect::<Vec<_>>();
-    let tokens = Token::parse(&body);
-    dbg_hex!(&tokens);
-
-    let lexemes = Lexeme::lex(tokens);
-    dbg_hex!(&lexemes);
-    for lexeme in &lexemes {
-        lexeme.visualise(0);
-    }
-
-    let mut output = vec![];
-    for lexeme in &lexemes {
-        lexeme.write_lexeme(&mut output);
-    }
-
-    let mut i = 0;
-    while i < output.len() {
-        let mut chunk = output.iter().skip(i).take(4);
-        // TODO this might crash
-        if *chunk.next().unwrap() == 0xff
-            && *chunk.next().unwrap() == 0x32
-            && *chunk.next().unwrap() == 0x01
-        {
-            output.splice(i..i + 4, [0xff, 0x2f, 0x00]);
-            i += 3;
-        } else {
-            i += 1;
-        }
-    }
-
-    dictionary(&mut output, header.quarter_note_time);
+    let (header, body) = convert(&contents);
 
     let mut output_file = File::create(args.output.unwrap_or_else(|| {
         args.input.with_file_name(format!(
@@ -73,7 +37,7 @@ fn main() {
                 .collect::<Vec<_>>(),
         )
         .unwrap();
-    let output_end = output
+    let output_end = body
         .windows(3)
         .enumerate()
         .find_map(|(i, c)| {
@@ -84,7 +48,49 @@ fn main() {
             }
         })
         .unwrap();
-    output_file.write_all(&output[0..output_end + 3]).unwrap();
+    output_file.write_all(&body[0..output_end + 3]).unwrap();
+}
+
+fn convert(bytes: &[u8]) -> (Header, Vec<u8>) {
+    let mut content_iter = bytes.iter().copied();
+
+    let header = Header::load(&mut content_iter);
+    dbg_hex!(&header);
+    assert_eq!(0x5145_5361, header.magic, "invalid magic number");
+
+    let body = content_iter.collect::<Vec<_>>();
+    let tokens = Token::parse(&body);
+    dbg_hex!(&tokens);
+
+    let lexemes = Lexeme::lex(tokens);
+    dbg_hex!(&lexemes);
+    for lexeme in &lexemes {
+        lexeme.visualise(0);
+    }
+
+    let mut body = vec![];
+    for lexeme in &lexemes {
+        lexeme.write_lexeme(&mut body);
+    }
+
+    let mut i = 0;
+    while i < body.len() {
+        let mut chunk = body.iter().skip(i).take(4);
+        // TODO this might crash
+        if *chunk.next().unwrap() == 0xff
+            && *chunk.next().unwrap() == 0x32
+            && *chunk.next().unwrap() == 0x01
+        {
+            body.splice(i..i + 4, [0xff, 0x2f, 0x00]);
+            i += 3;
+        } else {
+            i += 1;
+        }
+    }
+
+    dictionary(&mut body, header.quarter_note_time);
+
+    (header, body)
 }
 
 fn dictionary(file: &mut Vec<u8>, quarter_note_time: u32) {
