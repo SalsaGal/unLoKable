@@ -7,7 +7,12 @@ use std::{fs::File, io::Read, path::PathBuf};
 #[derive(Parser)]
 #[command(version)]
 struct Args {
+    /// cds file to read
     input: PathBuf,
+    /// Whether to display debug information or not
+    #[clap(long, short)]
+    debug: bool,
+    /// Output path of the seq file, defaults to the input with a different extension
     #[clap(long, short)]
     output: Option<PathBuf>,
 }
@@ -18,7 +23,7 @@ fn main() {
     let mut contents = vec![];
     file.read_to_end(&mut contents).expect("file not readable");
 
-    let (header, body) = convert(&contents);
+    let (header, body) = convert(&contents, args.debug);
 
     let mut output_file = File::create(args.output.unwrap_or_else(|| {
         args.input.with_file_name(format!(
@@ -51,21 +56,27 @@ fn main() {
     output_file.write_all(&body[0..output_end + 3]).unwrap();
 }
 
-fn convert(bytes: &[u8]) -> (Header, Vec<u8>) {
+fn convert(bytes: &[u8], debug: bool) -> (Header, Vec<u8>) {
     let mut content_iter = bytes.iter().copied();
 
     let header = Header::load(&mut content_iter);
-    dbg_hex!(&header);
+    if debug {
+        dbg_hex!(&header);
+    }
     assert_eq!(0x5145_5361, header.magic, "invalid magic number");
 
     let body = content_iter.collect::<Vec<_>>();
     let tokens = Token::parse(&body);
-    dbg_hex!(&tokens);
+    if debug {
+        dbg_hex!(&tokens);
+    }
 
     let lexemes = Lexeme::lex(tokens);
-    dbg_hex!(&lexemes);
-    for lexeme in &lexemes {
-        lexeme.visualise(0);
+    if debug {
+        dbg_hex!(&lexemes);
+        for lexeme in &lexemes {
+            lexeme.visualise(0);
+        }
     }
 
     let mut body = vec![];
