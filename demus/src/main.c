@@ -178,8 +178,8 @@ int main(int argc, char *argv[]) {
   make_directory(samples_path);
 
   for (int i = 0; i < header.numWaves; i++) {
-    char *msq_path = calloc(strlen(remove_extension(mus_path)) + strlen(remove_extension(remove_path(mus_path))) + 20, sizeof(char));
-    sprintf(msq_path, "%s/samples/%s_%04d.bin", remove_extension(mus_path), remove_extension(remove_path(mus_path)), i);
+    char *msq_path = calloc(strlen(remove_extension(mus_path)) + strlen(remove_extension(remove_path(mus_path))) + 16 + strlen(wave_entries[i].name), sizeof(char));
+    sprintf(msq_path, "%s/samples/%.20s.bin", remove_extension(mus_path), wave_entries[i].name);
 
     FILE *msq_out = fopen(msq_path, "wb");
     for (unsigned char *c = waves[i].start; c < waves[i].start + waves[i].length; c++) {
