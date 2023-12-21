@@ -80,7 +80,18 @@ fn main() {
         path.file_stem().unwrap().to_string_lossy()
     )))
     .unwrap();
-    output_file.write_all(&output).unwrap();
+    let output_end = output
+        .windows(3)
+        .enumerate()
+        .find_map(|(i, c)| {
+            if *c == [0xff, 0x2f, 0x00] {
+                Some(i)
+            } else {
+                None
+            }
+        })
+        .unwrap();
+    output_file.write_all(&output[0..output_end + 3]).unwrap();
 }
 
 fn dictionary(file: &mut Vec<u8>, quarter_note_time: u32) {
