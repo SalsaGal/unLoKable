@@ -3,15 +3,6 @@ use either::Either;
 use std::io::Write;
 use std::{fs::File, io::Read, path::PathBuf};
 
-#[derive(Debug)]
-struct Header {
-    magic: u32,
-    quarter_note_time: u32,
-    ppqn: u16,
-    #[allow(unused)]
-    version: u16,
-}
-
 fn main() {
     let path = PathBuf::from(
         std::env::args()
@@ -24,31 +15,15 @@ fn main() {
 
     let mut content_iter = contents.iter().copied();
 
-    let header = Header {
-        magic: u32::from_be_bytes([
-            content_iter.next().unwrap(),
-            content_iter.next().unwrap(),
-            content_iter.next().unwrap(),
-            content_iter.next().unwrap(),
-        ]),
-        quarter_note_time: u32::from_be_bytes([
-            content_iter.next().unwrap(),
-            content_iter.next().unwrap(),
-            content_iter.next().unwrap(),
-            content_iter.next().unwrap(),
-        ]),
-        ppqn: u16::from_be_bytes([content_iter.next().unwrap(), content_iter.next().unwrap()]),
-        version: u16::from_be_bytes([content_iter.next().unwrap(), content_iter.next().unwrap()]),
-    };
+    let header = Header::load(&mut content_iter);
+    dbg_hex!(&header);
     assert_eq!(0x5145_5361, header.magic, "invalid magic number");
 
-    dbg_hex!(&header);
-
     let body = content_iter.collect::<Vec<_>>();
-    let tokens = parse_file(&body);
+    let tokens = Token::parse(&body);
     dbg_hex!(&tokens);
 
-    let lexemes = lex_file(tokens);
+    let lexemes = Lexeme::lex(tokens);
     dbg_hex!(&lexemes);
     for lexeme in &lexemes {
         lexeme.visualise(0);
@@ -56,7 +31,7 @@ fn main() {
 
     let mut output = vec![];
     for lexeme in &lexemes {
-        write_lexeme(&mut output, lexeme);
+        lexeme.write_lexeme(&mut output);
     }
 
     let mut i = 0;
@@ -175,17 +150,32 @@ fn dictionary(file: &mut Vec<u8>, quarter_note_time: u32) {
     }
 }
 
-fn write_lexeme(file: &mut Vec<u8>, lexeme: &Lexeme) {
-    match lexeme {
-        Lexeme::Data(data) => file.write_all(data).unwrap(),
-        Lexeme::Loop(count, lexemes) => {
-            file.write_all(&[0xff, 0x2e, 0x01, 0x00]).unwrap();
-            for _ in 0..(*count).max(1) {
-                for lexeme in lexemes {
-                    write_lexeme(file, lexeme);
-                }
-                file.write_all(&[0xff, 0x2f, 0x00]).unwrap();
-            }
+#[derive(Debug)]
+struct Header {
+    magic: u32,
+    quarter_note_time: u32,
+    ppqn: u16,
+    #[allow(unused)]
+    version: u16,
+}
+
+impl Header {
+    fn load(bytes: &mut impl Iterator<Item = u8>) -> Self {
+        Header {
+            magic: u32::from_be_bytes([
+                bytes.next().unwrap(),
+                bytes.next().unwrap(),
+                bytes.next().unwrap(),
+                bytes.next().unwrap(),
+            ]),
+            quarter_note_time: u32::from_be_bytes([
+                bytes.next().unwrap(),
+                bytes.next().unwrap(),
+                bytes.next().unwrap(),
+                bytes.next().unwrap(),
+            ]),
+            ppqn: u16::from_be_bytes([bytes.next().unwrap(), bytes.next().unwrap()]),
+            version: u16::from_be_bytes([bytes.next().unwrap(), bytes.next().unwrap()]),
         }
     }
 }
@@ -200,30 +190,32 @@ enum Token<'a> {
     LoopFinish,
 }
 
-fn parse_file(bytes: &[u8]) -> Vec<Token> {
-    let mut i = 0;
-    let mut tokens = vec![];
-    while i < bytes.len() {
-        if bytes[i] == 0xff {
-            if bytes[i + 1] == 0x2e && bytes[i + 2] == 0x01 {
-                tokens.push(Token::LoopStart(bytes[i + 3]));
-                i += 4;
-                continue;
-            } else if bytes[i + 1] == 0x2f && bytes[i + 2] == 0 {
-                tokens.push(Token::LoopFinish);
-                i += 3;
-                continue;
+impl Token<'_> {
+    fn parse(bytes: &[u8]) -> Vec<Token> {
+        let mut i = 0;
+        let mut tokens = vec![];
+        while i < bytes.len() {
+            if bytes[i] == 0xff {
+                if bytes[i + 1] == 0x2e && bytes[i + 2] == 0x01 {
+                    tokens.push(Token::LoopStart(bytes[i + 3]));
+                    i += 4;
+                    continue;
+                } else if bytes[i + 1] == 0x2f && bytes[i + 2] == 0 {
+                    tokens.push(Token::LoopFinish);
+                    i += 3;
+                    continue;
+                }
             }
+            if let Some(Token::Data(data)) = tokens.last_mut() {
+                *data = &bytes[i - data.len()..=i];
+            } else {
+                tokens.push(Token::Data(&bytes[i..=i]));
+            }
+            i += 1;
         }
-        if let Some(Token::Data(data)) = tokens.last_mut() {
-            *data = &bytes[i - data.len()..=i];
-        } else {
-            tokens.push(Token::Data(&bytes[i..=i]));
-        }
-        i += 1;
-    }
 
-    tokens
+        tokens
+    }
 }
 
 #[derive(Debug)]
@@ -249,42 +241,59 @@ impl Lexeme {
             ),
         }
     }
-}
 
-fn lex_file(tokens: Vec<Token>) -> Vec<Lexeme> {
-    let mut lexemes: Vec<Either<Token, Lexeme>> =
-        tokens.iter().copied().map(Either::Left).collect::<Vec<_>>();
+    fn lex(tokens: Vec<Token>) -> Vec<Lexeme> {
+        let mut lexemes: Vec<Either<Token, Lexeme>> =
+            tokens.iter().copied().map(Either::Left).collect::<Vec<_>>();
 
-    let mut i = 0;
-    while i < lexemes.len() {
-        match lexemes[i] {
-            Either::Left(Token::LoopFinish) => {
-                let mut j = i - 1;
-                lexemes.remove(i);
-                let mut loop_body = vec![];
-                loop {
-                    match lexemes[j] {
-                        Either::Left(Token::LoopStart(count)) => {
-                            loop_body.reverse();
-                            lexemes[j] =
-                                Either::Right(Lexeme::Loop(count, std::mem::take(&mut loop_body)));
-                            i = j;
-                            break;
+        let mut i = 0;
+        while i < lexemes.len() {
+            match lexemes[i] {
+                Either::Left(Token::LoopFinish) => {
+                    let mut j = i - 1;
+                    lexemes.remove(i);
+                    let mut loop_body = vec![];
+                    loop {
+                        match lexemes[j] {
+                            Either::Left(Token::LoopStart(count)) => {
+                                loop_body.reverse();
+                                lexemes[j] = Either::Right(Lexeme::Loop(
+                                    count,
+                                    std::mem::take(&mut loop_body),
+                                ));
+                                i = j;
+                                break;
+                            }
+                            Either::Left(token) => panic!("unexpected token: {token:?}"),
+                            Either::Right(_) => loop_body.push(lexemes.remove(j).unwrap_right()),
                         }
-                        Either::Left(token) => panic!("unexpected token: {token:?}"),
-                        Either::Right(_) => loop_body.push(lexemes.remove(j).unwrap_right()),
+                        j -= 1;
                     }
-                    j -= 1;
                 }
+                Either::Left(Token::Data(data)) => {
+                    lexemes[i] = Either::Right(Lexeme::Data(data.to_vec()));
+                }
+                Either::Left(Token::LoopStart(_)) | Either::Right(_) => {}
             }
-            Either::Left(Token::Data(data)) => {
-                lexemes[i] = Either::Right(Lexeme::Data(data.to_vec()));
-            }
-            Either::Left(Token::LoopStart(_)) | Either::Right(_) => {}
+
+            i += 1;
         }
 
-        i += 1;
+        lexemes.into_iter().map(Either::unwrap_right).collect()
     }
 
-    lexemes.into_iter().map(Either::unwrap_right).collect()
+    fn write_lexeme(&self, file: &mut Vec<u8>) {
+        match self {
+            Lexeme::Data(data) => file.write_all(data).unwrap(),
+            Lexeme::Loop(count, lexemes) => {
+                file.write_all(&[0xff, 0x2e, 0x01, 0x00]).unwrap();
+                for _ in 0..(*count).max(1) {
+                    for lexeme in lexemes {
+                        lexeme.write_lexeme(file);
+                    }
+                    file.write_all(&[0xff, 0x2f, 0x00]).unwrap();
+                }
+            }
+        }
+    }
 }

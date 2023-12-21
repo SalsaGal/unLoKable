@@ -1,2 +1,0 @@
-[default]
-cargo run -- tests/nothing.cds
