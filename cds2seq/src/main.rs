@@ -80,6 +80,16 @@ fn main() {
         path.file_stem().unwrap().to_string_lossy()
     )))
     .unwrap();
+    output_file
+        .write_all(
+            &[0x70, 0x51, 0x45, 0x53, 0x00, 0x00, 0x00, 0x01]
+                .into_iter()
+                .chain(header.ppqn.to_le_bytes())
+                .chain(header.quarter_note_time.to_le_bytes().into_iter().skip(1))
+                .chain([0x04, 0x02])
+                .collect::<Vec<_>>(),
+        )
+        .unwrap();
     let output_end = output
         .windows(3)
         .enumerate()
