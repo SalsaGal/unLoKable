@@ -8,6 +8,7 @@ struct Header {
     magic: u32,
     quarter_note_time: u32,
     ppqn: u16,
+    #[allow(unused)]
     version: u16,
 }
 
@@ -76,7 +77,7 @@ fn main() {
     dictionary(&mut output, header.quarter_note_time);
 
     let mut output_file = File::create(path.with_file_name(format!(
-        "{}_expanded.bin",
+        "{}.seq",
         path.file_stem().unwrap().to_string_lossy()
     )))
     .unwrap();
