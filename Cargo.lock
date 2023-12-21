@@ -144,6 +144,10 @@ dependencies = [
 [[package]]
 name = "sequence"
 version = "0.1.0"
+dependencies = [
+ "clap",
+ "dbg_hex",
+]
 
 [[package]]
 name = "strsim"
