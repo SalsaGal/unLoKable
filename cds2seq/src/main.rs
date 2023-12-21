@@ -1,15 +1,20 @@
+use clap::Parser;
 use dbg_hex::dbg_hex;
 use either::Either;
 use std::io::Write;
 use std::{fs::File, io::Read, path::PathBuf};
 
+#[derive(Parser)]
+#[command(version)]
+struct Args {
+    input: PathBuf,
+    #[clap(long, short)]
+    output: Option<PathBuf>,
+}
+
 fn main() {
-    let path = PathBuf::from(
-        std::env::args()
-            .nth(1)
-            .expect("argument needs to be supplied"),
-    );
-    let mut file = File::open(&path).expect("file cannot be opened");
+    let args = Args::parse();
+    let mut file = File::open(&args.input).expect("file cannot be opened");
     let mut contents = vec![];
     file.read_to_end(&mut contents).expect("file not readable");
 
@@ -51,10 +56,12 @@ fn main() {
 
     dictionary(&mut output, header.quarter_note_time);
 
-    let mut output_file = File::create(path.with_file_name(format!(
-        "{}.seq",
-        path.file_stem().unwrap().to_string_lossy()
-    )))
+    let mut output_file = File::create(args.output.unwrap_or_else(|| {
+        args.input.with_file_name(format!(
+            "{}.seq",
+            args.input.file_stem().unwrap().to_string_lossy()
+        ))
+    }))
     .unwrap();
     output_file
         .write_all(
