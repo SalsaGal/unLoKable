@@ -25,12 +25,12 @@ fn main() {
     let output = convert(bytes, args.debug);
 }
 
-fn convert(bytes: Vec<u8>, debug: bool) -> Vec<u8> {
+fn convert(bytes: Vec<u8>, debug: bool) -> Vec<Vec<u8>> {
     let mut bytes_iter = bytes.iter();
 
     let header = MsqHeader::parse(&mut bytes_iter);
     assert!(
-        header.magic == 0x5153_4d61 || header.magic == 0x5145_5361,
+        header.magic == 0x614d_5351 || header.magic == 0x6153_4551,
         "found invalid magic number {:#x}",
         header.magic
     );
@@ -42,21 +42,32 @@ fn convert(bytes: Vec<u8>, debug: bool) -> Vec<u8> {
         .take(header.num_tracks as usize * 4)
         .collect::<Vec<_>>()
         .chunks(4)
-        .map(|x| u32::from_be_bytes([*x[0], *x[1], *x[2], *x[3]]))
+        .map(|x| u32::from_le_bytes([*x[0], *x[1], *x[2], *x[3]]))
         .collect::<Vec<_>>();
+
+    if debug {
+        dbg!(&track_offsets);
+    }
 
     let mut tracks = Vec::with_capacity(track_offsets.len());
     for (i, offset) in track_offsets.iter().copied().enumerate() {
         tracks.push(
-            offset
+            offset as usize
                 ..track_offsets
                     .get(i + 1)
                     .copied()
-                    .unwrap_or(bytes.len() as u32),
+                    .unwrap_or(bytes.len() as u32) as usize,
         );
     }
 
-    todo!()
+    if debug {
+        dbg!(&tracks);
+    }
+
+    tracks
+        .into_iter()
+        .map(|x| bytes[x].to_vec())
+        .collect::<Vec<_>>()
 }
 
 #[derive(Debug)]
@@ -72,22 +83,22 @@ struct MsqHeader {
 impl MsqHeader {
     fn parse<'a>(bytes: &mut impl Iterator<Item = &'a u8>) -> Self {
         MsqHeader {
-            magic: u32::from_be_bytes([
+            magic: u32::from_le_bytes([
                 *bytes.next().unwrap(),
                 *bytes.next().unwrap(),
                 *bytes.next().unwrap(),
                 *bytes.next().unwrap(),
             ]),
-            quarter_note_time: u32::from_be_bytes([
+            quarter_note_time: u32::from_le_bytes([
                 *bytes.next().unwrap(),
                 *bytes.next().unwrap(),
                 *bytes.next().unwrap(),
                 *bytes.next().unwrap(),
             ]),
-            ppqn: u16::from_be_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            version: u16::from_be_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            num_tracks: u16::from_be_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            padding: u16::from_be_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+            ppqn: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+            version: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+            num_tracks: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+            padding: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
         }
     }
 }
