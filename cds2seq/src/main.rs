@@ -45,7 +45,24 @@ fn main() {
     dbg_hex!(&header);
 
     let body = content_iter.collect::<Vec<_>>();
-    let tokens = parse_file(&body);
+    let mut tokens = parse_file(&body);
+    let mut loop_starter_count = tokens
+        .iter()
+        .filter(|x| matches!(x, Token::LoopStart(_)))
+        .count();
+    let mut loop_terminator_count = tokens
+        .iter()
+        .filter(|x| matches!(x, Token::LoopFinish))
+        .count();
+    while loop_starter_count < loop_terminator_count {
+        tokens.insert(0, Token::LoopStart(0));
+        loop_starter_count += 1;
+    }
+    while loop_starter_count > loop_terminator_count {
+        tokens.insert(tokens.len() - 1, Token::LoopFinish);
+        tokens.insert(tokens.len() - 1, Token::Data(&[0]));
+        loop_terminator_count += 1;
+    }
     dbg_hex!(&tokens);
 
     let lexemes = lex_file(tokens);
@@ -108,8 +125,11 @@ fn main() {
 fn dictionary(file: &mut Vec<u8>, quarter_note_time: u32) {
     const MAGIC: u16 = 0x51ff;
 
-    let loop_terminator_count = file.windows(3).filter(|x| *x == [0xff, 0x2f, 0x00]).count();
-    let mut loop_terminator_index = 0;
+    let sentinel_count = file
+        .windows(3)
+        .filter(|x| matches!(x, [0xff, 0x2f | 0x44, 0x00]))
+        .count();
+    let mut sentinel_index = 0;
 
     let mut i = 0;
     while i < file.len() {
@@ -138,20 +158,14 @@ fn dictionary(file: &mut Vec<u8>, quarter_note_time: u32) {
                     i += 3;
                     None
                 }
-                [0x2f, 0x00] => {
-                    loop_terminator_index += 1;
-                    if loop_terminator_count > 1 && loop_terminator_index < loop_terminator_count {
-                        Some(3)
-                    } else {
-                        None
-                    }
-                }
-                [0x44, 0x00] => {
-                    if loop_terminator_count == 0 {
+                [0x2f | 0x44, 0x00] => {
+                    sentinel_index += 1;
+                    if sentinel_index == sentinel_count {
                         file[i + 1] = 0x2f;
+                        None
+                    } else {
+                        Some(3)
                     }
-                    i += 3;
-                    None
                 }
                 [0xf0, length] => Some(length as usize + 3),
                 _ => None,
@@ -199,12 +213,15 @@ enum Token<'a> {
     Data(&'a [u8]),
     /// `FF2F00`.
     LoopFinish,
+    /// `FF4400`.
+    GlobalEnding,
 }
 
 fn parse_file(bytes: &[u8]) -> Vec<Token> {
     let mut i = 0;
     let mut tokens = vec![];
     while i < bytes.len() {
+        // TODO Use match layout from dictionary
         if bytes[i] == 0xff {
             if bytes[i + 1] == 0x2e && bytes[i + 2] == 0x01 {
                 tokens.push(Token::LoopStart(bytes[i + 3]));
@@ -212,6 +229,10 @@ fn parse_file(bytes: &[u8]) -> Vec<Token> {
                 continue;
             } else if bytes[i + 1] == 0x2f && bytes[i + 2] == 0 {
                 tokens.push(Token::LoopFinish);
+                i += 3;
+                continue;
+            } else if bytes[i + 1] == 0x44 && bytes[i + 2] == 0 {
+                tokens.push(Token::GlobalEnding);
                 i += 3;
                 continue;
             }
@@ -280,6 +301,9 @@ fn lex_file(tokens: Vec<Token>) -> Vec<Lexeme> {
             }
             Either::Left(Token::Data(data)) => {
                 lexemes[i] = Either::Right(Lexeme::Data(data.to_vec()));
+            }
+            Either::Left(Token::GlobalEnding) => {
+                lexemes[i] = Either::Right(Lexeme::Data(vec![0xff, 0x44, 0x00]))
             }
             Either::Left(Token::LoopStart(_)) | Either::Right(_) => {}
         }
