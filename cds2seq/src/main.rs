@@ -56,6 +56,7 @@ fn main() {
         .count();
     while loop_starter_count < loop_terminator_count {
         tokens.insert(0, Token::LoopStart(0));
+        tokens.insert(0, Token::Data(&[0]));
         loop_starter_count += 1;
     }
     while loop_starter_count > loop_terminator_count {
