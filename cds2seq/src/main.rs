@@ -153,6 +153,7 @@ fn dictionary(file: &mut Vec<u8>, quarter_note_time: u32) {
                     i += 3;
                     None
                 }
+                [0xf0, length] => Some(length as usize + 3),
                 _ => None,
             }
         } else {
