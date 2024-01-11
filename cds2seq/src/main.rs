@@ -168,7 +168,7 @@ fn dictionary(file: &mut Vec<u8>, quarter_note_time: u32) {
                     .chain(quarter_note_time.to_ne_bytes().iter().skip(1))
                     .copied(),
             );
-            i += length - 5;
+            i += 5;
         } else {
             i += 1;
         }
