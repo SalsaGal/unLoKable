@@ -1,5 +1,9 @@
 use dbg_hex::dbg_hex;
-use std::{fs::File, io::Read, path::PathBuf};
+use std::{
+    fs::File,
+    io::{Read, Write},
+    path::PathBuf,
+};
 
 use clap::Parser;
 
@@ -18,14 +22,38 @@ struct Args {
 
 fn main() {
     let args = Args::parse();
-    let mut input = File::open(args.input).expect("unable to open file");
+    let mut input = File::open(&args.input).expect("unable to open file");
     let mut bytes = vec![];
     input.read_to_end(&mut bytes).unwrap();
 
-    let output = convert(bytes, args.debug);
+    let (header, tracks) = convert(bytes, args.debug);
+    let folder = args.input.with_extension("");
+    std::fs::create_dir(&folder).expect("unable to make output folder");
+    for (index, track) in tracks.into_iter().enumerate() {
+        let mut output = File::create(folder.join(format!(
+            "{}_{index:04}.cds",
+            folder.file_name().unwrap().to_string_lossy()
+        )))
+        .unwrap();
+        output
+            .write_all(
+                &[
+                    &[0x70, 0x53, 0x44, 0x43, 0x0, 0x0, 0x0, 0x1],
+                    header.ppqn.to_ne_bytes().as_slice(),
+                    &header.quarter_note_time.to_ne_bytes()[1..],
+                    &[0x4, 0x2],
+                ]
+                .into_iter()
+                .flatten()
+                .copied()
+                .collect::<Vec<_>>(),
+            )
+            .unwrap();
+        output.write_all(&track).unwrap();
+    }
 }
 
-fn convert(bytes: Vec<u8>, debug: bool) -> Vec<Vec<u8>> {
+fn convert(bytes: Vec<u8>, debug: bool) -> (MsqHeader, Vec<Vec<u8>>) {
     let mut bytes_iter = bytes.iter();
 
     let header = MsqHeader::parse(&mut bytes_iter);
@@ -64,10 +92,13 @@ fn convert(bytes: Vec<u8>, debug: bool) -> Vec<Vec<u8>> {
         dbg!(&tracks);
     }
 
-    tracks
-        .into_iter()
-        .map(|x| bytes[x].to_vec())
-        .collect::<Vec<_>>()
+    (
+        header,
+        tracks
+            .into_iter()
+            .map(|x| bytes[x].to_vec())
+            .collect::<Vec<_>>(),
+    )
 }
 
 #[derive(Debug)]
@@ -75,9 +106,9 @@ struct MsqHeader {
     magic: u32,
     quarter_note_time: u32,
     ppqn: u16,
-    version: u16,
+    _version: u16,
     num_tracks: u16,
-    padding: u16,
+    _padding: u16,
 }
 
 impl MsqHeader {
@@ -96,9 +127,9 @@ impl MsqHeader {
                 *bytes.next().unwrap(),
             ]),
             ppqn: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            version: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+            _version: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
             num_tracks: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            padding: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+            _padding: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
         }
     }
 }
