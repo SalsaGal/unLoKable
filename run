@@ -1,12 +1,3 @@
 [default]
-make
-# out/bin/sound tests/ucma.snd tests/ucma.smp
-# out/bin/sequence tests/ucma/sequences/ucma_0003.msq
-# out/bin/cds2seq tests/all_cases.cds
-rm out/output.txt
-out/bin/demus -c tests/overland.mus tests/overland.sam > out/output.txt
-bat out/output.txt
-
-[clean]
-rm -rf tests/ucma
-make clean
+cargo run --bin sequence -- tests/msq_example.msq
+cargo run --bin cds2seq -- tests/factorial.cds
