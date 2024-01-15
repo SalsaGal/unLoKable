@@ -36,10 +36,10 @@ fn main() {
         output
             .write_all(
                 &[
-                    &[0x70, 0x53, 0x44, 0x43, 0x0, 0x0, 0x0, 0x1],
+                    &[0x51, 0x45, 0x53, 0x61],
+                    header.quarter_note_time.to_ne_bytes().as_slice(),
                     header.ppqn.to_ne_bytes().as_slice(),
-                    &header.quarter_note_time.to_ne_bytes()[1..],
-                    &[0x4, 0x2],
+                    &[0x43, 0x00],
                 ]
                 .into_iter()
                 .flatten()
