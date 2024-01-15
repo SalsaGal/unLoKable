@@ -1,7 +1,21 @@
+use clap::Parser;
 use dbg_hex::dbg_hex;
 use either::Either;
 use std::io::Write;
 use std::{fs::File, path::PathBuf};
+
+#[derive(Parser)]
+#[command(version)]
+struct Args {
+    /// msq file to read
+    input: PathBuf,
+    /// Whether to display debug information or not
+    #[clap(long, short)]
+    debug: bool,
+    /// Output path of the cds file, defaults to the input with a different extension
+    #[clap(long, short)]
+    output: Option<PathBuf>,
+}
 
 #[derive(Debug)]
 struct Header {
@@ -13,12 +27,8 @@ struct Header {
 }
 
 fn main() {
-    let path = PathBuf::from(
-        std::env::args()
-            .nth(1)
-            .expect("argument needs to be supplied"),
-    );
-    let contents = std::fs::read(&path).expect("file cannot be opened");
+    let args = Args::parse();
+    let contents = std::fs::read(&args.input).expect("file cannot be opened");
 
     let mut content_iter = contents.iter().copied();
 
@@ -40,7 +50,9 @@ fn main() {
     };
     assert_eq!(0x5145_5361, header.magic, "invalid magic number");
 
-    dbg_hex!(&header);
+    if args.debug {
+        dbg_hex!(&header);
+    }
 
     let body = content_iter.collect::<Vec<_>>();
     let mut tokens = parse_file(&body);
@@ -62,10 +74,14 @@ fn main() {
         tokens.insert(tokens.len() - 1, Token::Data(&[0]));
         loop_terminator_count += 1;
     }
-    dbg_hex!(&tokens);
+    if args.debug {
+        dbg_hex!(&tokens);
+    }
 
     let lexemes = lex_file(tokens);
-    dbg_hex!(&lexemes);
+    if args.debug {
+        dbg_hex!(&lexemes);
+    }
     for lexeme in &lexemes {
         lexeme.visualise(0);
     }
@@ -92,10 +108,12 @@ fn main() {
 
     dictionary(&mut output, header.quarter_note_time);
 
-    let mut output_file = File::create(path.with_file_name(format!(
-        "{}.seq",
-        path.file_stem().unwrap().to_string_lossy()
-    )))
+    let mut output_file = File::create(args.output.unwrap_or_else(|| {
+        args.input.with_file_name(format!(
+            "{}.seq",
+            args.input.file_stem().unwrap().to_string_lossy()
+        ))
+    }))
     .unwrap();
     output_file
         .write_all(
