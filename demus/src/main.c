@@ -171,6 +171,25 @@ int main(int argc, char *argv[]) {
     waves[i].start = sam_buffer.start + wave_entries[i].offset;
     waves[i].length = wave_entries[i].size;
     printf("Wave #%d: 0x%x + 0x%x\n", i, waves[i].start, waves[i].length);
+
+    if (!pc_style) {
+      unsigned char *to_check = waves[i].start + waves[i].length - 16;
+      // TODO Fix this
+      bool to_change = true;
+      if (to_check[0] != 0x07 && to_check[1] != 00) {
+        to_change = false;
+      }
+      for (int i = 2; i < 16; i++) {
+        if (to_check[i] != 0x77) {
+          to_change = false;
+          break;
+        }
+      }
+
+      if (to_change) {
+        to_check[1] = 0x07;
+      }
+    }
   }
 
   char *samples_path = calloc(strlen(remove_extension(mus_path)) + 8, sizeof(char));
