@@ -1,9 +1,5 @@
 use dbg_hex::dbg_hex;
-use std::{
-    fs::File,
-    io::{Read, Write},
-    path::PathBuf,
-};
+use std::{fs::File, io::Write, path::PathBuf};
 
 use clap::Parser;
 
