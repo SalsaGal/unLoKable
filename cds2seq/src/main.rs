@@ -1,7 +1,7 @@
 use dbg_hex::dbg_hex;
 use either::Either;
 use std::io::Write;
-use std::{fs::File, io::Read, path::PathBuf};
+use std::{fs::File, path::PathBuf};
 
 #[derive(Debug)]
 struct Header {
@@ -18,9 +18,7 @@ fn main() {
             .nth(1)
             .expect("argument needs to be supplied"),
     );
-    let mut file = File::open(&path).expect("file cannot be opened");
-    let mut contents = vec![];
-    file.read_to_end(&mut contents).expect("file not readable");
+    let contents = std::fs::read(&path).expect("file cannot be opened");
 
     let mut content_iter = contents.iter().copied();
 

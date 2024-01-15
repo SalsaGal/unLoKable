@@ -22,9 +22,7 @@ struct Args {
 
 fn main() {
     let args = Args::parse();
-    let mut input = File::open(&args.input).expect("unable to open file");
-    let mut bytes = vec![];
-    input.read_to_end(&mut bytes).unwrap();
+    let bytes = std::fs::read(&args.input).expect("unable to open file");
 
     let (header, tracks) = convert(bytes, args.debug);
     let folder = args.input.with_extension("");
