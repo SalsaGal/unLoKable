@@ -163,6 +163,7 @@ int main(int argc, char *argv[]) {
     for (unsigned char *c = sequences[i].start; c < sequences[i].start + sequences[i].length; c++) {
       write_byte(msq_out, *c);
     }
+    fclose(msq_out);
   }
 
   Slice *waves = calloc(header.numWaves, sizeof(Slice));
@@ -185,6 +186,7 @@ int main(int argc, char *argv[]) {
     for (unsigned char *c = waves[i].start; c < waves[i].start + waves[i].length; c++) {
       write_byte(msq_out, *c);
     }
+    fclose(msq_out);
   }
 
   return EXIT_SUCCESS;
