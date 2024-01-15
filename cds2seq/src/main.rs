@@ -126,7 +126,7 @@ fn dictionary(file: &mut Vec<u8>, quarter_note_time: u32) {
 
     let sentinel_count = file
         .windows(3)
-        .filter(|x| matches!(x, [0xff, 0x2f | 0x44, 0x00]))
+        .filter(|x| matches!(x, [0xff, 0x2f, 0x00]))
         .count();
     let mut sentinel_index = 0;
 
@@ -159,7 +159,7 @@ fn dictionary(file: &mut Vec<u8>, quarter_note_time: u32) {
                 }
                 [0x2f | 0x44, 0x00] => {
                     sentinel_index += 1;
-                    if sentinel_index == sentinel_count {
+                    if sentinel_index >= sentinel_count {
                         file[i + 1] = 0x2f;
                         None
                     } else {
