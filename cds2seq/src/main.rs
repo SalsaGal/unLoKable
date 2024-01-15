@@ -18,9 +18,7 @@ fn main() {
             .nth(1)
             .expect("argument needs to be supplied"),
     );
-    let mut file = File::open(&path).expect("file cannot be opened");
-    let mut contents = vec![];
-    file.read_to_end(&mut contents).expect("file not readable");
+    let contents = std::fs::read(&path).expect("file not readable");
 
     let mut content_iter = contents.iter().copied();
 
