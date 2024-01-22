@@ -3,7 +3,6 @@
 #include "../../lib/strings.h"
 #include "structures.h"
 
-#include <bits/pthreadtypes.h>
 #include <getopt.h>
 #include <stdbool.h>
 #include <stdio.h>
