@@ -11,8 +11,10 @@ pub enum Platform {
 #[derive(Parser)]
 #[command(version)]
 struct Args {
-    /// msq file to read
-    input: PathBuf,
+    /// `mus` file to read
+    mus_path: PathBuf,
+    /// `sam` file to read
+    sam_path: PathBuf,
     /// Whether to display debug information or not
     #[clap(short)]
     debug: bool,
@@ -24,6 +26,194 @@ struct Args {
     output: Option<PathBuf>,
 }
 
+macro_rules! le_bytes {
+    ($bytes: ident) => {
+        u32::from_le_bytes([
+            $bytes.next().unwrap(),
+            $bytes.next().unwrap(),
+            $bytes.next().unwrap(),
+            $bytes.next().unwrap(),
+        ])
+    };
+}
+
+macro_rules! be_bytes {
+    ($bytes: ident) => {
+        u32::from_be_bytes([
+            $bytes.next().unwrap(),
+            $bytes.next().unwrap(),
+            $bytes.next().unwrap(),
+            $bytes.next().unwrap(),
+        ])
+    };
+}
+
+macro_rules! name_bytes {
+    ($bytes: ident) => {{
+        let mut bytes = (&mut $bytes)
+            .take(20)
+            .take_while(WaveEntry::valid_char)
+            .collect::<Vec<_>>();
+        while bytes.len() < 20 {
+            bytes.push(0);
+        }
+        bytes
+            .into_iter()
+            .map(char::from)
+            .collect::<Vec<_>>()
+            .try_into()
+            .unwrap()
+    }};
+}
+
 fn main() {
     let args = Args::parse();
+
+    let mut mus_file = std::fs::read(args.mus_path).unwrap().into_iter();
+    let mut sam_file = std::fs::read(args.sam_path).unwrap().into_iter();
+
+    let header = MusHeader {
+        magic: le_bytes!(mus_file),
+        header_size: be_bytes!(mus_file),
+        version_number: be_bytes!(mus_file),
+        reverb_volume: be_bytes!(mus_file),
+        reverb_type: be_bytes!(mus_file),
+        reverb_multiply: be_bytes!(mus_file),
+        num_sequences: be_bytes!(mus_file),
+        num_labels: be_bytes!(mus_file),
+        offset_to_labels_offsets_table: be_bytes!(mus_file),
+        num_waves: be_bytes!(mus_file),
+        num_programs: be_bytes!(mus_file),
+        num_presets: be_bytes!(mus_file),
+    };
+    assert_eq!(header.magic, 0x4D757321, "Invalid magic number");
+    if args.debug {
+        dbg!(&header);
+    }
+
+    let msq_tables = (0..header.num_sequences)
+        .map(|_| MsqTable {
+            index: be_bytes!(mus_file),
+            offset: be_bytes!(mus_file),
+        })
+        .collect::<Vec<_>>();
+    if args.debug {
+        dbg!(&msq_tables);
+    }
+
+    let layers = (0..header.num_presets + header.num_programs)
+        .map(|_| be_bytes!(mus_file))
+        .collect::<Vec<_>>();
+    if args.debug {
+        dbg!(layers);
+    }
+
+    let wave_entries = (0..header.num_waves)
+        .map(|_| WaveEntry {
+            name: name_bytes!(mus_file),
+            offset: be_bytes!(mus_file),
+            loop_begin: be_bytes!(mus_file),
+            size: be_bytes!(mus_file),
+            loop_end: be_bytes!(mus_file),
+            sample_rate: be_bytes!(mus_file),
+            original_pitch: be_bytes!(mus_file),
+            loop_info: be_bytes!(mus_file),
+            snd_handle: be_bytes!(mus_file),
+        })
+        .collect::<Vec<_>>();
+    if args.debug {
+        dbg!(wave_entries);
+    }
+
+    let program_entries = (0..header.num_programs)
+        .map(|_| ProgramEntry {
+            name: name_bytes!(mus_file),
+            num_zones: be_bytes!(mus_file),
+        })
+        .collect::<Vec<_>>();
+}
+
+#[derive(Debug)]
+struct MusHeader {
+    magic: u32,
+    header_size: u32,
+    version_number: u32,
+    reverb_volume: u32,
+    reverb_type: u32,
+    reverb_multiply: u32,
+    num_sequences: u32,
+    num_labels: u32,
+    offset_to_labels_offsets_table: u32,
+    num_waves: u32,
+    num_programs: u32,
+    num_presets: u32,
+}
+
+#[derive(Debug)]
+struct MsqTable {
+    index: u32,
+    offset: u32,
+}
+
+#[derive(Debug)]
+struct WaveEntry {
+    name: [char; 20],
+    offset: u32,
+    loop_begin: u32,
+    size: u32,
+    loop_end: u32,
+    sample_rate: u32,
+    original_pitch: u32,
+    loop_info: u32,
+    snd_handle: u32,
+}
+
+impl WaveEntry {
+    fn valid_char(c: &u8) -> bool {
+        match c {
+            34 | 36 | 42 | 47 | 58 | 59 | 60 | 62 | 63 | 92 | 94 | 96 => false,
+            32..=126 => true,
+            _ => false,
+        }
+    }
+}
+
+#[derive(Debug)]
+struct Envelope {
+    delay: f32,
+    attack: f32,
+    hold: f32,
+    decay: f32,
+    sustain: f32,
+    release: f32,
+}
+
+#[derive(Debug)]
+struct ProgramZone {
+    pitch_finetuning: u32,
+    reverb: u32,
+    pan_position: f32,
+    keynum_hold: u32,
+    keynum_decay: u32,
+    volume_env: Envelope,
+    volume_env_atten: f32,
+    vib_delay: f32,
+    vib_frequency: f32,
+    vib_to_pitch: f32,
+    // usually padded as 0xFFFFFFFF. Copy the value from the "originalPitch" variable from the "waveEntry" structure */
+    root_key: u32,
+    note_low: u8,
+    note_high: u8,
+    velocity_low: u8,
+    velocity_high: u8,
+    wave_index: u32,
+    base_priority: f32,
+    modul_env: Envelope,
+    modul_env_to_pitch: f32,
+}
+
+#[derive(Debug)]
+struct ProgramEntry {
+    name: [char; 20],
+    num_zones: u32,
 }
