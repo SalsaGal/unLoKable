@@ -4,4 +4,5 @@ members = [
     "cds2seq",
     "demus",
     "msqsplit",
+    "seqrepeat",
 ]
