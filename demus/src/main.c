@@ -239,10 +239,10 @@ int main(int argc, char *argv[]) {
     write_byte(ads_out, 0x62);
     write_byte(ads_out, 0x64);
 
-    write_byte(ads_out, wave_entries[i].size & 0xff);
-    write_byte(ads_out, wave_entries[i].size & 0xff00 >> 8);
-    write_byte(ads_out, wave_entries[i].size & 0xff0000 >> 16);
-    write_byte(ads_out, wave_entries[i].size & 0xff000000 >> 24);
+    write_byte(ads_out, (wave_entries[i].size & 0xff));
+    write_byte(ads_out, (wave_entries[i].size & 0xff00) >> 8);
+    write_byte(ads_out, (wave_entries[i].size & 0xff0000) >> 16);
+    write_byte(ads_out, (wave_entries[i].size & 0xff000000) >> 24);
     
     for (unsigned char *c = waves[i].start; c < waves[i].start + waves[i].length; c++) {
       write_byte(ads_out, *c);
