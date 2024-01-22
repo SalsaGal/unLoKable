@@ -1,4 +1,4 @@
-use std::{fs::File, io::Write, path::PathBuf};
+use std::{fs::File, io::Write, num::NonZeroUsize, path::PathBuf};
 
 use clap::Parser;
 
@@ -7,7 +7,7 @@ struct Args {
     /// `seq` to read from.
     input: PathBuf,
     /// The number of the passes in the final file.
-    count: usize,
+    count: NonZeroUsize,
     /// Whether to read from the marker rather than the entire file.
     #[clap(short)]
     marker: bool,
@@ -57,9 +57,9 @@ fn main() {
 
     let mut output = Vec::with_capacity(bytes.len());
     output.write_all(beginning).unwrap();
-    for i in 0..args.count {
+    for i in 0..args.count.get() {
         output.write_all(to_copy).unwrap();
-        if i < args.count - 1 {
+        if i < args.count.get() - 1 {
             output.splice(output.len() - 3.., header.dummy_string());
         }
     }
