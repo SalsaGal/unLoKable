@@ -14,6 +14,12 @@ void write_byte(FILE *file, unsigned char byte) {
   fprintf(file, "%c", byte);
 }
 
+void write_byte_count(FILE *file, unsigned char byte, int count) {
+  for (int i = 0; i < count; i++) {
+    write_byte(file, byte);
+  }
+}
+
 int main(int argc, char *argv[]) {
   char *output_dir = NULL;
   bool pc_style = true;
@@ -199,13 +205,50 @@ int main(int argc, char *argv[]) {
 
   for (int i = 0; i < header.numWaves; i++) {
     char *msq_path = calloc(strlen(remove_extension(mus_path)) + strlen(remove_extension(remove_path(mus_path))) + 16 + strlen(wave_entries[i].name), sizeof(char));
-    sprintf(msq_path, "%s/samples/%.20s.bin", remove_extension(mus_path), wave_entries[i].name);
+    sprintf(msq_path, "%s/samples/%.20s.ads", remove_extension(mus_path), wave_entries[i].name);
 
-    FILE *msq_out = fopen(msq_path, "wb");
-    for (unsigned char *c = waves[i].start; c < waves[i].start + waves[i].length; c++) {
-      write_byte(msq_out, *c);
+    FILE *ads_out = fopen(msq_path, "wb");
+    write_byte(ads_out, 0x53);
+    write_byte(ads_out, 0x53);
+    write_byte(ads_out, 0x68);
+    write_byte(ads_out, 0x64);
+
+    write_byte(ads_out, 0x18);
+    write_byte_count(ads_out, 0, 3);
+
+    if (pc_style) {
+      write_byte(ads_out, 0x01);
+    } else {
+      write_byte(ads_out, 0x10);
     }
-    fclose(msq_out);
+    write_byte_count(ads_out, 0, 3);
+
+    write_byte(ads_out, wave_entries[i].sampleRate & 0xff);
+    write_byte(ads_out, wave_entries[i].sampleRate & 0xff00 >> 8);
+    write_byte(ads_out, wave_entries[i].sampleRate & 0xff0000 >> 16);
+    write_byte(ads_out, wave_entries[i].sampleRate & 0xff000000 >> 24);
+
+    write_byte(ads_out, 1);
+    write_byte_count(ads_out, 0, 3);
+
+    write_byte_count(ads_out, 0, 4);
+
+    write_byte_count(ads_out, 0xff, 8);
+
+    write_byte(ads_out, 0x53);
+    write_byte(ads_out, 0x53);
+    write_byte(ads_out, 0x62);
+    write_byte(ads_out, 0x64);
+
+    write_byte(ads_out, wave_entries[i].size & 0xff);
+    write_byte(ads_out, wave_entries[i].size & 0xff00 >> 8);
+    write_byte(ads_out, wave_entries[i].size & 0xff0000 >> 16);
+    write_byte(ads_out, wave_entries[i].size & 0xff000000 >> 24);
+    
+    for (unsigned char *c = waves[i].start; c < waves[i].start + waves[i].length; c++) {
+      write_byte(ads_out, *c);
+    }
+    fclose(ads_out);
   }
 
   return EXIT_SUCCESS;
