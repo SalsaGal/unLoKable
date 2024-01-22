@@ -48,6 +48,17 @@ macro_rules! be_bytes {
     };
 }
 
+macro_rules! float_be_bytes {
+    ($bytes: ident) => {
+        f32::from_be_bytes([
+            $bytes.next().unwrap(),
+            $bytes.next().unwrap(),
+            $bytes.next().unwrap(),
+            $bytes.next().unwrap(),
+        ])
+    };
+}
+
 macro_rules! name_bytes {
     ($bytes: ident) => {{
         let mut bytes = (&mut $bytes)
@@ -105,7 +116,7 @@ fn main() {
         .map(|_| be_bytes!(mus_file))
         .collect::<Vec<_>>();
     if args.debug {
-        dbg!(layers);
+        dbg!(&layers);
     }
 
     let wave_entries = (0..header.num_waves)
@@ -122,7 +133,7 @@ fn main() {
         })
         .collect::<Vec<_>>();
     if args.debug {
-        dbg!(wave_entries);
+        dbg!(&wave_entries);
     }
 
     let program_entries = (0..header.num_programs)
@@ -131,6 +142,62 @@ fn main() {
             num_zones: be_bytes!(mus_file),
         })
         .collect::<Vec<_>>();
+    if args.debug {
+        dbg!(&program_entries);
+    }
+
+    let program_zones = (0..header.num_programs)
+        .map(|_| ProgramZone {
+            pitch_finetuning: be_bytes!(mus_file),
+            reverb: be_bytes!(mus_file),
+            pan_position: float_be_bytes!(mus_file),
+            keynum_hold: be_bytes!(mus_file),
+            keynum_decay: be_bytes!(mus_file),
+            volume_env: Envelope::parse(&mut mus_file),
+            volume_env_atten: float_be_bytes!(mus_file),
+            vib_delay: float_be_bytes!(mus_file),
+            vib_frequency: float_be_bytes!(mus_file),
+            vib_to_pitch: float_be_bytes!(mus_file),
+            root_key: be_bytes!(mus_file),
+            note_low: mus_file.next().unwrap(),
+            note_high: mus_file.next().unwrap(),
+            velocity_low: mus_file.next().unwrap(),
+            velocity_high: mus_file.next().unwrap(),
+            wave_index: be_bytes!(mus_file),
+            base_priority: float_be_bytes!(mus_file),
+            modul_env: Envelope::parse(&mut mus_file),
+            modul_env_to_pitch: float_be_bytes!(mus_file),
+        })
+        .collect::<Vec<_>>();
+    if args.debug {
+        dbg!(&program_zones);
+    }
+
+    let preset_entries = (0..header.num_presets)
+        .map(|_| PresetEntry {
+            name: name_bytes!(mus_file),
+            midi_bank_number: be_bytes!(mus_file),
+            midi_preset_number: be_bytes!(mus_file),
+            num_zones: be_bytes!(mus_file),
+        })
+        .collect::<Vec<_>>();
+    if args.debug {
+        dbg!(&preset_entries);
+    }
+
+    let preset_zones = (0..header.num_presets)
+        .map(|_| PresetZone {
+            root_key: be_bytes!(mus_file),
+            note_low: mus_file.next().unwrap(),
+            note_high: mus_file.next().unwrap(),
+            velocity_low: mus_file.next().unwrap(),
+            velocity_high: mus_file.next().unwrap(),
+            program_index: be_bytes!(mus_file),
+        })
+        .collect::<Vec<_>>();
+    if args.debug {
+        dbg!(&preset_zones);
+    }
 }
 
 #[derive(Debug)]
@@ -188,6 +255,19 @@ struct Envelope {
     release: f32,
 }
 
+impl Envelope {
+    fn parse(bytes: &mut impl Iterator<Item = u8>) -> Self {
+        Self {
+            delay: float_be_bytes!(bytes),
+            attack: float_be_bytes!(bytes),
+            hold: float_be_bytes!(bytes),
+            decay: float_be_bytes!(bytes),
+            sustain: float_be_bytes!(bytes),
+            release: float_be_bytes!(bytes),
+        }
+    }
+}
+
 #[derive(Debug)]
 struct ProgramZone {
     pitch_finetuning: u32,
@@ -215,5 +295,23 @@ struct ProgramZone {
 #[derive(Debug)]
 struct ProgramEntry {
     name: [char; 20],
+    num_zones: u32,
+}
+
+#[derive(Debug)]
+struct PresetZone {
+    root_key: u32,
+    note_low: u8,
+    note_high: u8,
+    velocity_low: u8,
+    velocity_high: u8,
+    program_index: u32,
+}
+
+#[derive(Debug)]
+struct PresetEntry {
+    name: [char; 20],
+    midi_bank_number: u32,
+    midi_preset_number: u32,
     num_zones: u32,
 }
