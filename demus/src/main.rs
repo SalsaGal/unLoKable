@@ -80,22 +80,24 @@ macro_rules! name_bytes {
 fn main() {
     let args = Args::parse();
 
-    let mut mus_file = std::fs::read(args.mus_path).unwrap().into_iter();
-    let mut sam_file = std::fs::read(args.sam_path).unwrap().into_iter();
+    let mus_file = std::fs::read(args.mus_path).unwrap();
+    let mut mus_bytes = mus_file.into_iter();
+    let sam_file = std::fs::read(args.sam_path).unwrap();
+    let mut sam_bytes = sam_file.into_iter();
 
     let header = MusHeader {
-        magic: le_bytes!(mus_file),
-        header_size: be_bytes!(mus_file),
-        version_number: be_bytes!(mus_file),
-        reverb_volume: be_bytes!(mus_file),
-        reverb_type: be_bytes!(mus_file),
-        reverb_multiply: be_bytes!(mus_file),
-        num_sequences: be_bytes!(mus_file),
-        num_labels: be_bytes!(mus_file),
-        offset_to_labels_offsets_table: be_bytes!(mus_file),
-        num_waves: be_bytes!(mus_file),
-        num_programs: be_bytes!(mus_file),
-        num_presets: be_bytes!(mus_file),
+        magic: le_bytes!(mus_bytes),
+        header_size: be_bytes!(mus_bytes),
+        version_number: be_bytes!(mus_bytes),
+        reverb_volume: be_bytes!(mus_bytes),
+        reverb_type: be_bytes!(mus_bytes),
+        reverb_multiply: be_bytes!(mus_bytes),
+        num_sequences: be_bytes!(mus_bytes),
+        num_labels: be_bytes!(mus_bytes),
+        offset_to_labels_offsets_table: be_bytes!(mus_bytes),
+        num_waves: be_bytes!(mus_bytes),
+        num_programs: be_bytes!(mus_bytes),
+        num_presets: be_bytes!(mus_bytes),
     };
     assert_eq!(header.magic, 0x4D757321, "Invalid magic number");
     if args.debug {
@@ -104,8 +106,8 @@ fn main() {
 
     let msq_tables = (0..header.num_sequences)
         .map(|_| MsqTable {
-            index: be_bytes!(mus_file),
-            offset: be_bytes!(mus_file),
+            index: be_bytes!(mus_bytes),
+            offset: be_bytes!(mus_bytes),
         })
         .collect::<Vec<_>>();
     if args.debug {
@@ -113,7 +115,7 @@ fn main() {
     }
 
     let layers = (0..header.num_presets + header.num_programs)
-        .map(|_| be_bytes!(mus_file))
+        .map(|_| be_bytes!(mus_bytes))
         .collect::<Vec<_>>();
     if args.debug {
         dbg!(&layers);
@@ -121,15 +123,15 @@ fn main() {
 
     let wave_entries = (0..header.num_waves)
         .map(|_| WaveEntry {
-            name: name_bytes!(mus_file),
-            offset: be_bytes!(mus_file),
-            loop_begin: be_bytes!(mus_file),
-            size: be_bytes!(mus_file),
-            loop_end: be_bytes!(mus_file),
-            sample_rate: be_bytes!(mus_file),
-            original_pitch: be_bytes!(mus_file),
-            loop_info: be_bytes!(mus_file),
-            snd_handle: be_bytes!(mus_file),
+            name: name_bytes!(mus_bytes),
+            offset: be_bytes!(mus_bytes),
+            loop_begin: be_bytes!(mus_bytes),
+            size: be_bytes!(mus_bytes),
+            loop_end: be_bytes!(mus_bytes),
+            sample_rate: be_bytes!(mus_bytes),
+            original_pitch: be_bytes!(mus_bytes),
+            loop_info: be_bytes!(mus_bytes),
+            snd_handle: be_bytes!(mus_bytes),
         })
         .collect::<Vec<_>>();
     if args.debug {
@@ -138,8 +140,8 @@ fn main() {
 
     let program_entries = (0..header.num_programs)
         .map(|_| ProgramEntry {
-            name: name_bytes!(mus_file),
-            num_zones: be_bytes!(mus_file),
+            name: name_bytes!(mus_bytes),
+            num_zones: be_bytes!(mus_bytes),
         })
         .collect::<Vec<_>>();
     if args.debug {
@@ -148,25 +150,25 @@ fn main() {
 
     let program_zones = (0..header.num_programs)
         .map(|_| ProgramZone {
-            pitch_finetuning: be_bytes!(mus_file),
-            reverb: be_bytes!(mus_file),
-            pan_position: float_be_bytes!(mus_file),
-            keynum_hold: be_bytes!(mus_file),
-            keynum_decay: be_bytes!(mus_file),
-            volume_env: Envelope::parse(&mut mus_file),
-            volume_env_atten: float_be_bytes!(mus_file),
-            vib_delay: float_be_bytes!(mus_file),
-            vib_frequency: float_be_bytes!(mus_file),
-            vib_to_pitch: float_be_bytes!(mus_file),
-            root_key: be_bytes!(mus_file),
-            note_low: mus_file.next().unwrap(),
-            note_high: mus_file.next().unwrap(),
-            velocity_low: mus_file.next().unwrap(),
-            velocity_high: mus_file.next().unwrap(),
-            wave_index: be_bytes!(mus_file),
-            base_priority: float_be_bytes!(mus_file),
-            modul_env: Envelope::parse(&mut mus_file),
-            modul_env_to_pitch: float_be_bytes!(mus_file),
+            pitch_finetuning: be_bytes!(mus_bytes),
+            reverb: be_bytes!(mus_bytes),
+            pan_position: float_be_bytes!(mus_bytes),
+            keynum_hold: be_bytes!(mus_bytes),
+            keynum_decay: be_bytes!(mus_bytes),
+            volume_env: Envelope::parse(&mut mus_bytes),
+            volume_env_atten: float_be_bytes!(mus_bytes),
+            vib_delay: float_be_bytes!(mus_bytes),
+            vib_frequency: float_be_bytes!(mus_bytes),
+            vib_to_pitch: float_be_bytes!(mus_bytes),
+            root_key: be_bytes!(mus_bytes),
+            note_low: mus_bytes.next().unwrap(),
+            note_high: mus_bytes.next().unwrap(),
+            velocity_low: mus_bytes.next().unwrap(),
+            velocity_high: mus_bytes.next().unwrap(),
+            wave_index: be_bytes!(mus_bytes),
+            base_priority: float_be_bytes!(mus_bytes),
+            modul_env: Envelope::parse(&mut mus_bytes),
+            modul_env_to_pitch: float_be_bytes!(mus_bytes),
         })
         .collect::<Vec<_>>();
     if args.debug {
@@ -175,10 +177,10 @@ fn main() {
 
     let preset_entries = (0..header.num_presets)
         .map(|_| PresetEntry {
-            name: name_bytes!(mus_file),
-            midi_bank_number: be_bytes!(mus_file),
-            midi_preset_number: be_bytes!(mus_file),
-            num_zones: be_bytes!(mus_file),
+            name: name_bytes!(mus_bytes),
+            midi_bank_number: be_bytes!(mus_bytes),
+            midi_preset_number: be_bytes!(mus_bytes),
+            num_zones: be_bytes!(mus_bytes),
         })
         .collect::<Vec<_>>();
     if args.debug {
@@ -187,12 +189,12 @@ fn main() {
 
     let preset_zones = (0..header.num_presets)
         .map(|_| PresetZone {
-            root_key: be_bytes!(mus_file),
-            note_low: mus_file.next().unwrap(),
-            note_high: mus_file.next().unwrap(),
-            velocity_low: mus_file.next().unwrap(),
-            velocity_high: mus_file.next().unwrap(),
-            program_index: be_bytes!(mus_file),
+            root_key: be_bytes!(mus_bytes),
+            note_low: mus_bytes.next().unwrap(),
+            note_high: mus_bytes.next().unwrap(),
+            velocity_low: mus_bytes.next().unwrap(),
+            velocity_high: mus_bytes.next().unwrap(),
+            program_index: be_bytes!(mus_bytes),
         })
         .collect::<Vec<_>>();
     if args.debug {
