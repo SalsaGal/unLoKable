@@ -222,10 +222,10 @@ int main(int argc, char *argv[]) {
     }
     write_byte_count(ads_out, 0, 3);
 
-    write_byte(ads_out, wave_entries[i].sampleRate & 0xff);
-    write_byte(ads_out, wave_entries[i].sampleRate & 0xff00 >> 8);
-    write_byte(ads_out, wave_entries[i].sampleRate & 0xff0000 >> 16);
-    write_byte(ads_out, wave_entries[i].sampleRate & 0xff000000 >> 24);
+    write_byte(ads_out, (wave_entries[i].sampleRate & 0xff));
+    write_byte(ads_out, (wave_entries[i].sampleRate & 0xff00) >> 8);
+    write_byte(ads_out, (wave_entries[i].sampleRate & 0xff0000) >> 16);
+    write_byte(ads_out, (wave_entries[i].sampleRate & 0xff000000) >> 24);
 
     write_byte(ads_out, 1);
     write_byte_count(ads_out, 0, 3);
