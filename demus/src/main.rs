@@ -48,9 +48,9 @@ macro_rules! be_bytes {
     };
 }
 
-macro_rules! float_be_bytes {
+macro_rules! float_le_bytes {
     ($bytes: ident) => {
-        f32::from_be_bytes([
+        f32::from_le_bytes([
             $bytes.next().unwrap(),
             $bytes.next().unwrap(),
             $bytes.next().unwrap(),
@@ -86,18 +86,18 @@ fn main() {
     let mut sam_bytes = sam_file.iter().copied();
 
     let header = MusHeader {
-        magic: le_bytes!(mus_bytes),
-        header_size: be_bytes!(mus_bytes),
-        version_number: be_bytes!(mus_bytes),
-        reverb_volume: be_bytes!(mus_bytes),
-        reverb_type: be_bytes!(mus_bytes),
-        reverb_multiply: be_bytes!(mus_bytes),
-        num_sequences: be_bytes!(mus_bytes),
-        num_labels: be_bytes!(mus_bytes),
-        offset_to_labels_offsets_table: be_bytes!(mus_bytes),
-        num_waves: be_bytes!(mus_bytes),
-        num_programs: be_bytes!(mus_bytes),
-        num_presets: be_bytes!(mus_bytes),
+        magic: be_bytes!(mus_bytes),
+        header_size: le_bytes!(mus_bytes),
+        version_number: le_bytes!(mus_bytes),
+        reverb_volume: le_bytes!(mus_bytes),
+        reverb_type: le_bytes!(mus_bytes),
+        reverb_multiply: le_bytes!(mus_bytes),
+        num_sequences: le_bytes!(mus_bytes),
+        num_labels: le_bytes!(mus_bytes),
+        offset_to_labels_offsets_table: le_bytes!(mus_bytes),
+        num_waves: le_bytes!(mus_bytes),
+        num_programs: le_bytes!(mus_bytes),
+        num_presets: le_bytes!(mus_bytes),
     };
     assert_eq!(header.magic, 0x4D757321, "Invalid magic number");
     if args.debug {
@@ -106,8 +106,8 @@ fn main() {
 
     let msq_tables = (0..header.num_sequences)
         .map(|_| MsqTable {
-            index: be_bytes!(mus_bytes),
-            offset: be_bytes!(mus_bytes),
+            index: le_bytes!(mus_bytes),
+            offset: le_bytes!(mus_bytes),
         })
         .collect::<Vec<_>>();
     if args.debug {
@@ -115,7 +115,7 @@ fn main() {
     }
 
     let layers = (0..header.num_presets + header.num_programs)
-        .map(|_| be_bytes!(mus_bytes))
+        .map(|_| le_bytes!(mus_bytes))
         .collect::<Vec<_>>();
     if args.debug {
         dbg!(&layers);
@@ -124,14 +124,14 @@ fn main() {
     let wave_entries = (0..header.num_waves)
         .map(|_| WaveEntry {
             name: name_bytes!(mus_bytes),
-            offset: be_bytes!(mus_bytes),
-            loop_begin: be_bytes!(mus_bytes),
-            size: be_bytes!(mus_bytes),
-            loop_end: be_bytes!(mus_bytes),
-            sample_rate: be_bytes!(mus_bytes),
-            original_pitch: be_bytes!(mus_bytes),
-            loop_info: be_bytes!(mus_bytes),
-            snd_handle: be_bytes!(mus_bytes),
+            offset: le_bytes!(mus_bytes),
+            loop_begin: le_bytes!(mus_bytes),
+            size: le_bytes!(mus_bytes),
+            loop_end: le_bytes!(mus_bytes),
+            sample_rate: le_bytes!(mus_bytes),
+            original_pitch: le_bytes!(mus_bytes),
+            loop_info: le_bytes!(mus_bytes),
+            snd_handle: le_bytes!(mus_bytes),
         })
         .collect::<Vec<_>>();
     if args.debug {
@@ -141,7 +141,7 @@ fn main() {
     let program_entries = (0..header.num_programs)
         .map(|_| ProgramEntry {
             name: name_bytes!(mus_bytes),
-            num_zones: be_bytes!(mus_bytes),
+            num_zones: le_bytes!(mus_bytes),
         })
         .collect::<Vec<_>>();
     if args.debug {
@@ -150,25 +150,25 @@ fn main() {
 
     let program_zones = (0..header.num_programs)
         .map(|_| ProgramZone {
-            pitch_finetuning: be_bytes!(mus_bytes),
-            reverb: be_bytes!(mus_bytes),
-            pan_position: float_be_bytes!(mus_bytes),
-            keynum_hold: be_bytes!(mus_bytes),
-            keynum_decay: be_bytes!(mus_bytes),
+            pitch_finetuning: le_bytes!(mus_bytes),
+            reverb: le_bytes!(mus_bytes),
+            pan_position: float_le_bytes!(mus_bytes),
+            keynum_hold: le_bytes!(mus_bytes),
+            keynum_decay: le_bytes!(mus_bytes),
             volume_env: Envelope::parse(&mut mus_bytes),
-            volume_env_atten: float_be_bytes!(mus_bytes),
-            vib_delay: float_be_bytes!(mus_bytes),
-            vib_frequency: float_be_bytes!(mus_bytes),
-            vib_to_pitch: float_be_bytes!(mus_bytes),
-            root_key: be_bytes!(mus_bytes),
+            volume_env_atten: float_le_bytes!(mus_bytes),
+            vib_delay: float_le_bytes!(mus_bytes),
+            vib_frequency: float_le_bytes!(mus_bytes),
+            vib_to_pitch: float_le_bytes!(mus_bytes),
+            root_key: le_bytes!(mus_bytes),
             note_low: mus_bytes.next().unwrap(),
             note_high: mus_bytes.next().unwrap(),
             velocity_low: mus_bytes.next().unwrap(),
             velocity_high: mus_bytes.next().unwrap(),
-            wave_index: be_bytes!(mus_bytes),
-            base_priority: float_be_bytes!(mus_bytes),
+            wave_index: le_bytes!(mus_bytes),
+            base_priority: float_le_bytes!(mus_bytes),
             modul_env: Envelope::parse(&mut mus_bytes),
-            modul_env_to_pitch: float_be_bytes!(mus_bytes),
+            modul_env_to_pitch: float_le_bytes!(mus_bytes),
         })
         .collect::<Vec<_>>();
     if args.debug {
@@ -178,9 +178,9 @@ fn main() {
     let preset_entries = (0..header.num_presets)
         .map(|_| PresetEntry {
             name: name_bytes!(mus_bytes),
-            midi_bank_number: be_bytes!(mus_bytes),
-            midi_preset_number: be_bytes!(mus_bytes),
-            num_zones: be_bytes!(mus_bytes),
+            midi_bank_number: le_bytes!(mus_bytes),
+            midi_preset_number: le_bytes!(mus_bytes),
+            num_zones: le_bytes!(mus_bytes),
         })
         .collect::<Vec<_>>();
     if args.debug {
@@ -189,12 +189,12 @@ fn main() {
 
     let preset_zones = (0..header.num_presets)
         .map(|_| PresetZone {
-            root_key: be_bytes!(mus_bytes),
+            root_key: le_bytes!(mus_bytes),
             note_low: mus_bytes.next().unwrap(),
             note_high: mus_bytes.next().unwrap(),
             velocity_low: mus_bytes.next().unwrap(),
             velocity_high: mus_bytes.next().unwrap(),
-            program_index: be_bytes!(mus_bytes),
+            program_index: le_bytes!(mus_bytes),
         })
         .collect::<Vec<_>>();
     if args.debug {
@@ -292,12 +292,12 @@ struct Envelope {
 impl Envelope {
     fn parse(bytes: &mut impl Iterator<Item = u8>) -> Self {
         Self {
-            delay: float_be_bytes!(bytes),
-            attack: float_be_bytes!(bytes),
-            hold: float_be_bytes!(bytes),
-            decay: float_be_bytes!(bytes),
-            sustain: float_be_bytes!(bytes),
-            release: float_be_bytes!(bytes),
+            delay: float_le_bytes!(bytes),
+            attack: float_le_bytes!(bytes),
+            hold: float_le_bytes!(bytes),
+            decay: float_le_bytes!(bytes),
+            sustain: float_le_bytes!(bytes),
+            release: float_le_bytes!(bytes),
         }
     }
 }
