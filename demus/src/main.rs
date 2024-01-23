@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{fs::File, io::Write, path::PathBuf};
 
 use clap::Parser;
 
@@ -80,10 +80,10 @@ macro_rules! name_bytes {
 fn main() {
     let args = Args::parse();
 
-    let mus_file = std::fs::read(args.mus_path).unwrap();
-    let mut mus_bytes = mus_file.into_iter();
-    let sam_file = std::fs::read(args.sam_path).unwrap();
-    let mut sam_bytes = sam_file.into_iter();
+    let mus_file = std::fs::read(&args.mus_path).unwrap();
+    let mut mus_bytes = mus_file.iter().copied();
+    let sam_file = std::fs::read(&args.sam_path).unwrap();
+    let mut sam_bytes = sam_file.iter().copied();
 
     let header = MusHeader {
         magic: le_bytes!(mus_bytes),
@@ -199,6 +199,38 @@ fn main() {
         .collect::<Vec<_>>();
     if args.debug {
         dbg!(&preset_zones);
+    }
+
+    // Definitely doable with iterators, but too lazy to work it out right now
+    let mut sequences: Vec<(u32, Option<u32>)> = Vec::with_capacity(header.num_sequences as usize);
+    for i in 0..header.num_sequences as usize {
+        sequences.push((msq_tables[i].offset, None));
+        if i > 0 {
+            sequences[i - 1].1 = Some(sequences[i].0 - sequences[i - 1].0);
+        }
+    }
+    // Convert the ranges into actual slices
+    let sequences = sequences
+        .into_iter()
+        .map(|(start, end)| match end {
+            Some(end) => &mus_file[start as usize..end as usize],
+            None => &mus_file[start as usize..],
+        })
+        .collect::<Vec<_>>();
+    if args.debug {
+        dbg!(&sequences);
+    }
+
+    let sequences_dir = args.mus_path.with_extension("").join("sequences");
+    std::fs::create_dir_all(&sequences_dir).unwrap();
+    for (i, sequence) in sequences.into_iter().enumerate() {
+        let path = sequences_dir.join(format!(
+            "{}_{:04}.msq",
+            args.mus_path.file_stem().unwrap().to_string_lossy(),
+            i,
+        ));
+        let mut file = File::create(path).unwrap();
+        file.write_all(sequence).unwrap();
     }
 }
 
