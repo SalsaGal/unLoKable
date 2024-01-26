@@ -38,7 +38,7 @@ typedef struct {
 		int sndHandle;
 } WaveEntry;
 
-WaveEntry parse_wave_entry(unsigned char **file, bool pc_style);
+WaveEntry parse_wave_entry(unsigned char **file);
 
 typedef struct {
 		float delay;

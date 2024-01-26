@@ -58,12 +58,12 @@ void parse_name(unsigned char **file, char buffer[20]) {
   }
 }
 
-WaveEntry parse_wave_entry(unsigned char **file, bool pc_style) {
+WaveEntry parse_wave_entry(unsigned char **file) {
   WaveEntry entry;
   parse_name(file, entry.name);
 	entry.offset = parse_int_be(file);
 	entry.loopBegin = parse_int_be(file);
-	entry.size = parse_int_be(file) * (pc_style ? 1 : 2);
+	entry.size = parse_int_be(file) * 2;
 	entry.loopEnd = parse_int_be(file);
 	entry.sampleRate = parse_int_be(file);
 	entry.originalPitch = parse_int_be(file) >> 8;

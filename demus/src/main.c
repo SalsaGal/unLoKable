@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
   }
   WaveEntry *wave_entries = calloc(header.numWaves, sizeof(WaveEntry));
   for (int i = 0; i < header.numWaves; i++) {
-    wave_entries[i] = parse_wave_entry(&mus_buffer_cursor, pc_style);
+    wave_entries[i] = parse_wave_entry(&mus_buffer_cursor);
     printf("Wave entry #%d \"%.20s\":\n", i, wave_entries[i].name);
 		printf("offset: %x\n", wave_entries[i].offset);
 		printf("loopBegin: %x\n", wave_entries[i].loopBegin);
