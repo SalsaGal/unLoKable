@@ -36,7 +36,7 @@ int pan_convert(float pan) {
   return (int) (pan * 1000 - 500);
 }
 
-int sustain_convert(float sustain) {
+int decibel_convert(float sustain) {
   return (int) (sustain * 10);
 }
 
