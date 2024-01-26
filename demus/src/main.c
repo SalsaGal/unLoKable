@@ -32,6 +32,10 @@ int cents_tuning(int note) {
   return (note % 256) * 100 / 256;
 }
 
+int pan_convert(float pan) {
+  return (int) (pan * 1000 - 500);
+}
+
 int main(int argc, char *argv[]) {
   char *output_dir = NULL;
   bool pc_style = true;
