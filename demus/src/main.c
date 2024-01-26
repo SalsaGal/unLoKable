@@ -24,6 +24,14 @@ int secs_to_timecent(float seconds) {
   return (int) 1200.0 * log2f(seconds < 0.001 ? 0.001 : seconds);
 }
 
+int semitone_tuning(int note) {
+  return note / 256;
+}
+
+int cents_tuning(int note) {
+  return (note % 256) * 100 / 256;
+}
+
 int main(int argc, char *argv[]) {
   char *output_dir = NULL;
   bool pc_style = true;
