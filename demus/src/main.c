@@ -36,6 +36,10 @@ int pan_convert(float pan) {
   return (int) (pan * 1000 - 500);
 }
 
+int sustain_convert(float sustain) {
+  return (int) (sustain * 10);
+}
+
 int main(int argc, char *argv[]) {
   char *output_dir = NULL;
   bool pc_style = true;
