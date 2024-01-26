@@ -3,7 +3,7 @@ CC = x86_64-w64-mingw32-gcc
 else
 CC = gcc
 endif
-CC_FLAGS = -Wall -Wextra -Ilib -g -fanalyzer
+CC_FLAGS = -Wall -Wextra -Ilib -g -fanalyzer -lm
 
 CDS2SEQ_OBJS = $(addprefix out/cds2seq/,main.o)
 DEMUS_OBJS = $(addprefix out/demus/,main.o structures.o)

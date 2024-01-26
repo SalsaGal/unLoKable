@@ -4,6 +4,7 @@
 #include "structures.h"
 
 #include <getopt.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,6 +18,10 @@ void write_byte_count(FILE *file, unsigned char byte, int count) {
   for (int i = 0; i < count; i++) {
     write_byte(file, byte);
   }
+}
+
+int secs_to_timecent(float seconds) {
+  return (int) 1200.0 * log2f(seconds < 0.001 ? 0.001 : seconds);
 }
 
 int main(int argc, char *argv[]) {
