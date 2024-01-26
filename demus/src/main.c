@@ -250,5 +250,13 @@ int main(int argc, char *argv[]) {
     fclose(ads_out);
   }
 
+  char *smp_loop_info_path = calloc(strlen(mus_path) * 8, sizeof(char));
+  sprintf(smp_loop_info_path, "%s/%s_smploopinfo.txt", remove_extension(mus_path), remove_extension(remove_path(mus_path)));
+  FILE *smp_loop_info = fopen(smp_loop_info_path, "w");
+  for (int i = 0; i < header.numWaves; i++) {
+    fprintf(smp_loop_info, "%d %d %.20s.wav\n", wave_entries[i].loopBegin, wave_entries[i].loopEnd, wave_entries[i].name);
+  }
+  fclose(smp_loop_info);
+
   return EXIT_SUCCESS;
 }
