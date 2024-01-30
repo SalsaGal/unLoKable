@@ -1,6 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
+    "adsloopfind",
     "cds2seq",
     "demus",
     "msqsplit",
