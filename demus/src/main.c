@@ -279,5 +279,76 @@ int main(int argc, char *argv[]) {
   }
   fclose(smp_loop_info);
 
+  char *info_path = calloc(strlen(mus_path) * 8, sizeof(char));
+  sprintf(info_path, "%s/%s.txt", remove_extension(mus_path), remove_extension(remove_path(mus_path)));
+  FILE *info_file = fopen(info_path, "w");
+
+  fprintf(info_file, "[Samples]\r\n");
+  for (int i = 0; i < header.numWaves; i++) {
+    fprintf(info_file, "\r\n    SampleName=%.20s\r\n", wave_entries[i].name);
+    fprintf(info_file, "        SampleRate=%d\r\n", wave_entries[i].sampleRate);
+    fprintf(info_file, "        Key=%d\r\n", wave_entries[i].originalPitch);
+    fprintf(info_file, "        FineTune=0\r\n");
+    fprintf(info_file, "        Type=1\r\n");
+  }
+
+  fprintf(info_file, "\r\n\r\n[Instruments]\r\n");
+  for (int i = 0; i < header.numPrograms; i++) {
+    fprintf(info_file, "\r\n    InstrumentName=%.20s\r\n", program_entries[i].name);
+
+    for (int j = 0; j < program_entries[i].numZones; j++) {
+      fprintf(info_file, "\r\n        Sample=%.20s\r\n", wave_entries[program_zones[i][j].waveIndex].name);
+      fprintf(info_file, "            Z_coarseTune=%d\r\n", semitone_tuning(program_zones[i][j].pitchFinetuning));
+      fprintf(info_file, "            Z_fineTune=%d\r\n", cents_tuning(program_zones[i][j].pitchFinetuning));
+      fprintf(info_file, "            Z_reverbEffectsSend=%d\r\n", program_zones[i][j].reverb * 10);
+      fprintf(info_file, "            Z_pan=%d\r\n", pan_convert(program_zones[i][j].panPosition));
+      fprintf(info_file, "            Z_keynumToVolEnvHold=%d\r\n", program_zones[i][j].keynumHold);
+      fprintf(info_file, "            Z_keynumToVolEnvDecay=%d\r\n", program_zones[i][j].keynumDecay);
+      fprintf(info_file, "            Z_attackVolEnv=%d\r\n", secs_to_timecent(program_zones[i][j].volumeEnv.attack));
+      fprintf(info_file, "            Z_decayVolEnv=%d\r\n", secs_to_timecent(program_zones[i][j].volumeEnv.decay));
+      fprintf(info_file, "            Z_sustainVolEnv=%d\r\n", decibel_convert(program_zones[i][j].volumeEnv.sustain));
+      fprintf(info_file, "            Z_releaseVolEnv=%d\r\n", secs_to_timecent(program_zones[i][j].volumeEnv.release));
+      fprintf(info_file, "            Z_initialAttenuation=%d\r\n", decibel_convert(program_zones[i][j].volumeEnvAtten));
+      fprintf(info_file, "            Z_delayVibLFO=%d\r\n", secs_to_timecent(program_zones[i][j].vibDelay));
+      fprintf(info_file, "            Z_freqVibLFO=%d\r\n", secs_to_timecent(program_zones[i][j].vibFrequency / 8.176));
+      fprintf(info_file, "            Z_vibLfoToPitch=%d\r\n", (int) program_zones[i][j].vibToPitch);
+      fprintf(info_file, "            Z_LowKey=%d\r\n", program_zones[i][j].noteLow);
+      fprintf(info_file, "            Z_HighKey=%d\r\n", program_zones[i][j].noteHigh);
+      fprintf(info_file, "            Z_LowVelocity=%d\r\n", program_zones[i][j].velocityLow);
+      fprintf(info_file, "            Z_HighVelocity=%d\r\n", program_zones[i][j].velocityHigh);
+      fprintf(info_file, "            Z_attackModEnv=%d\r\n", secs_to_timecent(program_zones[i][j].modulEnv.attack));
+      fprintf(info_file, "            Z_decayModEnv=%d\r\n", secs_to_timecent(program_zones[i][j].modulEnv.decay));
+      fprintf(info_file, "            Z_sustainModEnv=%d\r\n", secs_to_timecent(program_zones[i][j].modulEnv.sustain));
+      fprintf(info_file, "            Z_releaseModEnv=%d\r\n", secs_to_timecent(program_zones[i][j].modulEnv.release));
+      fprintf(info_file, "            Z_modEnvToPitch=%d\r\n", (int) program_zones[i][j].modulEnvToPitch);
+    }
+
+    fprintf(info_file, "\r\n        GlobalZone\r\n\r\n");
+  }
+
+  fprintf(info_file, "\r\n[Presets]");
+  for (int i = 0; i < header.numPresets; i++) {
+    fprintf(info_file, "\r\n\r\n    PresetName=%.20s\r\n", preset_entries[i].name);
+    fprintf(info_file, "        Bank=%d\r\n", preset_entries[i].MIDIBankNumber);
+    fprintf(info_file, "        Program=%d\r\n\r\n", preset_entries[i].MIDIPresetNumber);
+
+    for (int j = 0; j < preset_entries[i].numZones; j++) {
+      fprintf(info_file, "        Instrument=%.20s\r\n", program_entries[preset_zones[i][j].programIndex].name);
+      fprintf(info_file, "            L_LowKey=%d\r\n", preset_zones[i][j].noteLow);
+      fprintf(info_file, "            L_HighKey=%d\r\n", preset_zones[i][j].noteHigh);
+      fprintf(info_file, "            L_LowVelocity=%d\r\n", preset_zones[i][j].velocityLow);
+      fprintf(info_file, "            L_HighVelocity=%d\r\n", preset_zones[i][j].velocityHigh);
+      fprintf(info_file, "\r\n        GlobalLayer\r\n");
+    }
+  }
+
+  fprintf(info_file, "\r\n\r\n[Info]\r\n");
+  fprintf(info_file, "Version=2.1\r\n");
+  fprintf(info_file, "Engine=EMU8000\r\n");
+  fprintf(info_file, "Name=%s\r\n", remove_extension(remove_path(mus_path)));
+  fprintf(info_file, "Editor=Demus\r\n");
+
+  fclose(info_file);
+
   return EXIT_SUCCESS;
 }
