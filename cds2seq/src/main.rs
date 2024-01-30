@@ -320,7 +320,7 @@ fn lex_file(tokens: Vec<Token>) -> Vec<Lexeme> {
                 lexemes[i] = Either::Right(Lexeme::Data(data.to_vec()));
             }
             Either::Left(Token::GlobalEnding) => {
-                lexemes[i] = Either::Right(Lexeme::Data(vec![0xff, 0x44, 0x00]))
+                lexemes[i] = Either::Right(Lexeme::Data(vec![0xff, 0x44, 0x00]));
             }
             Either::Left(Token::LoopStart(_)) | Either::Right(_) => {}
         }
