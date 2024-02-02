@@ -59,22 +59,20 @@ macro_rules! float_le_bytes {
     };
 }
 
-macro_rules! name_bytes {
-    ($bytes: ident) => {{
-        let mut bytes = (&mut $bytes)
-            .take(20)
-            .take_while(WaveEntry::valid_char)
-            .collect::<Vec<_>>();
-        while bytes.len() < 20 {
-            bytes.push(0);
+fn parse_name(bytes: &mut impl Iterator<Item = u8>) -> [char; 20] {
+    let mut encountered_garbage = false;
+    ['\0'; 20].map(move |_| {
+        let c = bytes.next().unwrap();
+        // This first term isn't needed right?
+        if !encountered_garbage && !WaveEntry::valid_char(&c) {
+            encountered_garbage = true;
         }
-        bytes
-            .into_iter()
-            .map(char::from)
-            .collect::<Vec<_>>()
-            .try_into()
-            .unwrap()
-    }};
+        if encountered_garbage {
+            '\0'
+        } else {
+            c.into()
+        }
+    })
 }
 
 fn main() {
@@ -122,7 +120,7 @@ fn main() {
 
     let wave_entries = (0..header.num_waves)
         .map(|_| WaveEntry {
-            name: name_bytes!(mus_bytes),
+            name: parse_name(&mut mus_bytes),
             offset: le_bytes!(mus_bytes),
             loop_begin: le_bytes!(mus_bytes),
             size: le_bytes!(mus_bytes) * 2,
@@ -139,7 +137,7 @@ fn main() {
 
     let program_entries = (0..header.num_programs)
         .map(|_| ProgramEntry {
-            name: name_bytes!(mus_bytes),
+            name: parse_name(&mut mus_bytes),
             num_zones: le_bytes!(mus_bytes),
         })
         .collect::<Vec<_>>();
@@ -176,7 +174,7 @@ fn main() {
 
     let preset_entries = (0..header.num_presets)
         .map(|_| PresetEntry {
-            name: name_bytes!(mus_bytes),
+            name: parse_name(&mut mus_bytes),
             midi_bank_number: le_bytes!(mus_bytes),
             midi_preset_number: le_bytes!(mus_bytes),
             num_zones: le_bytes!(mus_bytes),
@@ -259,7 +257,11 @@ fn main() {
     for (wave, wave_entry) in waves.into_iter().zip(wave_entries) {
         let path = samples_path.join(format!(
             "{}.ads",
-            wave_entry.name.iter().collect::<String>()
+            wave_entry
+                .name
+                .iter()
+                .take_while(|x| **x != '\0')
+                .collect::<String>()
         ));
         let mut sample_file = File::create(path).unwrap();
 
