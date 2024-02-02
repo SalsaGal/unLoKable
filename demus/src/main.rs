@@ -2,7 +2,7 @@ use std::{fs::File, io::Write, path::PathBuf};
 
 use clap::Parser;
 
-#[derive(Clone, Copy, clap::ValueEnum)]
+#[derive(Clone, Copy, PartialEq, Eq, clap::ValueEnum)]
 pub enum Platform {
     Dreamcast,
     PC,
@@ -82,8 +82,7 @@ fn main() {
 
     let mus_file = std::fs::read(&args.mus_path).unwrap();
     let mut mus_bytes = mus_file.iter().copied();
-    let sam_file = std::fs::read(&args.sam_path).unwrap();
-    let mut sam_bytes = sam_file.iter().copied();
+    let mut sam_file = std::fs::read(&args.sam_path).unwrap();
 
     let header = MusHeader {
         magic: be_bytes!(mus_bytes),
@@ -126,10 +125,10 @@ fn main() {
             name: name_bytes!(mus_bytes),
             offset: le_bytes!(mus_bytes),
             loop_begin: le_bytes!(mus_bytes),
-            size: le_bytes!(mus_bytes),
+            size: le_bytes!(mus_bytes) * 2,
             loop_end: le_bytes!(mus_bytes),
             sample_rate: le_bytes!(mus_bytes),
-            original_pitch: le_bytes!(mus_bytes),
+            original_pitch: le_bytes!(mus_bytes) >> 8,
             loop_info: le_bytes!(mus_bytes),
             snd_handle: le_bytes!(mus_bytes),
         })
@@ -213,7 +212,7 @@ fn main() {
     let sequences = sequences
         .into_iter()
         .map(|(start, end)| match end {
-            Some(end) => &mus_file[start as usize..end as usize],
+            Some(end) => &mus_file[start as usize..start as usize + end as usize],
             None => &mus_file[start as usize..],
         })
         .collect::<Vec<_>>();
@@ -231,6 +230,60 @@ fn main() {
         ));
         let mut file = File::create(path).unwrap();
         file.write_all(sequence).unwrap();
+    }
+
+    let waves = wave_entries
+        .iter()
+        .map(|wave_entry| {
+            dbg!(wave_entry);
+            let wave_range =
+                wave_entry.offset as usize..wave_entry.offset as usize + wave_entry.size as usize;
+            if args.platform == Platform::Dreamcast {
+                let check_index = wave_range.start + wave_range.end - 16;
+                if sam_file[check_index..check_index + 16]
+                    == [
+                        0x07, 0x00, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
+                        0x77, 0x77, 0x77, 0x77,
+                    ]
+                {
+                    sam_file[check_index + 1] = 0x07;
+                }
+            }
+            wave_range
+        })
+        .collect::<Vec<_>>();
+
+    let samples_path = args.mus_path.with_extension("").join("samples");
+    std::fs::create_dir(&samples_path).unwrap();
+
+    for (wave, wave_entry) in waves.into_iter().zip(wave_entries) {
+        let path = samples_path.join(format!(
+            "{}.ads",
+            wave_entry.name.iter().collect::<String>()
+        ));
+        let mut sample_file = File::create(path).unwrap();
+
+        sample_file
+            .write_all(&[0x53, 0x53, 0x68, 0x64, 0x18, 0x0, 0x0, 0x0])
+            .unwrap();
+        if args.platform == Platform::PC {
+            sample_file.write_all(&[0x01]).unwrap();
+        } else {
+            sample_file.write_all(&[0x10]).unwrap();
+        }
+        sample_file.write_all(&[0; 3]).unwrap();
+        sample_file
+            .write_all(&wave_entry.sample_rate.to_be_bytes())
+            .unwrap();
+        sample_file.write_all(&[1]).unwrap();
+        sample_file.write_all(&[0; 3]).unwrap();
+        sample_file.write_all(&[0; 4]).unwrap();
+        sample_file.write_all(&[0xff; 8]).unwrap();
+        sample_file.write_all(&[0x53, 0x53, 0x62, 0x64]).unwrap();
+        sample_file
+            .write_all(&wave_entry.size.to_be_bytes())
+            .unwrap();
+        sample_file.write_all(&sam_file[wave]).unwrap();
     }
 }
 
