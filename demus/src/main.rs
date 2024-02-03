@@ -2,9 +2,10 @@ use std::{fs::File, io::Write, path::PathBuf};
 
 use clap::Parser;
 
-#[derive(Clone, Copy, PartialEq, Eq, clap::ValueEnum)]
+#[derive(Clone, Copy, Default, PartialEq, Eq, clap::ValueEnum)]
 pub enum Platform {
     Dreamcast,
+    #[default]
     PC,
 }
 
@@ -20,7 +21,7 @@ struct Args {
     debug: bool,
     /// What platform to use the format of
     #[clap(short)]
-    platform: Platform,
+    platform: Option<Platform>,
     /// Output path of the cds file, defaults to the input with a different extension
     #[clap(long, short)]
     output: Option<PathBuf>,
@@ -236,7 +237,7 @@ fn main() {
             dbg!(wave_entry);
             let wave_range =
                 wave_entry.offset as usize..wave_entry.offset as usize + wave_entry.size as usize;
-            if args.platform == Platform::Dreamcast {
+            if args.platform.unwrap_or_default() == Platform::Dreamcast {
                 let check_index = wave_range.start + wave_range.end - 16;
                 if sam_file[check_index..check_index + 16]
                     == [
@@ -268,7 +269,7 @@ fn main() {
         sample_file
             .write_all(&[0x53, 0x53, 0x68, 0x64, 0x18, 0x0, 0x0, 0x0])
             .unwrap();
-        if args.platform == Platform::PC {
+        if args.platform.unwrap_or_default() == Platform::PC {
             sample_file.write_all(&[0x01]).unwrap();
         } else {
             sample_file.write_all(&[0x10]).unwrap();
