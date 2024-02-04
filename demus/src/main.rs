@@ -27,6 +27,26 @@ struct Args {
     output: Option<PathBuf>,
 }
 
+fn secs_to_timecent(seconds: f32) -> i32 {
+    (1200.0 * f32::log2(seconds.max(0.001))) as i32
+}
+
+fn semitone_tuning(note: i32) -> i32 {
+    note / 256
+}
+
+fn cents_tuning(note: i32) -> i32 {
+    (note % 256) * 100 / 256
+}
+
+fn pan_convert(pan: f32) -> i32 {
+    (pan * 1000.0 - 500.0) as i32
+}
+
+fn percentage_to_decibels(sustain: f32) -> i32 {
+    (sustain * 10.0) as i32
+}
+
 macro_rules! le_bytes {
     ($bytes: ident) => {
         i32::from_le_bytes([
