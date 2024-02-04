@@ -140,77 +140,70 @@ fn main() {
         dbg!(&wave_entries);
     }
 
-    let program_entries = (0..header.num_programs)
-        .map(|_| ProgramEntry {
+    let mut program_entries = Vec::with_capacity(header.num_programs as usize);
+    let mut program_zones = Vec::with_capacity(header.num_programs as usize);
+    for _ in 0..header.num_programs {
+        program_entries.push(ProgramEntry {
             name: parse_name(&mut mus_bytes),
             num_zones: le_bytes!(mus_bytes),
-        })
-        .collect::<Vec<_>>();
+        });
+        program_zones.push(Vec::with_capacity(
+            program_entries.last().unwrap().num_zones as usize,
+        ));
+        for _ in 0..program_entries.last().unwrap().num_zones {
+            program_zones.last_mut().unwrap().push(ProgramZone {
+                pitch_finetuning: le_bytes!(mus_bytes),
+                reverb: le_bytes!(mus_bytes),
+                pan_position: float_le_bytes!(mus_bytes),
+                keynum_hold: le_bytes!(mus_bytes),
+                keynum_decay: le_bytes!(mus_bytes),
+                volume_env: Envelope::parse(&mut mus_bytes),
+                volume_env_atten: float_le_bytes!(mus_bytes),
+                vib_delay: float_le_bytes!(mus_bytes),
+                vib_frequency: float_le_bytes!(mus_bytes),
+                vib_to_pitch: float_le_bytes!(mus_bytes),
+                root_key: le_bytes!(mus_bytes),
+                note_low: mus_bytes.next().unwrap(),
+                note_high: mus_bytes.next().unwrap(),
+                velocity_low: mus_bytes.next().unwrap(),
+                velocity_high: mus_bytes.next().unwrap(),
+                wave_index: le_bytes!(mus_bytes),
+                base_priority: float_le_bytes!(mus_bytes),
+                modul_env: Envelope::parse(&mut mus_bytes),
+                modul_env_to_pitch: float_le_bytes!(mus_bytes),
+            });
+        }
+    }
     if args.debug {
-        dbg!(&program_entries);
+        dbg!(&program_entries, &program_zones);
     }
 
-    let program_zones: Vec<Vec<ProgramZone>> = program_entries
-        .iter()
-        .map(|entry| {
-            (0..entry.num_zones)
-                .map(|_| ProgramZone {
-                    pitch_finetuning: le_bytes!(mus_bytes),
-                    reverb: le_bytes!(mus_bytes),
-                    pan_position: float_le_bytes!(mus_bytes),
-                    keynum_hold: le_bytes!(mus_bytes),
-                    keynum_decay: le_bytes!(mus_bytes),
-                    volume_env: Envelope::parse(&mut mus_bytes),
-                    volume_env_atten: float_le_bytes!(mus_bytes),
-                    vib_delay: float_le_bytes!(mus_bytes),
-                    vib_frequency: float_le_bytes!(mus_bytes),
-                    vib_to_pitch: float_le_bytes!(mus_bytes),
-                    root_key: le_bytes!(mus_bytes),
-                    note_low: mus_bytes.next().unwrap(),
-                    note_high: mus_bytes.next().unwrap(),
-                    velocity_low: mus_bytes.next().unwrap(),
-                    velocity_high: mus_bytes.next().unwrap(),
-                    wave_index: le_bytes!(mus_bytes),
-                    base_priority: float_le_bytes!(mus_bytes),
-                    modul_env: Envelope::parse(&mut mus_bytes),
-                    modul_env_to_pitch: float_le_bytes!(mus_bytes),
-                })
-                .collect()
-        })
-        .collect();
-    if args.debug {
-        dbg!(&program_zones);
-    }
-
-    let preset_entries = (0..header.num_presets)
-        .map(|_| PresetEntry {
+    let mut preset_entries = Vec::with_capacity(header.num_presets as usize);
+    let mut preset_zones = Vec::with_capacity(header.num_presets as usize);
+    for _ in 0..header.num_presets {
+        preset_entries.push(PresetEntry {
             name: parse_name(&mut mus_bytes),
             midi_bank_number: le_bytes!(mus_bytes),
             midi_preset_number: le_bytes!(mus_bytes),
             num_zones: le_bytes!(mus_bytes),
-        })
-        .collect::<Vec<_>>();
-    if args.debug {
+        });
         dbg!(&preset_entries);
+        preset_zones.push(Vec::with_capacity(
+            preset_entries.last().unwrap().num_zones as usize,
+        ));
+        for _ in 0..preset_entries.last().unwrap().num_zones {
+            preset_zones.last_mut().unwrap().push(PresetZone {
+                root_key: le_bytes!(mus_bytes),
+                note_low: mus_bytes.next().unwrap(),
+                note_high: mus_bytes.next().unwrap(),
+                velocity_low: mus_bytes.next().unwrap(),
+                velocity_high: mus_bytes.next().unwrap(),
+                program_index: le_bytes!(mus_bytes),
+            });
+        }
     }
-
-    let preset_zones: Vec<Vec<PresetZone>> = preset_entries
-        .iter()
-        .map(|entry| {
-            (0..entry.num_zones)
-                .map(|_| PresetZone {
-                    root_key: le_bytes!(mus_bytes),
-                    note_low: mus_bytes.next().unwrap(),
-                    note_high: mus_bytes.next().unwrap(),
-                    velocity_low: mus_bytes.next().unwrap(),
-                    velocity_high: mus_bytes.next().unwrap(),
-                    program_index: le_bytes!(mus_bytes),
-                })
-                .collect()
-        })
-        .collect();
     if args.debug {
-        dbg!(&preset_zones);
+        dbg!(&preset_entries, &preset_zones);
     }
 
     // Definitely doable with iterators, but too lazy to work it out right now
