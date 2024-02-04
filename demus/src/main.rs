@@ -29,7 +29,7 @@ struct Args {
 
 macro_rules! le_bytes {
     ($bytes: ident) => {
-        u32::from_le_bytes([
+        i32::from_le_bytes([
             $bytes.next().unwrap(),
             $bytes.next().unwrap(),
             $bytes.next().unwrap(),
@@ -40,7 +40,7 @@ macro_rules! le_bytes {
 
 macro_rules! be_bytes {
     ($bytes: ident) => {
-        u32::from_be_bytes([
+        i32::from_be_bytes([
             $bytes.next().unwrap(),
             $bytes.next().unwrap(),
             $bytes.next().unwrap(),
@@ -214,7 +214,7 @@ fn main() {
     }
 
     // Definitely doable with iterators, but too lazy to work it out right now
-    let mut sequences: Vec<(u32, Option<u32>)> = Vec::with_capacity(header.num_sequences as usize);
+    let mut sequences: Vec<(i32, Option<i32>)> = Vec::with_capacity(header.num_sequences as usize);
     for i in 0..header.num_sequences as usize {
         sequences.push((msq_tables[i].offset, None));
         if i > 0 {
@@ -322,37 +322,37 @@ fn main() {
 
 #[derive(Debug)]
 struct MusHeader {
-    magic: u32,
-    header_size: u32,
-    version_number: u32,
-    reverb_volume: u32,
-    reverb_type: u32,
-    reverb_multiply: u32,
-    num_sequences: u32,
-    num_labels: u32,
-    offset_to_labels_offsets_table: u32,
-    num_waves: u32,
-    num_programs: u32,
-    num_presets: u32,
+    magic: i32,
+    header_size: i32,
+    version_number: i32,
+    reverb_volume: i32,
+    reverb_type: i32,
+    reverb_multiply: i32,
+    num_sequences: i32,
+    num_labels: i32,
+    offset_to_labels_offsets_table: i32,
+    num_waves: i32,
+    num_programs: i32,
+    num_presets: i32,
 }
 
 #[derive(Debug)]
 struct MsqTable {
-    index: u32,
-    offset: u32,
+    index: i32,
+    offset: i32,
 }
 
 #[derive(Debug)]
 struct WaveEntry {
     name: [char; 20],
-    offset: u32,
-    loop_begin: u32,
-    size: u32,
-    loop_end: u32,
-    sample_rate: u32,
-    original_pitch: u32,
-    loop_info: u32,
-    snd_handle: u32,
+    offset: i32,
+    loop_begin: i32,
+    size: i32,
+    loop_end: i32,
+    sample_rate: i32,
+    original_pitch: i32,
+    loop_info: i32,
+    snd_handle: i32,
 }
 
 impl WaveEntry {
@@ -390,23 +390,23 @@ impl Envelope {
 
 #[derive(Debug)]
 struct ProgramZone {
-    pitch_finetuning: u32,
-    reverb: u32,
+    pitch_finetuning: i32,
+    reverb: i32,
     pan_position: f32,
-    keynum_hold: u32,
-    keynum_decay: u32,
+    keynum_hold: i32,
+    keynum_decay: i32,
     volume_env: Envelope,
     volume_env_atten: f32,
     vib_delay: f32,
     vib_frequency: f32,
     vib_to_pitch: f32,
     // usually padded as 0xFFFFFFFF. Copy the value from the "originalPitch" variable from the "waveEntry" structure */
-    root_key: u32,
+    root_key: i32,
     note_low: u8,
     note_high: u8,
     velocity_low: u8,
     velocity_high: u8,
-    wave_index: u32,
+    wave_index: i32,
     base_priority: f32,
     modul_env: Envelope,
     modul_env_to_pitch: f32,
@@ -415,23 +415,23 @@ struct ProgramZone {
 #[derive(Debug)]
 struct ProgramEntry {
     name: [char; 20],
-    num_zones: u32,
+    num_zones: i32,
 }
 
 #[derive(Debug)]
 struct PresetZone {
-    root_key: u32,
+    root_key: i32,
     note_low: u8,
     note_high: u8,
     velocity_low: u8,
     velocity_high: u8,
-    program_index: u32,
+    program_index: i32,
 }
 
 #[derive(Debug)]
 struct PresetEntry {
     name: [char; 20],
-    midi_bank_number: u32,
-    midi_preset_number: u32,
-    num_zones: u32,
+    midi_bank_number: i32,
+    midi_preset_number: i32,
+    num_zones: i32,
 }
