@@ -1,4 +1,4 @@
-use std::{fs::File, io::Write, path::PathBuf};
+use std::{fmt::Display, fs::File, io::Write, path::PathBuf};
 
 use clap::Parser;
 
@@ -74,6 +74,10 @@ fn parse_name(bytes: &mut impl Iterator<Item = u8>) -> [char; 20] {
             c.into()
         }
     })
+}
+
+fn name_to_str(name: &[char; 20]) -> String {
+    name.iter().take_while(|x| **x != '\0').collect()
 }
 
 fn main() {
@@ -255,15 +259,8 @@ fn main() {
     let samples_path = args.mus_path.with_extension("").join("samples");
     std::fs::create_dir(&samples_path).unwrap();
 
-    for (wave, wave_entry) in waves.into_iter().zip(wave_entries) {
-        let path = samples_path.join(format!(
-            "{}.ads",
-            wave_entry
-                .name
-                .iter()
-                .take_while(|x| **x != '\0')
-                .collect::<String>()
-        ));
+    for (wave, wave_entry) in waves.iter().zip(&wave_entries) {
+        let path = samples_path.join(format!("{}.ads", name_to_str(&wave_entry.name)));
         let mut sample_file = File::create(path).unwrap();
 
         sample_file
@@ -286,7 +283,30 @@ fn main() {
         sample_file
             .write_all(&wave_entry.size.to_be_bytes())
             .unwrap();
-        sample_file.write_all(&sam_file[wave]).unwrap();
+        sample_file.write_all(&sam_file[wave.clone()]).unwrap();
+    }
+
+    let smp_loop_info_path = args.mus_path.with_extension("").join(format!(
+        "{}_smploopinfo.txt",
+        args.mus_path
+            .with_extension("")
+            .file_stem()
+            .unwrap()
+            .to_string_lossy()
+    ));
+    let mut smp_loop_info = File::create(smp_loop_info_path).unwrap();
+    for entry in &wave_entries {
+        smp_loop_info
+            .write_all(
+                format!(
+                    "{} {} {}.wav\n",
+                    entry.loop_begin,
+                    entry.loop_end,
+                    name_to_str(&entry.name),
+                )
+                .as_bytes(),
+            )
+            .unwrap()
     }
 }
 
