@@ -318,7 +318,7 @@ int main(int argc, char *argv[]) {
       fprintf(info_file, "            Z_HighVelocity=%d\r\n", program_zones[i][j].velocityHigh);
       fprintf(info_file, "            Z_attackModEnv=%d\r\n", secs_to_timecent(program_zones[i][j].modulEnv.attack));
       fprintf(info_file, "            Z_decayModEnv=%d\r\n", secs_to_timecent(program_zones[i][j].modulEnv.decay));
-      fprintf(info_file, "            Z_sustainModEnv=%d\r\n", secs_to_timecent(program_zones[i][j].modulEnv.sustain));
+      fprintf(info_file, "            Z_sustainModEnv=%d\r\n", (int) (program_zones[i][j].modulEnv.sustain * 10.0));
       fprintf(info_file, "            Z_releaseModEnv=%d\r\n", secs_to_timecent(program_zones[i][j].modulEnv.release));
       fprintf(info_file, "            Z_modEnvToPitch=%d\r\n", (int) program_zones[i][j].modulEnvToPitch);
     }
