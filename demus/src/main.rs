@@ -352,7 +352,7 @@ fn main() {
                     format!(
                         "{} {} {}.wav\n",
                         entry.loop_begin,
-                        entry.loop_end,
+                        entry.loop_end - 1,
                         name_to_str(&entry.name),
                     )
                     .as_bytes(),
