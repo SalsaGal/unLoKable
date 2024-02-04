@@ -321,6 +321,9 @@ int main(int argc, char *argv[]) {
       fprintf(info_file, "            Z_sustainModEnv=%d\r\n", (int) (program_zones[i][j].modulEnv.sustain * 10.0));
       fprintf(info_file, "            Z_releaseModEnv=%d\r\n", secs_to_timecent(program_zones[i][j].modulEnv.release));
       fprintf(info_file, "            Z_modEnvToPitch=%d\r\n", (int) program_zones[i][j].modulEnvToPitch);
+      if (program_zones[i][j].rootKey != -1) {
+        fprintf(info_file, "            Z_overridingRootKey=%d\r\n", program_zones[i][j].rootKey);
+      }
     }
 
     fprintf(info_file, "\r\n        GlobalZone\r\n\r\n");
