@@ -324,6 +324,7 @@ int main(int argc, char *argv[]) {
       if (program_zones[i][j].rootKey != -1) {
         fprintf(info_file, "            Z_overridingRootKey=%d\r\n", program_zones[i][j].rootKey);
       }
+      fprintf(info_file, "            Z_sampleModes=%d\r\n", wave_entries[program_zones[i][j].waveIndex].loopInfo);
     }
 
     fprintf(info_file, "\r\n        GlobalZone\r\n\r\n");
