@@ -62,7 +62,7 @@ macro_rules! float_le_bytes {
 
 fn parse_name(bytes: &mut impl Iterator<Item = u8>) -> [char; 20] {
     let mut encountered_garbage = false;
-    ['\0'; 20].map(move |_| {
+    let mut bytes = ['\0'; 20].map(move |_| {
         let c = bytes.next().unwrap();
         // This first term isn't needed right?
         if !encountered_garbage && !WaveEntry::valid_char(&c) {
@@ -73,7 +73,28 @@ fn parse_name(bytes: &mut impl Iterator<Item = u8>) -> [char; 20] {
         } else {
             c.into()
         }
-    })
+    });
+    for c in bytes.iter_mut().rev() {
+        if *c == ' ' {
+            *c = '\0';
+        } else if WaveEntry::valid_char(&(*c as u8)) {
+            break;
+        }
+    }
+
+    bytes
+}
+
+#[test]
+fn test_parse_name() {
+    assert_eq!(
+        parse_name(&mut "C Hit          \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0".bytes())[6],
+        '\0'
+    );
+    assert_eq!(
+        parse_name(&mut "C Hit\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0".bytes())[2],
+        'H'
+    );
 }
 
 fn name_to_str(name: &[char; 20]) -> String {
