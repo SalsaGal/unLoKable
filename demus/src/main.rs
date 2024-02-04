@@ -148,7 +148,7 @@ fn main() {
         num_programs: le_bytes!(mus_bytes),
         num_presets: le_bytes!(mus_bytes),
     };
-    assert_eq!(header.magic, 0x4D757321, "Invalid magic number");
+    assert_eq!(header.magic, 0x4D75_7321, "Invalid magic number");
     if args.debug {
         dbg!(&header);
     }
@@ -357,7 +357,7 @@ fn main() {
                     )
                     .as_bytes(),
                 )
-                .unwrap()
+                .unwrap();
         }
     }
 }
