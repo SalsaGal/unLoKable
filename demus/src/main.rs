@@ -346,17 +346,19 @@ fn main() {
     ));
     let mut smp_loop_info = File::create(smp_loop_info_path).unwrap();
     for entry in &wave_entries {
-        smp_loop_info
-            .write_all(
-                format!(
-                    "{} {} {}.wav\n",
-                    entry.loop_begin,
-                    entry.loop_end,
-                    name_to_str(&entry.name),
+        if entry.loop_info != 0 {
+            smp_loop_info
+                .write_all(
+                    format!(
+                        "{} {} {}.wav\n",
+                        entry.loop_begin,
+                        entry.loop_end,
+                        name_to_str(&entry.name),
+                    )
+                    .as_bytes(),
                 )
-                .as_bytes(),
-            )
-            .unwrap()
+                .unwrap()
+        }
     }
 }
 
