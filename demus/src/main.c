@@ -37,7 +37,7 @@ int pan_convert(float pan) {
 }
 
 int percentage_to_decibel(float sustain) {
-  return (int) (sustain * 10);
+  return (int) (-(10.0 * log10f((sustain < 0.001 ? 0.001 : sustain) / 100.0)) * 10.0);
 }
 
 int main(int argc, char *argv[]) {
