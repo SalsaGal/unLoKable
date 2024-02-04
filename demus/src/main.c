@@ -308,7 +308,7 @@ int main(int argc, char *argv[]) {
       fprintf(info_file, "            Z_decayVolEnv=%d\r\n", secs_to_timecent(program_zones[i][j].volumeEnv.decay));
       fprintf(info_file, "            Z_sustainVolEnv=%d\r\n", percentage_to_decibel(program_zones[i][j].volumeEnv.sustain));
       fprintf(info_file, "            Z_releaseVolEnv=%d\r\n", secs_to_timecent(program_zones[i][j].volumeEnv.release));
-      fprintf(info_file, "            Z_initialAttenuation=%d\r\n", percentage_to_decibel(program_zones[i][j].volumeEnvAtten));
+      fprintf(info_file, "            Z_initialAttenuation=%d\r\n", (int) (program_zones[i][j].volumeEnvAtten * 10.0));
       fprintf(info_file, "            Z_delayVibLFO=%d\r\n", secs_to_timecent(program_zones[i][j].vibDelay));
       fprintf(info_file, "            Z_freqVibLFO=%d\r\n", secs_to_timecent(program_zones[i][j].vibFrequency / 8.176));
       fprintf(info_file, "            Z_vibLfoToPitch=%d\r\n", (int) program_zones[i][j].vibToPitch);
