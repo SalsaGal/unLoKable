@@ -1,4 +1,4 @@
-use std::{fmt::Display, fs::File, io::Write, path::PathBuf};
+use std::{fs::File, io::Write, path::PathBuf};
 
 use clap::Parser;
 
@@ -150,29 +150,34 @@ fn main() {
         dbg!(&program_entries);
     }
 
-    let program_zones = (0..header.num_programs)
-        .map(|_| ProgramZone {
-            pitch_finetuning: le_bytes!(mus_bytes),
-            reverb: le_bytes!(mus_bytes),
-            pan_position: float_le_bytes!(mus_bytes),
-            keynum_hold: le_bytes!(mus_bytes),
-            keynum_decay: le_bytes!(mus_bytes),
-            volume_env: Envelope::parse(&mut mus_bytes),
-            volume_env_atten: float_le_bytes!(mus_bytes),
-            vib_delay: float_le_bytes!(mus_bytes),
-            vib_frequency: float_le_bytes!(mus_bytes),
-            vib_to_pitch: float_le_bytes!(mus_bytes),
-            root_key: le_bytes!(mus_bytes),
-            note_low: mus_bytes.next().unwrap(),
-            note_high: mus_bytes.next().unwrap(),
-            velocity_low: mus_bytes.next().unwrap(),
-            velocity_high: mus_bytes.next().unwrap(),
-            wave_index: le_bytes!(mus_bytes),
-            base_priority: float_le_bytes!(mus_bytes),
-            modul_env: Envelope::parse(&mut mus_bytes),
-            modul_env_to_pitch: float_le_bytes!(mus_bytes),
+    let program_zones: Vec<Vec<ProgramZone>> = program_entries
+        .iter()
+        .map(|entry| {
+            (0..entry.num_zones)
+                .map(|_| ProgramZone {
+                    pitch_finetuning: le_bytes!(mus_bytes),
+                    reverb: le_bytes!(mus_bytes),
+                    pan_position: float_le_bytes!(mus_bytes),
+                    keynum_hold: le_bytes!(mus_bytes),
+                    keynum_decay: le_bytes!(mus_bytes),
+                    volume_env: Envelope::parse(&mut mus_bytes),
+                    volume_env_atten: float_le_bytes!(mus_bytes),
+                    vib_delay: float_le_bytes!(mus_bytes),
+                    vib_frequency: float_le_bytes!(mus_bytes),
+                    vib_to_pitch: float_le_bytes!(mus_bytes),
+                    root_key: le_bytes!(mus_bytes),
+                    note_low: mus_bytes.next().unwrap(),
+                    note_high: mus_bytes.next().unwrap(),
+                    velocity_low: mus_bytes.next().unwrap(),
+                    velocity_high: mus_bytes.next().unwrap(),
+                    wave_index: le_bytes!(mus_bytes),
+                    base_priority: float_le_bytes!(mus_bytes),
+                    modul_env: Envelope::parse(&mut mus_bytes),
+                    modul_env_to_pitch: float_le_bytes!(mus_bytes),
+                })
+                .collect()
         })
-        .collect::<Vec<_>>();
+        .collect();
     if args.debug {
         dbg!(&program_zones);
     }
@@ -189,16 +194,21 @@ fn main() {
         dbg!(&preset_entries);
     }
 
-    let preset_zones = (0..header.num_presets)
-        .map(|_| PresetZone {
-            root_key: le_bytes!(mus_bytes),
-            note_low: mus_bytes.next().unwrap(),
-            note_high: mus_bytes.next().unwrap(),
-            velocity_low: mus_bytes.next().unwrap(),
-            velocity_high: mus_bytes.next().unwrap(),
-            program_index: le_bytes!(mus_bytes),
+    let preset_zones: Vec<Vec<PresetZone>> = preset_entries
+        .iter()
+        .map(|entry| {
+            (0..entry.num_zones)
+                .map(|_| PresetZone {
+                    root_key: le_bytes!(mus_bytes),
+                    note_low: mus_bytes.next().unwrap(),
+                    note_high: mus_bytes.next().unwrap(),
+                    velocity_low: mus_bytes.next().unwrap(),
+                    velocity_high: mus_bytes.next().unwrap(),
+                    program_index: le_bytes!(mus_bytes),
+                })
+                .collect()
         })
-        .collect::<Vec<_>>();
+        .collect();
     if args.debug {
         dbg!(&preset_zones);
     }
