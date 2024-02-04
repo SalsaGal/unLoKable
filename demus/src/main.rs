@@ -51,6 +51,7 @@ fn percentage_to_decibels(percentage: f32) -> i32 {
 fn test_maths() {
     assert_eq!(percentage_to_decibels(100.0), 0);
     assert_eq!(percentage_to_decibels(50.0), 30);
+    assert_eq!(percentage_to_decibels(10.0), 100);
 }
 
 macro_rules! le_bytes {
@@ -360,6 +361,289 @@ fn main() {
                 .unwrap();
         }
     }
+
+    let info_path = args.mus_path.with_extension("").join(format!(
+        "{}.txt",
+        args.mus_path
+            .with_extension("")
+            .file_stem()
+            .unwrap()
+            .to_string_lossy()
+    ));
+    let mut info_file = File::create(info_path).unwrap();
+    write!(&mut info_file, "[Samples]").unwrap();
+    for wave_entry in &wave_entries {
+        write!(
+            &mut info_file,
+            "\r\n    SampleName={}\r\n",
+            name_to_str(&wave_entry.name),
+        )
+        .unwrap();
+        write!(
+            &mut info_file,
+            "        SampleRate={}\r\n",
+            wave_entry.sample_rate,
+        )
+        .unwrap();
+        write!(
+            &mut info_file,
+            "        Key={}\r\n",
+            wave_entry.original_pitch,
+        )
+        .unwrap();
+        write!(&mut info_file, "        FineTune=0\r\n").unwrap();
+        write!(&mut info_file, "        Type=1\r\n").unwrap();
+    }
+
+    write!(&mut info_file, "\r\n\r\n[Instruments]\r\n").unwrap();
+    for (i, program_entry) in program_entries.iter().enumerate() {
+        write!(
+            &mut info_file,
+            "\r\n    InstrumentName={}\r\n",
+            name_to_str(&program_entry.name)
+        )
+        .unwrap();
+        for program_zone in program_zones[i].iter() {
+            write!(
+                &mut info_file,
+                "\r\n        Sample={}\r\n",
+                name_to_str(&wave_entries[program_zone.wave_index as usize].name)
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_coarseTune={}\r\n",
+                semitone_tuning(program_zone.pitch_finetuning)
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_fineTune={}\r\n",
+                cents_tuning(program_zone.pitch_finetuning)
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_reverbEffectsSend={}\r\n",
+                program_zone.reverb * 10
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_pan={}\r\n",
+                pan_convert(program_zone.pan_position)
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_keynumToVolEnvHold={}\r\n",
+                program_zone.keynum_hold
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_keynumToVolEnvDecay={}\r\n",
+                program_zone.keynum_decay
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_attackVolEnv={}\r\n",
+                secs_to_timecent(program_zone.volume_env.attack)
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_decayVolEnv={}\r\n",
+                secs_to_timecent(program_zone.volume_env.decay)
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_sustainVolEnv={}\r\n",
+                percentage_to_decibels(program_zone.volume_env.sustain)
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_releaseVolEnv={}\r\n",
+                secs_to_timecent(program_zone.volume_env.release)
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_delayVolEnv={}\r\n",
+                secs_to_timecent(program_zone.volume_env.delay)
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_delayModEnv={}\r\n",
+                secs_to_timecent(program_zone.modul_env.delay)
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_initialAttenuation={}\r\n",
+                (program_zone.volume_env_atten * 10.0) as i32
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_delayVibLFO={}\r\n",
+                secs_to_timecent(program_zone.vib_delay)
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_freqVibLFO={}\r\n",
+                secs_to_timecent(program_zone.vib_frequency / 8.176)
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_vibLfoToPitch={}\r\n",
+                program_zone.vib_to_pitch as i32
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_LowKey={}\r\n",
+                program_zone.note_low
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_HighKey={}\r\n",
+                program_zone.note_high
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_LowVelocity={}\r\n",
+                program_zone.velocity_low
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_HighVelocity={}\r\n",
+                program_zone.velocity_high
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_attackModEnv={}\r\n",
+                secs_to_timecent(program_zone.modul_env.attack)
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_decayModEnv={}\r\n",
+                secs_to_timecent(program_zone.modul_env.decay)
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_sustainModEnv={}\r\n",
+                (program_zone.modul_env.sustain * 10.0) as i32
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_releaseModEnv={}\r\n",
+                secs_to_timecent(program_zone.modul_env.release)
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_modEnvToPitch={}\r\n",
+                program_zone.modul_env_to_pitch as i32
+            )
+            .unwrap();
+            if program_zone.root_key != -1 {
+                write!(
+                    &mut info_file,
+                    "            Z_overridingRootKey={}\r\n",
+                    program_zone.root_key
+                )
+                .unwrap();
+            }
+            write!(
+                &mut info_file,
+                "            Z_sampleModes={}\r\n",
+                wave_entries[program_zone.wave_index as usize].loop_info
+            )
+            .unwrap();
+        }
+
+        write!(&mut info_file, "\r\n        GlobalZone\r\n\r\n").unwrap();
+    }
+
+    write!(&mut info_file, "\r\n[Preset]\r\n").unwrap();
+    for (i, preset_entry) in preset_entries.iter().enumerate() {
+        write!(
+            &mut info_file,
+            "\r\n\r\n    PresetName={}\r\n",
+            name_to_str(&preset_entry.name),
+        )
+        .unwrap();
+        write!(
+            &mut info_file,
+            "        Bank={}\r\n",
+            preset_entry.midi_bank_number,
+        )
+        .unwrap();
+        write!(
+            &mut info_file,
+            "        Program={}\r\n\r\n",
+            preset_entry.midi_preset_number,
+        )
+        .unwrap();
+
+        for zone in preset_zones[i].iter() {
+            write!(
+                &mut info_file,
+                "        Instrument={}\r\n",
+                name_to_str(&program_entries[zone.program_index as usize].name),
+            )
+            .unwrap();
+            write!(&mut info_file, "            L_LowKey={}\r\n", zone.note_low).unwrap();
+            write!(
+                &mut info_file,
+                "            L_HighKey={}\r\n",
+                zone.note_high,
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            L_LowVelocity={}\r\n",
+                zone.velocity_low,
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            L_HighVelocity={}\r\n",
+                zone.velocity_high,
+            )
+            .unwrap();
+            write!(&mut info_file, "\r\n        GlobalLayer\r\n").unwrap();
+        }
+    }
+
+    write!(&mut info_file, "\r\n\r\n[Info]\r\n").unwrap();
+    write!(&mut info_file, "Version=2.1\r\n").unwrap();
+    write!(&mut info_file, "Engine=EMU8000\r\n").unwrap();
+    write!(
+        &mut info_file,
+        "Name={}\r\n",
+        args.mus_path
+            .with_extension("")
+            .file_stem()
+            .unwrap()
+            .to_string_lossy()
+    )
+    .unwrap();
+    write!(&mut info_file, "Editor=Demus\r\n").unwrap();
 }
 
 #[derive(Debug)]
