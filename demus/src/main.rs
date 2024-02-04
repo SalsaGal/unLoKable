@@ -43,8 +43,14 @@ fn pan_convert(pan: f32) -> i32 {
     (pan * 1000.0 - 500.0) as i32
 }
 
-fn percentage_to_decibels(sustain: f32) -> i32 {
-    (sustain * 10.0) as i32
+fn percentage_to_decibels(percentage: f32) -> i32 {
+    (-(10.0 * f32::log10(percentage.max(0.001) / 100.0)) * 10.0) as i32
+}
+
+#[test]
+fn test_maths() {
+    assert_eq!(percentage_to_decibels(100.0), 0);
+    assert_eq!(percentage_to_decibels(50.0), 30);
 }
 
 macro_rules! le_bytes {
