@@ -10,18 +10,19 @@ fn main() {
     );
     let ads_file = std::fs::read(&ads_path).unwrap();
 
-    let (lb, le) = find_loops(&ads_file);
-    print!(
-        "{lb} {le} {}\r\n",
-        ads_path
-            .with_extension("wav")
-            .file_name()
-            .unwrap()
-            .to_string_lossy()
-    );
+    if let Some((lb, le)) = find_loops(&ads_file) {
+        print!(
+            "{lb} {le} {}\r\n",
+            ads_path
+                .with_extension("wav")
+                .file_name()
+                .unwrap()
+                .to_string_lossy()
+        );
+    }
 }
 
-fn find_loops(ads_file: &[u8]) -> (u32, u32) {
+fn find_loops(ads_file: &[u8]) -> Option<(u32, u32)> {
     if ads_file[0..4] != MAGIC_NUMBER {
         eprintln!(
             "Invalid magic number, expected {MAGIC_NUMBER:?}, found {:?}",
@@ -33,7 +34,7 @@ fn find_loops(ads_file: &[u8]) -> (u32, u32) {
     let body_size = load_bytes(&ads_file[0x24..]);
     let codec = load_bytes(&ads_file[8..]);
     if codec != 0x10 {
-        return (0, 0);
+        return None;
     }
 
     let channel_number = load_bytes(&ads_file[0x10..]);
@@ -47,13 +48,12 @@ fn find_loops(ads_file: &[u8]) -> (u32, u32) {
             if x[1] == 6 {
                 Some((
                     i as u32 * 28 / channel_number,
-                    body_size / 16 * 28 / channel_number,
+                    body_size / 16 * 28 / channel_number - 1,
                 ))
             } else {
                 None
             }
         })
-        .unwrap_or((0, 0))
 }
 
 fn load_bytes(bytes: &[u8]) -> u32 {
