@@ -54,6 +54,7 @@ fn main() {
         dbg_hex!(&header);
     }
 
+    // Balance the tokens
     let body = content_iter.collect::<Vec<_>>();
     let mut tokens = parse_file(&body);
     let mut loop_starter_count = tokens
@@ -87,7 +88,11 @@ fn main() {
     }
 
     let mut output = vec![];
+    let mut has_infinite_loop = false;
     for lexeme in &lexemes {
+        if matches!(lexeme, Lexeme::Loop(0, _)) {
+            has_infinite_loop = true;
+        }
         write_lexeme(&mut output, lexeme);
     }
 
@@ -99,6 +104,7 @@ fn main() {
             && *chunk.next().unwrap() == 0x32
             && *chunk.next().unwrap() == 0x01
         {
+            has_infinite_loop = true;
             output.splice(i..i + 4, [0xff, 0x2f, 0x00]);
             i += 3;
         } else {
@@ -106,7 +112,7 @@ fn main() {
         }
     }
 
-    dictionary(&mut output, header.quarter_note_time);
+    dictionary(&mut output, header.quarter_note_time, has_infinite_loop);
 
     let mut output_file = File::create(args.output.unwrap_or_else(|| {
         args.input.with_file_name(format!(
@@ -139,7 +145,7 @@ fn main() {
     output_file.write_all(&output[0..output_end + 3]).unwrap();
 }
 
-fn dictionary(file: &mut Vec<u8>, quarter_note_time: u32) {
+fn dictionary(file: &mut Vec<u8>, quarter_note_time: u32, has_infinite_loop: bool) {
     const MAGIC: u16 = 0x51ff;
 
     let sentinel_count = file
@@ -177,7 +183,14 @@ fn dictionary(file: &mut Vec<u8>, quarter_note_time: u32) {
                 }
                 [0x2f | 0x44, 0x00] => {
                     sentinel_index += 1;
-                    if sentinel_index == sentinel_count {
+                    if has_infinite_loop {
+                        if sentinel_index == sentinel_count - 1 {
+                            file[i + 1] = 0x2f;
+                            None
+                        } else {
+                            Some(3)
+                        }
+                    } else if sentinel_index == sentinel_count {
                         file[i + 1] = 0x2f;
                         None
                     } else {
