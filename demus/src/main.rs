@@ -390,7 +390,7 @@ fn main() {
             .to_string_lossy()
     ));
     let mut info_file = File::create(info_path).unwrap();
-    write!(&mut info_file, "[Samples]").unwrap();
+    write!(&mut info_file, "[Samples]\r\n").unwrap();
     for wave_entry in &wave_entries {
         write!(
             &mut info_file,
