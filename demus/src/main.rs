@@ -288,7 +288,7 @@ fn main() {
         std::io::stdout().flush().unwrap();
         let mut input = String::new();
         std::io::stdin().read_line(&mut input).unwrap();
-        if input == "y" {
+        if input.trim() == "y" {
             std::fs::remove_dir_all(&sequences_dir).unwrap();
         } else {
             println!("Abandoning");
