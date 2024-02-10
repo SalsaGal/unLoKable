@@ -283,6 +283,7 @@ fn main() {
     }
 
     let sequences_dir = args.mus_path.with_extension("").join("sequences");
+    let samples_dir = args.mus_path.with_extension("").join("samples");
     if sequences_dir.exists() {
         print!("Directory already exists, delete? [y/(n)]: ");
         std::io::stdout().flush().unwrap();
@@ -290,6 +291,7 @@ fn main() {
         std::io::stdin().read_line(&mut input).unwrap();
         if input.trim() == "y" {
             std::fs::remove_dir_all(&sequences_dir).unwrap();
+            std::fs::remove_dir_all(&samples_dir).unwrap();
         } else {
             println!("Abandoning");
             return;
@@ -309,11 +311,10 @@ fn main() {
     let waves = wave_entries
         .iter()
         .map(|wave_entry| {
-            dbg!(wave_entry);
             let wave_range =
                 wave_entry.offset as usize..wave_entry.offset as usize + wave_entry.size as usize;
             if platform == Platform::Console {
-                let check_index = wave_range.start + wave_range.end - 16;
+                let check_index = wave_range.end - 16;
                 if sam_file[check_index..check_index + 16]
                     == [
                         0x07, 0x00, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
@@ -327,11 +328,9 @@ fn main() {
         })
         .collect::<Vec<_>>();
 
-    let samples_path = args.mus_path.with_extension("").join("samples");
-    std::fs::create_dir(&samples_path).unwrap();
-
+    std::fs::create_dir(&samples_dir).unwrap();
     for (wave, wave_entry) in waves.iter().zip(&wave_entries) {
-        let path = samples_path.join(format!("{}.ads", name_to_str(&wave_entry.name)));
+        let path = samples_dir.join(format!("{}.ads", name_to_str(&wave_entry.name)));
         let mut sample_file = File::create(path).unwrap();
 
         sample_file
