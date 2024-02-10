@@ -598,7 +598,7 @@ fn main() {
         write!(&mut info_file, "\r\n        GlobalZone\r\n\r\n").unwrap();
     }
 
-    write!(&mut info_file, "\r\n[Presets]\r\n").unwrap();
+    write!(&mut info_file, "\r\n[Presets]").unwrap();
     for (i, preset_entry) in preset_entries.iter().enumerate() {
         write!(
             &mut info_file,
