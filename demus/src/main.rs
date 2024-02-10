@@ -187,7 +187,7 @@ fn main() {
             size: le_bytes!(mus_bytes) * 2,
             loop_end: le_bytes!(mus_bytes),
             sample_rate: le_bytes!(mus_bytes),
-            original_pitch: le_bytes!(mus_bytes) >> 8,
+            original_pitch: le_bytes!(mus_bytes) / 256,
             loop_info: le_bytes!(mus_bytes),
             snd_handle: le_bytes!(mus_bytes),
         })
