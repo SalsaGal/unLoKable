@@ -275,6 +275,18 @@ fn main() {
     }
 
     let sequences_dir = args.mus_path.with_extension("").join("sequences");
+    if sequences_dir.exists() {
+        print!("Directory already exists, delete? [y/(n)]: ");
+        std::io::stdout().flush().unwrap();
+        let mut input = String::new();
+        std::io::stdin().read_line(&mut input).unwrap();
+        if input == "y" {
+            std::fs::remove_dir_all(&sequences_dir).unwrap();
+        } else {
+            println!("Abandoning");
+            return;
+        }
+    }
     std::fs::create_dir_all(&sequences_dir).unwrap();
     for (i, sequence) in sequences.into_iter().enumerate() {
         let path = sequences_dir.join(format!(
