@@ -3,6 +3,7 @@ resolver = "2"
 members = [
     "adsloopfind",
     "cds2seq",
+    "demul",
     "demus",
     "msqsplit",
     "seqrepeat",

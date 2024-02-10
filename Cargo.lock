@@ -116,6 +116,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2f74abed44e4dbc4d0548b565869c66c9c6d6d84011a8c14cee2cacfdada3d60"
 
 [[package]]
+name = "demul"
+version = "0.1.0"
+
+[[package]]
 name = "demus"
 version = "0.1.0"
 dependencies = [
