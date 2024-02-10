@@ -4,7 +4,7 @@ use clap::Parser;
 
 #[derive(Clone, Copy, Default, PartialEq, Eq, clap::ValueEnum)]
 pub enum Platform {
-    Dreamcast,
+    Console,
     #[default]
     PC,
 }
@@ -19,10 +19,13 @@ struct Args {
     /// Whether to display debug information or not
     #[clap(short)]
     debug: bool,
-    /// What platform to use the format of
-    #[clap(short)]
-    platform: Option<Platform>,
-    /// Output path of the cds file, defaults to the input with a different extension
+    /// Tells program to use PC format. This is the default.
+    #[clap(long, short)]
+    pc: bool,
+    /// Tells program to use console format.
+    #[clap(long, short)]
+    console: bool,
+    /// Output folder of the files, defaults to the input with a different extension.
     #[clap(long, short)]
     output: Option<PathBuf>,
 }
@@ -130,6 +133,11 @@ fn name_to_str(name: &[char; 20]) -> String {
 
 fn main() {
     let args = Args::parse();
+    let platform = if args.console {
+        Platform::Console
+    } else {
+        Platform::PC
+    };
 
     let mus_file = std::fs::read(&args.mus_path).unwrap();
     let mut mus_bytes = mus_file.iter().copied();
@@ -304,7 +312,7 @@ fn main() {
             dbg!(wave_entry);
             let wave_range =
                 wave_entry.offset as usize..wave_entry.offset as usize + wave_entry.size as usize;
-            if args.platform.unwrap_or_default() == Platform::Dreamcast {
+            if platform == Platform::Console {
                 let check_index = wave_range.start + wave_range.end - 16;
                 if sam_file[check_index..check_index + 16]
                     == [
@@ -329,7 +337,7 @@ fn main() {
         sample_file
             .write_all(&[0x53, 0x53, 0x68, 0x64, 0x18, 0x0, 0x0, 0x0])
             .unwrap();
-        if args.platform.unwrap_or_default() == Platform::PC {
+        if platform == Platform::PC {
             sample_file.write_all(&[0x01]).unwrap();
         } else {
             sample_file.write_all(&[0x10]).unwrap();
