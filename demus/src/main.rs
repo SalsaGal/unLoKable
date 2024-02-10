@@ -344,7 +344,7 @@ fn main() {
         }
         sample_file.write_all(&[0; 3]).unwrap();
         sample_file
-            .write_all(&wave_entry.sample_rate.to_be_bytes())
+            .write_all(&wave_entry.sample_rate.to_le_bytes())
             .unwrap();
         sample_file.write_all(&[1]).unwrap();
         sample_file.write_all(&[0; 3]).unwrap();
@@ -352,7 +352,7 @@ fn main() {
         sample_file.write_all(&[0xff; 8]).unwrap();
         sample_file.write_all(&[0x53, 0x53, 0x62, 0x64]).unwrap();
         sample_file
-            .write_all(&wave_entry.size.to_be_bytes())
+            .write_all(&wave_entry.size.to_le_bytes())
             .unwrap();
         sample_file.write_all(&sam_file[wave.clone()]).unwrap();
     }
