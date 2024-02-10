@@ -79,9 +79,9 @@ impl Chunk {
         match variant {
             0 => {
                 let audio = Self::Audio {
-                    size: parse_u32(bytes)?,
+                    size: parse_u32(bytes)? - 16,
                 };
-                get_bytes(bytes, 8);
+                get_bytes(bytes, 8 + 16);
                 Some(audio)
             }
             1 => {
