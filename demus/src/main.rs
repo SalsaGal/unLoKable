@@ -422,7 +422,7 @@ fn main() {
             name_to_str(&program_entry.name)
         )
         .unwrap();
-        for program_zone in program_zones[i].iter() {
+        for program_zone in &program_zones[i] {
             write!(
                 &mut info_file,
                 "\r\n        Sample={}\r\n",
@@ -619,7 +619,7 @@ fn main() {
         )
         .unwrap();
 
-        for zone in preset_zones[i].iter() {
+        for zone in &preset_zones[i] {
             write!(
                 &mut info_file,
                 "        Instrument={}\r\n",
