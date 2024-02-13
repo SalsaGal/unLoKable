@@ -2,6 +2,9 @@ use std::{fs::File, io::Write, path::PathBuf};
 
 use clap::Parser;
 
+const HEADER_VERSION_114: i32 = 270;
+const HEADER_VERSION_120: i32 = 276;
+
 #[derive(Clone, Copy, Default, PartialEq, Eq, clap::ValueEnum)]
 pub enum Platform {
     Console,
@@ -146,20 +149,7 @@ fn main() {
     let mut mus_bytes = mus_file.iter().copied();
     let mut sam_file = std::fs::read(&args.sam_path).unwrap();
 
-    let header = MusHeader {
-        magic: be_bytes!(mus_bytes),
-        header_size: le_bytes!(mus_bytes),
-        version_number: le_bytes!(mus_bytes),
-        reverb_volume: le_bytes!(mus_bytes),
-        reverb_type: le_bytes!(mus_bytes),
-        reverb_multiply: le_bytes!(mus_bytes),
-        num_sequences: le_bytes!(mus_bytes),
-        num_labels: le_bytes!(mus_bytes),
-        offset_to_labels_offsets_table: le_bytes!(mus_bytes),
-        num_waves: le_bytes!(mus_bytes),
-        num_programs: le_bytes!(mus_bytes),
-        num_presets: le_bytes!(mus_bytes),
-    };
+    let header = MusHeader::parse(&mut mus_bytes);
     assert_eq!(header.magic, 0x4D75_7321, "Invalid magic number");
     if args.debug {
         dbg!(&header);
@@ -677,11 +667,52 @@ struct MusHeader {
     reverb_type: i32,
     reverb_multiply: i32,
     num_sequences: i32,
+    num_streams: Option<i32>,
+    stream_bpm: Option<i32>,
+    stream_info_pointer: Option<i32>,
     num_labels: i32,
     offset_to_labels_offsets_table: i32,
     num_waves: i32,
     num_programs: i32,
     num_presets: i32,
+}
+
+impl MusHeader {
+    fn parse(bytes: &mut impl Iterator<Item = u8>) -> Self {
+        let magic = be_bytes!(bytes);
+        let header_size = le_bytes!(bytes);
+        let version_number = le_bytes!(bytes);
+
+        Self {
+            magic,
+            header_size,
+            version_number,
+            reverb_volume: le_bytes!(bytes),
+            reverb_type: le_bytes!(bytes),
+            reverb_multiply: le_bytes!(bytes),
+            num_sequences: le_bytes!(bytes),
+            num_streams: if version_number == HEADER_VERSION_120 {
+                Some(le_bytes!(bytes))
+            } else {
+                None
+            },
+            stream_bpm: if version_number == HEADER_VERSION_120 {
+                Some(le_bytes!(bytes))
+            } else {
+                None
+            },
+            stream_info_pointer: if version_number == HEADER_VERSION_120 {
+                Some(le_bytes!(bytes))
+            } else {
+                None
+            },
+            num_labels: le_bytes!(bytes),
+            offset_to_labels_offsets_table: le_bytes!(bytes),
+            num_waves: le_bytes!(bytes),
+            num_programs: le_bytes!(bytes),
+            num_presets: le_bytes!(bytes),
+        }
+    }
 }
 
 #[derive(Debug)]
