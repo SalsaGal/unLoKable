@@ -74,8 +74,8 @@ fn main() {
     }
 
     let mut rate_file = File::create(format!(
-        "{}_rate.txt",
-        args.input.with_extension("").to_string_lossy()
+        "{}/{project_name}_rate.txt",
+        output_dir.to_string_lossy()
     ))
     .unwrap();
     for i in 0..channels {
