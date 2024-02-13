@@ -16,18 +16,6 @@ fn main() {
 
     let mul_file = std::fs::read(&args.input).unwrap();
 
-    let mut rate_file = File::create(format!(
-        "{}_rate.txt",
-        args.input.with_extension("").to_string_lossy()
-    ))
-    .unwrap();
-    writeln!(
-        &mut rate_file,
-        "{}",
-        u32::from_le_bytes([mul_file[0], mul_file[1], mul_file[2], mul_file[3]]),
-    )
-    .unwrap();
-
     let channels = u32::from_le_bytes([mul_file[12], mul_file[13], mul_file[14], mul_file[15]]);
 
     // TODO Use slices instead of `Vec<Vec<>>`s
@@ -81,6 +69,20 @@ fn main() {
                 .flatten()
                 .map(|(_, x)| x)
                 .collect::<Vec<_>>(),
+        )
+        .unwrap();
+    }
+
+    let mut rate_file = File::create(format!(
+        "{}_rate.txt",
+        args.input.with_extension("").to_string_lossy()
+    ))
+    .unwrap();
+    for i in 0..channels {
+        write!(
+            &mut rate_file,
+            "{project_name}_audio_ch{i}.bin 1 {} 0\r\n",
+            u32::from_le_bytes([mul_file[0], mul_file[1], mul_file[2], mul_file[3]]),
         )
         .unwrap();
     }
