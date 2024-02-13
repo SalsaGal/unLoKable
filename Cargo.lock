@@ -3,6 +3,13 @@
 version = 3
 
 [[package]]
+name = "adsheader"
+version = "0.1.0"
+dependencies = [
+ "clap",
+]
+
+[[package]]
 name = "adsloopfind"
 version = "0.1.0"
 

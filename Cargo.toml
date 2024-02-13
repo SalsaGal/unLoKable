@@ -1,10 +1,12 @@
 [workspace]
 resolver = "2"
 members = [
+    "adsheader",
     "adsloopfind",
     "cds2seq",
     "demul",
     "demus",
     "msqsplit",
-    "seqrepeat", "sound",
+    "seqrepeat",
+    "sound",
 ]
