@@ -81,7 +81,7 @@ fn main() {
     for i in 0..channels {
         write!(
             &mut rate_file,
-            "{project_name}_audio_ch{i}.bin 1 {} 0\r\n",
+            "{project_name}_audio_ch{i}.bin 1 {} 0 16\r\n",
             u32::from_le_bytes([mul_file[0], mul_file[1], mul_file[2], mul_file[3]]),
         )
         .unwrap();
