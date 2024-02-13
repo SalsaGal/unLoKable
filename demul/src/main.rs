@@ -25,31 +25,41 @@ fn main() {
     )
     .unwrap();
 
+    let channels = u32::from_le_bytes([mul_file[12], mul_file[13], mul_file[14], mul_file[15]]);
+
     // TODO Use slices instead of `Vec<Vec<>>`s
     let mut body = mul_file[0x800..].iter().copied().enumerate();
-    let mut audio_slices = vec![];
+    let mut audio_slices = (0..channels).map(|_| vec![]).collect::<Vec<_>>();
     let mut data_slices = vec![];
     while let Some(current_chunk) = Chunk::parse(&mut body) {
         match current_chunk {
-            Chunk::Audio { size } => audio_slices.push(get_bytes(&mut body, size as usize)),
+            Chunk::Audio { size } => {
+                let split_size = size / channels;
+                let bytes = get_bytes(&mut body, size as usize);
+                for (i, slice) in bytes.chunks(split_size as usize).enumerate() {
+                    audio_slices[i].push(slice.to_vec());
+                }
+            }
             Chunk::Data { size } => data_slices.push(get_bytes(&mut body, size as usize)),
         }
     }
 
     if !audio_slices.is_empty() {
-        let mut out = File::create(format!(
-            "{}_audio.bin",
-            args.input.with_extension("").to_string_lossy()
-        ))
-        .unwrap();
-        out.write_all(
-            &audio_slices
-                .into_iter()
-                .flatten()
-                .map(|(_, x)| x)
-                .collect::<Vec<_>>(),
-        )
-        .unwrap();
+        for (i, slices) in audio_slices.into_iter().enumerate() {
+            let mut out = File::create(format!(
+                "{}_audio_{i}.bin",
+                args.input.with_extension("").to_string_lossy()
+            ))
+            .unwrap();
+            out.write_all(
+                &slices
+                    .into_iter()
+                    .flatten()
+                    .map(|(_, x)| x)
+                    .collect::<Vec<_>>(),
+            )
+            .unwrap();
+        }
     }
     if !data_slices.is_empty() {
         let mut out = File::create(format!(
