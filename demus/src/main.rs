@@ -373,7 +373,7 @@ fn main() {
             smp_loop_info
                 .write_all(
                     format!(
-                        "{} {} {}.wav\n",
+                        "{} {} {}.wav\r\n",
                         entry.loop_begin,
                         entry.loop_end - 1,
                         name_to_str(&entry.name),
