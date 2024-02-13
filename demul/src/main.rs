@@ -6,6 +6,9 @@ use clap::Parser;
 struct Args {
     /// The `mul` file to read from.
     input: PathBuf,
+    /// The output directory
+    #[clap(short, long)]
+    output: Option<PathBuf>,
 }
 
 fn main() {
@@ -44,11 +47,15 @@ fn main() {
         }
     }
 
+    let project_name = args.input.file_stem().unwrap().to_string_lossy();
+    let output_dir = args.output.unwrap_or_else(|| args.input.with_extension(""));
+    std::fs::create_dir(&output_dir).unwrap();
     if !audio_slices.is_empty() {
         for (i, slices) in audio_slices.into_iter().enumerate() {
             let mut out = File::create(format!(
-                "{}_audio_{i}.bin",
-                args.input.with_extension("").to_string_lossy()
+                "{}/{}_audio_ch{i}.bin",
+                output_dir.to_string_lossy(),
+                project_name
             ))
             .unwrap();
             out.write_all(
@@ -63,8 +70,9 @@ fn main() {
     }
     if !data_slices.is_empty() {
         let mut out = File::create(format!(
-            "{}_data.bin",
-            args.input.with_extension("").to_string_lossy()
+            "{}/{}_data.bin",
+            output_dir.to_string_lossy(),
+            project_name
         ))
         .unwrap();
         out.write_all(
