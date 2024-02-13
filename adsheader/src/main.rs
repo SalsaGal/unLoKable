@@ -21,7 +21,7 @@ fn main() {
     let file_len = file.len();
 
     file.splice(
-        0..1,
+        0..0,
         [
             [0x53, 0x53, 0x68, 0x64],
             [0x18, 0, 0, 0],
