@@ -268,7 +268,7 @@ fn main() {
         .into_iter()
         .map(|(start, end)| match end {
             Some(end) => &mus_file[start as usize..start as usize + end as usize],
-            None => &mus_file[start as usize..],
+            None => &mus_file[start as usize..header.offset_to_labels_offsets_table as usize],
         })
         .collect::<Vec<_>>();
     if args.debug {
