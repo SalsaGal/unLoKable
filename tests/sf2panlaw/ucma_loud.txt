@@ -1,0 +1,3267 @@
+[Samples]
+
+    SampleName=Sample 0
+        SampleRate=44100
+        Key=112
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 1
+        SampleRate=44100
+        Key=85
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 2
+        SampleRate=44100
+        Key=73
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 3
+        SampleRate=44100
+        Key=54
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 4
+        SampleRate=44100
+        Key=90
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 5
+        SampleRate=44100
+        Key=51
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 6
+        SampleRate=44100
+        Key=63
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 7
+        SampleRate=44100
+        Key=75
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 8
+        SampleRate=44100
+        Key=87
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 9
+        SampleRate=44100
+        Key=36
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 10
+        SampleRate=44100
+        Key=78
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 11
+        SampleRate=44100
+        Key=90
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 12
+        SampleRate=44100
+        Key=24
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 13
+        SampleRate=44100
+        Key=49
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 14
+        SampleRate=44100
+        Key=66
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 15
+        SampleRate=44100
+        Key=62
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 16
+        SampleRate=44100
+        Key=79
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 17
+        SampleRate=44100
+        Key=91
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 18
+        SampleRate=44100
+        Key=74
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 19
+        SampleRate=44100
+        Key=39
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 20
+        SampleRate=44100
+        Key=51
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 21
+        SampleRate=44100
+        Key=63
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 22
+        SampleRate=44100
+        Key=74
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 23
+        SampleRate=44100
+        Key=86
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 24
+        SampleRate=44100
+        Key=78
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 25
+        SampleRate=44100
+        Key=78
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 26
+        SampleRate=44100
+        Key=77
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 27
+        SampleRate=44100
+        Key=83
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 28
+        SampleRate=44100
+        Key=63
+        FineTune=0
+        Type=1
+
+    SampleName=Sample 29
+        SampleRate=44100
+        Key=61
+        FineTune=0
+        Type=1
+
+
+[Instruments]
+
+    InstrumentName=Instr bnk0 num0
+
+        Sample=Sample 4
+            Z_LowKey=0
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=65193
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=60
+            Z_fineTune=36
+            Z_sampleModes=1
+            Z_overridingRootKey=90
+
+        Sample=Sample 4
+            Z_LowKey=0
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=343
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=60
+            Z_fineTune=52
+            Z_sampleModes=1
+            Z_overridingRootKey=90
+
+        GlobalZone
+
+
+    InstrumentName=Instr bnk0 num1
+
+        Sample=Sample 3
+            Z_LowKey=0
+            Z_HighKey=42
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=65193
+            Z_attackVolEnv=60489
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=1630
+            Z_initialAttenuation=102
+            Z_fineTune=81
+            Z_sampleModes=1
+            Z_overridingRootKey=54
+
+        Sample=Sample 3
+            Z_LowKey=0
+            Z_HighKey=42
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=343
+            Z_attackVolEnv=59991
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=1630
+            Z_initialAttenuation=102
+            Z_fineTune=87
+            Z_sampleModes=1
+            Z_overridingRootKey=54
+
+        Sample=Sample 2
+            Z_LowKey=43
+            Z_HighKey=56
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=65193
+            Z_attackVolEnv=61191
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=1630
+            Z_initialAttenuation=60
+            Z_fineTune=1
+            Z_sampleModes=1
+            Z_overridingRootKey=73
+
+        Sample=Sample 2
+            Z_LowKey=43
+            Z_HighKey=56
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=343
+            Z_attackVolEnv=60219
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=1630
+            Z_initialAttenuation=60
+            Z_fineTune=7
+            Z_sampleModes=1
+            Z_overridingRootKey=73
+
+        Sample=Sample 1
+            Z_LowKey=57
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=65193
+            Z_attackVolEnv=60489
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=1630
+            Z_initialAttenuation=102
+            Z_fineTune=86
+            Z_sampleModes=1
+            Z_overridingRootKey=85
+
+        Sample=Sample 1
+            Z_LowKey=57
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=343
+            Z_attackVolEnv=59602
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=1630
+            Z_initialAttenuation=102
+            Z_fineTune=92
+            Z_sampleModes=1
+            Z_overridingRootKey=85
+
+        GlobalZone
+
+
+    InstrumentName=Instr bnk0 num2
+
+        Sample=Sample 24
+            Z_LowKey=0
+            Z_HighKey=60
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=60489
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_sampleModes=1
+            Z_overridingRootKey=78
+
+        Sample=Sample 25
+            Z_LowKey=61
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=60489
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_sampleModes=1
+            Z_overridingRootKey=78
+
+        GlobalZone
+
+
+    InstrumentName=Instr bnk0 num3
+
+        Sample=Sample 19
+            Z_LowKey=0
+            Z_HighKey=32
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=65036
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=84
+            Z_fineTune=94
+            Z_sampleModes=0
+            Z_overridingRootKey=39
+
+        Sample=Sample 19
+            Z_LowKey=0
+            Z_HighKey=32
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=500
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=84
+            Z_fineTune=4
+            Z_sampleModes=0
+            Z_overridingRootKey=38
+
+        Sample=Sample 20
+            Z_LowKey=33
+            Z_HighKey=45
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=65036
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=84
+            Z_fineTune=94
+            Z_sampleModes=0
+            Z_overridingRootKey=51
+
+        Sample=Sample 20
+            Z_LowKey=33
+            Z_HighKey=45
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=500
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=84
+            Z_fineTune=4
+            Z_sampleModes=0
+            Z_overridingRootKey=50
+
+        Sample=Sample 21
+            Z_LowKey=46
+            Z_HighKey=57
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=65036
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=84
+            Z_fineTune=94
+            Z_sampleModes=0
+            Z_overridingRootKey=63
+
+        Sample=Sample 21
+            Z_LowKey=46
+            Z_HighKey=57
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=500
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=84
+            Z_fineTune=4
+            Z_sampleModes=0
+            Z_overridingRootKey=62
+
+        Sample=Sample 22
+            Z_LowKey=58
+            Z_HighKey=69
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=65036
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=84
+            Z_fineTune=94
+            Z_sampleModes=0
+            Z_overridingRootKey=74
+
+        Sample=Sample 22
+            Z_LowKey=58
+            Z_HighKey=69
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=500
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=84
+            Z_fineTune=4
+            Z_sampleModes=0
+            Z_overridingRootKey=73
+
+        Sample=Sample 23
+            Z_LowKey=70
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=65036
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=84
+            Z_fineTune=94
+            Z_sampleModes=0
+            Z_overridingRootKey=86
+
+        Sample=Sample 23
+            Z_LowKey=70
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=500
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=84
+            Z_fineTune=4
+            Z_sampleModes=0
+            Z_overridingRootKey=85
+
+        GlobalZone
+
+
+    InstrumentName=Instr bnk0 num4
+
+        Sample=Sample 12
+            Z_LowKey=0
+            Z_HighKey=20
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_sampleModes=0
+            Z_overridingRootKey=24
+
+        Sample=Sample 13
+            Z_LowKey=21
+            Z_HighKey=30
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_fineTune=44
+            Z_sampleModes=0
+            Z_overridingRootKey=49
+
+        Sample=Sample 14
+            Z_LowKey=31
+            Z_HighKey=42
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_fineTune=53
+            Z_sampleModes=0
+            Z_overridingRootKey=66
+
+        Sample=Sample 15
+            Z_LowKey=43
+            Z_HighKey=60
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=28
+            Z_sampleModes=0
+            Z_overridingRootKey=62
+
+        Sample=Sample 16
+            Z_LowKey=61
+            Z_HighKey=69
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_sampleModes=0
+            Z_overridingRootKey=79
+
+        Sample=Sample 17
+            Z_LowKey=70
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=51
+            Z_sampleModes=0
+            Z_overridingRootKey=91
+
+        GlobalZone
+
+
+    InstrumentName=Instr bnk0 num5
+
+        Sample=Sample 18
+            Z_LowKey=0
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=65036
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=84
+            Z_fineTune=95
+            Z_sampleModes=0
+            Z_overridingRootKey=74
+
+        Sample=Sample 18
+            Z_LowKey=0
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=500
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=84
+            Z_fineTune=3
+            Z_sampleModes=0
+            Z_overridingRootKey=73
+
+        GlobalZone
+
+
+    InstrumentName=Instr bnk0 num6
+
+        Sample=Sample 10
+            Z_LowKey=0
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=62391
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=2830
+            Z_initialAttenuation=9
+            Z_fineTune=62
+            Z_sampleModes=1
+            Z_overridingRootKey=78
+
+        GlobalZone
+
+
+    InstrumentName=Instr bnk0 num7
+
+        Sample=Sample 5
+            Z_LowKey=0
+            Z_HighKey=40
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_sampleModes=0
+            Z_overridingRootKey=51
+
+        Sample=Sample 6
+            Z_LowKey=41
+            Z_HighKey=52
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_sampleModes=0
+            Z_overridingRootKey=63
+
+        Sample=Sample 7
+            Z_LowKey=53
+            Z_HighKey=64
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_sampleModes=0
+            Z_overridingRootKey=75
+
+        Sample=Sample 8
+            Z_LowKey=65
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_sampleModes=0
+            Z_overridingRootKey=87
+
+        GlobalZone
+
+
+    InstrumentName=Instr bnk0 num8
+
+        Sample=Sample 26
+            Z_LowKey=0
+            Z_HighKey=61
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=65249
+            Z_attackVolEnv=51591
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=1630
+            Z_initialAttenuation=52
+            Z_fineTune=52
+            Z_sampleModes=0
+            Z_overridingRootKey=77
+
+        Sample=Sample 26
+            Z_LowKey=0
+            Z_HighKey=61
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=500
+            Z_attackVolEnv=51591
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=1630
+            Z_initialAttenuation=84
+            Z_fineTune=75
+            Z_sampleModes=0
+            Z_overridingRootKey=77
+
+        Sample=Sample 0
+            Z_LowKey=62
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=65193
+            Z_attackVolEnv=50391
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=101
+            Z_releaseVolEnv=4030
+            Z_initialAttenuation=191
+            Z_fineTune=49
+            Z_sampleModes=1
+            Z_overridingRootKey=112
+
+        Sample=Sample 0
+            Z_LowKey=62
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=343
+            Z_attackVolEnv=50391
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=101
+            Z_releaseVolEnv=4030
+            Z_initialAttenuation=191
+            Z_fineTune=54
+            Z_sampleModes=1
+            Z_overridingRootKey=112
+
+        GlobalZone
+
+
+    InstrumentName=Instr bnk0 num9
+
+        Sample=Sample 10
+            Z_LowKey=0
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=60489
+            Z_decayVolEnv=2417
+            Z_sustainVolEnv=71
+            Z_releaseVolEnv=2830
+            Z_initialAttenuation=9
+            Z_fineTune=62
+            Z_sampleModes=1
+            Z_overridingRootKey=78
+
+        GlobalZone
+
+
+    InstrumentName=Instr bnk0 num10
+
+        Sample=Sample 11
+            Z_LowKey=49
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_fineTune=44
+            Z_sampleModes=0
+            Z_overridingRootKey=90
+
+        Sample=Sample 9
+            Z_LowKey=0
+            Z_HighKey=48
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=161
+            Z_attackVolEnv=52119
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=61164
+            Z_initialAttenuation=58
+            Z_sampleModes=0
+            Z_overridingRootKey=36
+
+        GlobalZone
+
+
+    InstrumentName=Instr bnk0 num11
+
+        Sample=Sample 24
+            Z_LowKey=0
+            Z_HighKey=60
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=917
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=1630
+            Z_initialAttenuation=9
+            Z_sampleModes=1
+            Z_overridingRootKey=78
+
+        Sample=Sample 25
+            Z_LowKey=61
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=1184
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=1630
+            Z_initialAttenuation=9
+            Z_sampleModes=1
+            Z_overridingRootKey=78
+
+        GlobalZone
+
+
+    InstrumentName=Instr bnk0 num12
+
+        Sample=Sample 5
+            Z_LowKey=0
+            Z_HighKey=40
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_sampleModes=0
+            Z_overridingRootKey=63
+
+        Sample=Sample 6
+            Z_LowKey=41
+            Z_HighKey=52
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_sampleModes=0
+            Z_overridingRootKey=75
+
+        Sample=Sample 7
+            Z_LowKey=53
+            Z_HighKey=64
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_sampleModes=0
+            Z_overridingRootKey=87
+
+        Sample=Sample 8
+            Z_LowKey=65
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_sampleModes=0
+            Z_overridingRootKey=99
+
+        GlobalZone
+
+
+    InstrumentName=Instr bnk0 num13
+
+        Sample=Sample 10
+            Z_LowKey=0
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=51008
+            Z_decayVolEnv=2417
+            Z_sustainVolEnv=0
+            Z_releaseVolEnv=1630
+            Z_initialAttenuation=9
+            Z_fineTune=62
+            Z_sampleModes=1
+            Z_overridingRootKey=78
+
+        Sample=Sample 27
+            Z_LowKey=0
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=60489
+            Z_decayVolEnv=2417
+            Z_sustainVolEnv=0
+            Z_releaseVolEnv=1630
+            Z_initialAttenuation=19
+            Z_fineTune=44
+            Z_sampleModes=0
+            Z_overridingRootKey=83
+
+        GlobalZone
+
+
+    InstrumentName=Instr bnk0 num14
+
+        Sample=Sample 0
+            Z_LowKey=0
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=65193
+            Z_attackVolEnv=62391
+            Z_decayVolEnv=2830
+            Z_sustainVolEnv=1000
+            Z_releaseVolEnv=1630
+            Z_initialAttenuation=102
+            Z_fineTune=27
+            Z_sampleModes=1
+            Z_overridingRootKey=65
+
+        Sample=Sample 0
+            Z_LowKey=0
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=343
+            Z_attackVolEnv=62889
+            Z_decayVolEnv=3090
+            Z_sustainVolEnv=1000
+            Z_releaseVolEnv=1630
+            Z_initialAttenuation=102
+            Z_fineTune=38
+            Z_sampleModes=1
+            Z_overridingRootKey=65
+
+        Sample=Sample 10
+            Z_LowKey=0
+            Z_HighKey=21
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=65193
+            Z_attackVolEnv=50391
+            Z_decayVolEnv=2830
+            Z_sustainVolEnv=1000
+            Z_releaseVolEnv=1630
+            Z_initialAttenuation=60
+            Z_fineTune=91
+            Z_sampleModes=1
+            Z_overridingRootKey=30
+
+        Sample=Sample 10
+            Z_LowKey=0
+            Z_HighKey=21
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=343
+            Z_attackVolEnv=50391
+            Z_decayVolEnv=3090
+            Z_sustainVolEnv=1000
+            Z_releaseVolEnv=1630
+            Z_initialAttenuation=60
+            Z_fineTune=7
+            Z_sampleModes=1
+            Z_overridingRootKey=29
+
+        Sample=Sample 10
+            Z_LowKey=22
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=65193
+            Z_attackVolEnv=50391
+            Z_decayVolEnv=2830
+            Z_sustainVolEnv=1000
+            Z_releaseVolEnv=1630
+            Z_initialAttenuation=60
+            Z_fineTune=91
+            Z_sampleModes=1
+            Z_overridingRootKey=42
+
+        Sample=Sample 10
+            Z_LowKey=22
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=343
+            Z_attackVolEnv=50391
+            Z_decayVolEnv=3090
+            Z_sustainVolEnv=1000
+            Z_releaseVolEnv=1630
+            Z_initialAttenuation=60
+            Z_fineTune=7
+            Z_sampleModes=1
+            Z_overridingRootKey=41
+
+        GlobalZone
+
+
+    InstrumentName=Instr bnk0 num15
+
+        Sample=Sample 24
+            Z_LowKey=0
+            Z_HighKey=60
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=60489
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=0
+            Z_sampleModes=1
+            Z_overridingRootKey=78
+
+        GlobalZone
+
+
+    InstrumentName=Instr bnk0 num16
+
+        Sample=Sample 4
+            Z_LowKey=0
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=65193
+            Z_attackVolEnv=953
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=60
+            Z_fineTune=36
+            Z_sampleModes=1
+            Z_overridingRootKey=90
+
+        Sample=Sample 4
+            Z_LowKey=0
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=343
+            Z_attackVolEnv=953
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=60
+            Z_fineTune=52
+            Z_sampleModes=1
+            Z_overridingRootKey=90
+
+        GlobalZone
+
+
+    InstrumentName=Instr bnk0 num17
+
+        Sample=Sample 19
+            Z_LowKey=0
+            Z_HighKey=32
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_fineTune=94
+            Z_sampleModes=0
+            Z_overridingRootKey=39
+
+        Sample=Sample 20
+            Z_LowKey=33
+            Z_HighKey=45
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_fineTune=94
+            Z_sampleModes=0
+            Z_overridingRootKey=51
+
+        Sample=Sample 21
+            Z_LowKey=46
+            Z_HighKey=57
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_fineTune=94
+            Z_sampleModes=0
+            Z_overridingRootKey=63
+
+        Sample=Sample 22
+            Z_LowKey=58
+            Z_HighKey=69
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_fineTune=94
+            Z_sampleModes=0
+            Z_overridingRootKey=74
+
+        Sample=Sample 23
+            Z_LowKey=70
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_fineTune=94
+            Z_sampleModes=0
+            Z_overridingRootKey=86
+
+        GlobalZone
+
+
+    InstrumentName=Instr bnk0 num18
+
+        Sample=Sample 26
+            Z_LowKey=0
+            Z_HighKey=61
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=51591
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=1630
+            Z_initialAttenuation=9
+            Z_fineTune=52
+            Z_sampleModes=0
+            Z_overridingRootKey=77
+
+        Sample=Sample 0
+            Z_LowKey=62
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=50391
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=101
+            Z_releaseVolEnv=4030
+            Z_initialAttenuation=140
+            Z_fineTune=49
+            Z_sampleModes=1
+            Z_overridingRootKey=112
+
+        GlobalZone
+
+
+    InstrumentName=Instr bnk0 num19
+
+        Sample=Sample 19
+            Z_LowKey=0
+            Z_HighKey=32
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_fineTune=94
+            Z_sampleModes=0
+            Z_overridingRootKey=39
+
+        Sample=Sample 20
+            Z_LowKey=33
+            Z_HighKey=45
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_fineTune=94
+            Z_sampleModes=0
+            Z_overridingRootKey=51
+
+        Sample=Sample 21
+            Z_LowKey=46
+            Z_HighKey=57
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_fineTune=94
+            Z_sampleModes=0
+            Z_overridingRootKey=63
+
+        Sample=Sample 22
+            Z_LowKey=58
+            Z_HighKey=69
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_fineTune=94
+            Z_sampleModes=0
+            Z_overridingRootKey=74
+
+        Sample=Sample 23
+            Z_LowKey=70
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_fineTune=94
+            Z_sampleModes=0
+            Z_overridingRootKey=86
+
+        GlobalZone
+
+
+    InstrumentName=Instr bnk0 num20
+
+        Sample=Sample 18
+            Z_LowKey=0
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_sampleModes=0
+            Z_overridingRootKey=73
+
+        GlobalZone
+
+
+    InstrumentName=Instr bnk0 num21
+
+        Sample=Sample 19
+            Z_LowKey=0
+            Z_HighKey=32
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=65036
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=84
+            Z_fineTune=94
+            Z_sampleModes=0
+            Z_overridingRootKey=39
+
+        Sample=Sample 19
+            Z_LowKey=0
+            Z_HighKey=32
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=500
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=84
+            Z_fineTune=4
+            Z_sampleModes=0
+            Z_overridingRootKey=38
+
+        Sample=Sample 28
+            Z_LowKey=33
+            Z_HighKey=57
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_fineTune=94
+            Z_sampleModes=0
+            Z_overridingRootKey=63
+
+        Sample=Sample 22
+            Z_LowKey=58
+            Z_HighKey=69
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=65036
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=84
+            Z_fineTune=94
+            Z_sampleModes=0
+            Z_overridingRootKey=74
+
+        Sample=Sample 22
+            Z_LowKey=58
+            Z_HighKey=69
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=500
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=84
+            Z_fineTune=4
+            Z_sampleModes=0
+            Z_overridingRootKey=73
+
+        Sample=Sample 23
+            Z_LowKey=70
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=65036
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=84
+            Z_fineTune=94
+            Z_sampleModes=0
+            Z_overridingRootKey=86
+
+        Sample=Sample 23
+            Z_LowKey=70
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=500
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=84
+            Z_fineTune=4
+            Z_sampleModes=0
+            Z_overridingRootKey=85
+
+        GlobalZone
+
+
+    InstrumentName=Instr bnk0 num22
+
+        Sample=Sample 12
+            Z_LowKey=0
+            Z_HighKey=20
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_sampleModes=0
+            Z_overridingRootKey=24
+
+        Sample=Sample 13
+            Z_LowKey=21
+            Z_HighKey=30
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_fineTune=44
+            Z_sampleModes=0
+            Z_overridingRootKey=49
+
+        Sample=Sample 14
+            Z_LowKey=31
+            Z_HighKey=42
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_fineTune=53
+            Z_sampleModes=0
+            Z_overridingRootKey=66
+
+        Sample=Sample 29
+            Z_LowKey=43
+            Z_HighKey=60
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=28
+            Z_sampleModes=0
+            Z_overridingRootKey=61
+
+        Sample=Sample 16
+            Z_LowKey=61
+            Z_HighKey=69
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=9
+            Z_sampleModes=0
+            Z_overridingRootKey=79
+
+        Sample=Sample 17
+            Z_LowKey=70
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=52851
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=430
+            Z_initialAttenuation=51
+            Z_sampleModes=0
+            Z_overridingRootKey=91
+
+        GlobalZone
+
+
+    InstrumentName=Instr bnk0 num23
+
+        Sample=Sample 3
+            Z_LowKey=0
+            Z_HighKey=42
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=60489
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=1630
+            Z_initialAttenuation=51
+            Z_fineTune=81
+            Z_sampleModes=1
+            Z_overridingRootKey=54
+
+        Sample=Sample 2
+            Z_LowKey=43
+            Z_HighKey=56
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=61191
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=1630
+            Z_initialAttenuation=9
+            Z_fineTune=1
+            Z_sampleModes=1
+            Z_overridingRootKey=73
+
+        Sample=Sample 1
+            Z_LowKey=57
+            Z_HighKey=120
+            Z_LowVelocity=0
+            Z_HighVelocity=127
+            Z_pan=0
+            Z_attackVolEnv=60489
+            Z_decayVolEnv=1217
+            Z_sustainVolEnv=5
+            Z_releaseVolEnv=1630
+            Z_initialAttenuation=51
+            Z_fineTune=86
+            Z_sampleModes=1
+            Z_overridingRootKey=85
+
+        GlobalZone
+
+
+[Presets]
+
+    PresetName=Instr bnk0 num0
+        Bank=0
+        Program=0
+
+        Instrument=Instr bnk0 num0
+            L_LowKey=0
+            L_HighKey=127
+            L_LowVelocity=0
+            L_HighVelocity=127
+            L_reverbEffectsSend=250
+
+        GlobalLayer
+            GL_startAddrsOffset=
+            GL_endAddrsOffset=
+            GL_startloopAddrsOffset=
+            GL_endloopAddrsOffset=
+            GL_startAddrsCoarseOffset=
+            GL_modLfoToPitch=
+            GL_vibLfoToPitch=
+            GL_modEnvToPitch=
+            GL_initialFilterFc=
+            GL_initialFilterQ=
+            GL_modLfoToFilterFc=
+            GL_modEnvToFilterFc=
+            GL_endAddrsCoarseOffset=
+            GL_modLfoToVolume=
+            GL_unused1=
+            GL_chorusEffectsSend=
+            GL_reverbEffectsSend=
+            GL_pan=
+            GL_unused2=
+            GL_unused3=
+            GL_unused4=
+            GL_delayModLFO=
+            GL_freqModLFO=
+            GL_delayVibLFO=
+            GL_freqVibLFO=
+            GL_delayModEnv=
+            GL_attackModEnv=
+            GL_holdModEnv=
+            GL_decayModEnv=
+            GL_sustainModEnv=
+            GL_releaseModEnv=
+            GL_keynumToModEnvHold=
+            GL_keynumToModEnvDecay=
+            GL_delayVolEnv=
+            GL_attackVolEnv=
+            GL_holdVolEnv=
+            GL_decayVolEnv=
+            GL_sustainVolEnv=
+            GL_releaseVolEnv=
+            GL_keynumToVolEnvHold=
+            GL_keynumToVolEnvDecay=
+            GL_reserved1=
+            GL_startloopAddrsCoarseOffset=
+            GL_keynum=
+            GL_velocity=
+            GL_initialAttenuation=
+            GL_reserved2=
+            GL_endloopAddrsCoarseOffset=
+            GL_coarseTune=
+            GL_fineTune=
+            GL_sampleModes=
+            GL_reserved3=
+            GL_scaleTuning=
+            GL_exclusiveClass=
+            GL_overridingRootKey=
+            GL_unused5=
+
+
+    PresetName=Instr bnk0 num1
+        Bank=0
+        Program=1
+
+        Instrument=Instr bnk0 num1
+            L_LowKey=0
+            L_HighKey=127
+            L_LowVelocity=0
+            L_HighVelocity=127
+            L_reverbEffectsSend=250
+
+        GlobalLayer
+            GL_startAddrsOffset=
+            GL_endAddrsOffset=
+            GL_startloopAddrsOffset=
+            GL_endloopAddrsOffset=
+            GL_startAddrsCoarseOffset=
+            GL_modLfoToPitch=
+            GL_vibLfoToPitch=
+            GL_modEnvToPitch=
+            GL_initialFilterFc=
+            GL_initialFilterQ=
+            GL_modLfoToFilterFc=
+            GL_modEnvToFilterFc=
+            GL_endAddrsCoarseOffset=
+            GL_modLfoToVolume=
+            GL_unused1=
+            GL_chorusEffectsSend=
+            GL_reverbEffectsSend=
+            GL_pan=
+            GL_unused2=
+            GL_unused3=
+            GL_unused4=
+            GL_delayModLFO=
+            GL_freqModLFO=
+            GL_delayVibLFO=
+            GL_freqVibLFO=
+            GL_delayModEnv=
+            GL_attackModEnv=
+            GL_holdModEnv=
+            GL_decayModEnv=
+            GL_sustainModEnv=
+            GL_releaseModEnv=
+            GL_keynumToModEnvHold=
+            GL_keynumToModEnvDecay=
+            GL_delayVolEnv=
+            GL_attackVolEnv=
+            GL_holdVolEnv=
+            GL_decayVolEnv=
+            GL_sustainVolEnv=
+            GL_releaseVolEnv=
+            GL_keynumToVolEnvHold=
+            GL_keynumToVolEnvDecay=
+            GL_reserved1=
+            GL_startloopAddrsCoarseOffset=
+            GL_keynum=
+            GL_velocity=
+            GL_initialAttenuation=
+            GL_reserved2=
+            GL_endloopAddrsCoarseOffset=
+            GL_coarseTune=
+            GL_fineTune=
+            GL_sampleModes=
+            GL_reserved3=
+            GL_scaleTuning=
+            GL_exclusiveClass=
+            GL_overridingRootKey=
+            GL_unused5=
+
+
+    PresetName=Instr bnk0 num2
+        Bank=0
+        Program=2
+
+        Instrument=Instr bnk0 num2
+            L_LowKey=0
+            L_HighKey=127
+            L_LowVelocity=0
+            L_HighVelocity=127
+            L_reverbEffectsSend=250
+
+        GlobalLayer
+            GL_startAddrsOffset=
+            GL_endAddrsOffset=
+            GL_startloopAddrsOffset=
+            GL_endloopAddrsOffset=
+            GL_startAddrsCoarseOffset=
+            GL_modLfoToPitch=
+            GL_vibLfoToPitch=
+            GL_modEnvToPitch=
+            GL_initialFilterFc=
+            GL_initialFilterQ=
+            GL_modLfoToFilterFc=
+            GL_modEnvToFilterFc=
+            GL_endAddrsCoarseOffset=
+            GL_modLfoToVolume=
+            GL_unused1=
+            GL_chorusEffectsSend=
+            GL_reverbEffectsSend=
+            GL_pan=
+            GL_unused2=
+            GL_unused3=
+            GL_unused4=
+            GL_delayModLFO=
+            GL_freqModLFO=
+            GL_delayVibLFO=
+            GL_freqVibLFO=
+            GL_delayModEnv=
+            GL_attackModEnv=
+            GL_holdModEnv=
+            GL_decayModEnv=
+            GL_sustainModEnv=
+            GL_releaseModEnv=
+            GL_keynumToModEnvHold=
+            GL_keynumToModEnvDecay=
+            GL_delayVolEnv=
+            GL_attackVolEnv=
+            GL_holdVolEnv=
+            GL_decayVolEnv=
+            GL_sustainVolEnv=
+            GL_releaseVolEnv=
+            GL_keynumToVolEnvHold=
+            GL_keynumToVolEnvDecay=
+            GL_reserved1=
+            GL_startloopAddrsCoarseOffset=
+            GL_keynum=
+            GL_velocity=
+            GL_initialAttenuation=
+            GL_reserved2=
+            GL_endloopAddrsCoarseOffset=
+            GL_coarseTune=
+            GL_fineTune=
+            GL_sampleModes=
+            GL_reserved3=
+            GL_scaleTuning=
+            GL_exclusiveClass=
+            GL_overridingRootKey=
+            GL_unused5=
+
+
+    PresetName=Instr bnk0 num3
+        Bank=0
+        Program=3
+
+        Instrument=Instr bnk0 num3
+            L_LowKey=0
+            L_HighKey=127
+            L_LowVelocity=0
+            L_HighVelocity=127
+            L_reverbEffectsSend=250
+
+        GlobalLayer
+            GL_startAddrsOffset=
+            GL_endAddrsOffset=
+            GL_startloopAddrsOffset=
+            GL_endloopAddrsOffset=
+            GL_startAddrsCoarseOffset=
+            GL_modLfoToPitch=
+            GL_vibLfoToPitch=
+            GL_modEnvToPitch=
+            GL_initialFilterFc=
+            GL_initialFilterQ=
+            GL_modLfoToFilterFc=
+            GL_modEnvToFilterFc=
+            GL_endAddrsCoarseOffset=
+            GL_modLfoToVolume=
+            GL_unused1=
+            GL_chorusEffectsSend=
+            GL_reverbEffectsSend=
+            GL_pan=
+            GL_unused2=
+            GL_unused3=
+            GL_unused4=
+            GL_delayModLFO=
+            GL_freqModLFO=
+            GL_delayVibLFO=
+            GL_freqVibLFO=
+            GL_delayModEnv=
+            GL_attackModEnv=
+            GL_holdModEnv=
+            GL_decayModEnv=
+            GL_sustainModEnv=
+            GL_releaseModEnv=
+            GL_keynumToModEnvHold=
+            GL_keynumToModEnvDecay=
+            GL_delayVolEnv=
+            GL_attackVolEnv=
+            GL_holdVolEnv=
+            GL_decayVolEnv=
+            GL_sustainVolEnv=
+            GL_releaseVolEnv=
+            GL_keynumToVolEnvHold=
+            GL_keynumToVolEnvDecay=
+            GL_reserved1=
+            GL_startloopAddrsCoarseOffset=
+            GL_keynum=
+            GL_velocity=
+            GL_initialAttenuation=
+            GL_reserved2=
+            GL_endloopAddrsCoarseOffset=
+            GL_coarseTune=
+            GL_fineTune=
+            GL_sampleModes=
+            GL_reserved3=
+            GL_scaleTuning=
+            GL_exclusiveClass=
+            GL_overridingRootKey=
+            GL_unused5=
+
+
+    PresetName=Instr bnk0 num4
+        Bank=0
+        Program=4
+
+        Instrument=Instr bnk0 num4
+            L_LowKey=0
+            L_HighKey=127
+            L_LowVelocity=0
+            L_HighVelocity=127
+            L_reverbEffectsSend=250
+
+        GlobalLayer
+            GL_startAddrsOffset=
+            GL_endAddrsOffset=
+            GL_startloopAddrsOffset=
+            GL_endloopAddrsOffset=
+            GL_startAddrsCoarseOffset=
+            GL_modLfoToPitch=
+            GL_vibLfoToPitch=
+            GL_modEnvToPitch=
+            GL_initialFilterFc=
+            GL_initialFilterQ=
+            GL_modLfoToFilterFc=
+            GL_modEnvToFilterFc=
+            GL_endAddrsCoarseOffset=
+            GL_modLfoToVolume=
+            GL_unused1=
+            GL_chorusEffectsSend=
+            GL_reverbEffectsSend=
+            GL_pan=
+            GL_unused2=
+            GL_unused3=
+            GL_unused4=
+            GL_delayModLFO=
+            GL_freqModLFO=
+            GL_delayVibLFO=
+            GL_freqVibLFO=
+            GL_delayModEnv=
+            GL_attackModEnv=
+            GL_holdModEnv=
+            GL_decayModEnv=
+            GL_sustainModEnv=
+            GL_releaseModEnv=
+            GL_keynumToModEnvHold=
+            GL_keynumToModEnvDecay=
+            GL_delayVolEnv=
+            GL_attackVolEnv=
+            GL_holdVolEnv=
+            GL_decayVolEnv=
+            GL_sustainVolEnv=
+            GL_releaseVolEnv=
+            GL_keynumToVolEnvHold=
+            GL_keynumToVolEnvDecay=
+            GL_reserved1=
+            GL_startloopAddrsCoarseOffset=
+            GL_keynum=
+            GL_velocity=
+            GL_initialAttenuation=
+            GL_reserved2=
+            GL_endloopAddrsCoarseOffset=
+            GL_coarseTune=
+            GL_fineTune=
+            GL_sampleModes=
+            GL_reserved3=
+            GL_scaleTuning=
+            GL_exclusiveClass=
+            GL_overridingRootKey=
+            GL_unused5=
+
+
+    PresetName=Instr bnk0 num5
+        Bank=0
+        Program=5
+
+        Instrument=Instr bnk0 num5
+            L_LowKey=0
+            L_HighKey=127
+            L_LowVelocity=0
+            L_HighVelocity=127
+            L_reverbEffectsSend=250
+
+        GlobalLayer
+            GL_startAddrsOffset=
+            GL_endAddrsOffset=
+            GL_startloopAddrsOffset=
+            GL_endloopAddrsOffset=
+            GL_startAddrsCoarseOffset=
+            GL_modLfoToPitch=
+            GL_vibLfoToPitch=
+            GL_modEnvToPitch=
+            GL_initialFilterFc=
+            GL_initialFilterQ=
+            GL_modLfoToFilterFc=
+            GL_modEnvToFilterFc=
+            GL_endAddrsCoarseOffset=
+            GL_modLfoToVolume=
+            GL_unused1=
+            GL_chorusEffectsSend=
+            GL_reverbEffectsSend=
+            GL_pan=
+            GL_unused2=
+            GL_unused3=
+            GL_unused4=
+            GL_delayModLFO=
+            GL_freqModLFO=
+            GL_delayVibLFO=
+            GL_freqVibLFO=
+            GL_delayModEnv=
+            GL_attackModEnv=
+            GL_holdModEnv=
+            GL_decayModEnv=
+            GL_sustainModEnv=
+            GL_releaseModEnv=
+            GL_keynumToModEnvHold=
+            GL_keynumToModEnvDecay=
+            GL_delayVolEnv=
+            GL_attackVolEnv=
+            GL_holdVolEnv=
+            GL_decayVolEnv=
+            GL_sustainVolEnv=
+            GL_releaseVolEnv=
+            GL_keynumToVolEnvHold=
+            GL_keynumToVolEnvDecay=
+            GL_reserved1=
+            GL_startloopAddrsCoarseOffset=
+            GL_keynum=
+            GL_velocity=
+            GL_initialAttenuation=
+            GL_reserved2=
+            GL_endloopAddrsCoarseOffset=
+            GL_coarseTune=
+            GL_fineTune=
+            GL_sampleModes=
+            GL_reserved3=
+            GL_scaleTuning=
+            GL_exclusiveClass=
+            GL_overridingRootKey=
+            GL_unused5=
+
+
+    PresetName=Instr bnk0 num6
+        Bank=0
+        Program=6
+
+        Instrument=Instr bnk0 num6
+            L_LowKey=0
+            L_HighKey=127
+            L_LowVelocity=0
+            L_HighVelocity=127
+            L_reverbEffectsSend=250
+
+        GlobalLayer
+            GL_startAddrsOffset=
+            GL_endAddrsOffset=
+            GL_startloopAddrsOffset=
+            GL_endloopAddrsOffset=
+            GL_startAddrsCoarseOffset=
+            GL_modLfoToPitch=
+            GL_vibLfoToPitch=
+            GL_modEnvToPitch=
+            GL_initialFilterFc=
+            GL_initialFilterQ=
+            GL_modLfoToFilterFc=
+            GL_modEnvToFilterFc=
+            GL_endAddrsCoarseOffset=
+            GL_modLfoToVolume=
+            GL_unused1=
+            GL_chorusEffectsSend=
+            GL_reverbEffectsSend=
+            GL_pan=
+            GL_unused2=
+            GL_unused3=
+            GL_unused4=
+            GL_delayModLFO=
+            GL_freqModLFO=
+            GL_delayVibLFO=
+            GL_freqVibLFO=
+            GL_delayModEnv=
+            GL_attackModEnv=
+            GL_holdModEnv=
+            GL_decayModEnv=
+            GL_sustainModEnv=
+            GL_releaseModEnv=
+            GL_keynumToModEnvHold=
+            GL_keynumToModEnvDecay=
+            GL_delayVolEnv=
+            GL_attackVolEnv=
+            GL_holdVolEnv=
+            GL_decayVolEnv=
+            GL_sustainVolEnv=
+            GL_releaseVolEnv=
+            GL_keynumToVolEnvHold=
+            GL_keynumToVolEnvDecay=
+            GL_reserved1=
+            GL_startloopAddrsCoarseOffset=
+            GL_keynum=
+            GL_velocity=
+            GL_initialAttenuation=
+            GL_reserved2=
+            GL_endloopAddrsCoarseOffset=
+            GL_coarseTune=
+            GL_fineTune=
+            GL_sampleModes=
+            GL_reserved3=
+            GL_scaleTuning=
+            GL_exclusiveClass=
+            GL_overridingRootKey=
+            GL_unused5=
+
+
+    PresetName=Instr bnk0 num7
+        Bank=0
+        Program=7
+
+        Instrument=Instr bnk0 num7
+            L_LowKey=0
+            L_HighKey=127
+            L_LowVelocity=0
+            L_HighVelocity=127
+            L_reverbEffectsSend=250
+
+        GlobalLayer
+            GL_startAddrsOffset=
+            GL_endAddrsOffset=
+            GL_startloopAddrsOffset=
+            GL_endloopAddrsOffset=
+            GL_startAddrsCoarseOffset=
+            GL_modLfoToPitch=
+            GL_vibLfoToPitch=
+            GL_modEnvToPitch=
+            GL_initialFilterFc=
+            GL_initialFilterQ=
+            GL_modLfoToFilterFc=
+            GL_modEnvToFilterFc=
+            GL_endAddrsCoarseOffset=
+            GL_modLfoToVolume=
+            GL_unused1=
+            GL_chorusEffectsSend=
+            GL_reverbEffectsSend=
+            GL_pan=
+            GL_unused2=
+            GL_unused3=
+            GL_unused4=
+            GL_delayModLFO=
+            GL_freqModLFO=
+            GL_delayVibLFO=
+            GL_freqVibLFO=
+            GL_delayModEnv=
+            GL_attackModEnv=
+            GL_holdModEnv=
+            GL_decayModEnv=
+            GL_sustainModEnv=
+            GL_releaseModEnv=
+            GL_keynumToModEnvHold=
+            GL_keynumToModEnvDecay=
+            GL_delayVolEnv=
+            GL_attackVolEnv=
+            GL_holdVolEnv=
+            GL_decayVolEnv=
+            GL_sustainVolEnv=
+            GL_releaseVolEnv=
+            GL_keynumToVolEnvHold=
+            GL_keynumToVolEnvDecay=
+            GL_reserved1=
+            GL_startloopAddrsCoarseOffset=
+            GL_keynum=
+            GL_velocity=
+            GL_initialAttenuation=
+            GL_reserved2=
+            GL_endloopAddrsCoarseOffset=
+            GL_coarseTune=
+            GL_fineTune=
+            GL_sampleModes=
+            GL_reserved3=
+            GL_scaleTuning=
+            GL_exclusiveClass=
+            GL_overridingRootKey=
+            GL_unused5=
+
+
+    PresetName=Instr bnk0 num8
+        Bank=0
+        Program=8
+
+        Instrument=Instr bnk0 num8
+            L_LowKey=0
+            L_HighKey=127
+            L_LowVelocity=0
+            L_HighVelocity=127
+            L_reverbEffectsSend=250
+
+        GlobalLayer
+            GL_startAddrsOffset=
+            GL_endAddrsOffset=
+            GL_startloopAddrsOffset=
+            GL_endloopAddrsOffset=
+            GL_startAddrsCoarseOffset=
+            GL_modLfoToPitch=
+            GL_vibLfoToPitch=
+            GL_modEnvToPitch=
+            GL_initialFilterFc=
+            GL_initialFilterQ=
+            GL_modLfoToFilterFc=
+            GL_modEnvToFilterFc=
+            GL_endAddrsCoarseOffset=
+            GL_modLfoToVolume=
+            GL_unused1=
+            GL_chorusEffectsSend=
+            GL_reverbEffectsSend=
+            GL_pan=
+            GL_unused2=
+            GL_unused3=
+            GL_unused4=
+            GL_delayModLFO=
+            GL_freqModLFO=
+            GL_delayVibLFO=
+            GL_freqVibLFO=
+            GL_delayModEnv=
+            GL_attackModEnv=
+            GL_holdModEnv=
+            GL_decayModEnv=
+            GL_sustainModEnv=
+            GL_releaseModEnv=
+            GL_keynumToModEnvHold=
+            GL_keynumToModEnvDecay=
+            GL_delayVolEnv=
+            GL_attackVolEnv=
+            GL_holdVolEnv=
+            GL_decayVolEnv=
+            GL_sustainVolEnv=
+            GL_releaseVolEnv=
+            GL_keynumToVolEnvHold=
+            GL_keynumToVolEnvDecay=
+            GL_reserved1=
+            GL_startloopAddrsCoarseOffset=
+            GL_keynum=
+            GL_velocity=
+            GL_initialAttenuation=
+            GL_reserved2=
+            GL_endloopAddrsCoarseOffset=
+            GL_coarseTune=
+            GL_fineTune=
+            GL_sampleModes=
+            GL_reserved3=
+            GL_scaleTuning=
+            GL_exclusiveClass=
+            GL_overridingRootKey=
+            GL_unused5=
+
+
+    PresetName=Instr bnk0 num9
+        Bank=0
+        Program=9
+
+        Instrument=Instr bnk0 num9
+            L_LowKey=0
+            L_HighKey=127
+            L_LowVelocity=0
+            L_HighVelocity=127
+            L_reverbEffectsSend=250
+
+        GlobalLayer
+            GL_startAddrsOffset=
+            GL_endAddrsOffset=
+            GL_startloopAddrsOffset=
+            GL_endloopAddrsOffset=
+            GL_startAddrsCoarseOffset=
+            GL_modLfoToPitch=
+            GL_vibLfoToPitch=
+            GL_modEnvToPitch=
+            GL_initialFilterFc=
+            GL_initialFilterQ=
+            GL_modLfoToFilterFc=
+            GL_modEnvToFilterFc=
+            GL_endAddrsCoarseOffset=
+            GL_modLfoToVolume=
+            GL_unused1=
+            GL_chorusEffectsSend=
+            GL_reverbEffectsSend=
+            GL_pan=
+            GL_unused2=
+            GL_unused3=
+            GL_unused4=
+            GL_delayModLFO=
+            GL_freqModLFO=
+            GL_delayVibLFO=
+            GL_freqVibLFO=
+            GL_delayModEnv=
+            GL_attackModEnv=
+            GL_holdModEnv=
+            GL_decayModEnv=
+            GL_sustainModEnv=
+            GL_releaseModEnv=
+            GL_keynumToModEnvHold=
+            GL_keynumToModEnvDecay=
+            GL_delayVolEnv=
+            GL_attackVolEnv=
+            GL_holdVolEnv=
+            GL_decayVolEnv=
+            GL_sustainVolEnv=
+            GL_releaseVolEnv=
+            GL_keynumToVolEnvHold=
+            GL_keynumToVolEnvDecay=
+            GL_reserved1=
+            GL_startloopAddrsCoarseOffset=
+            GL_keynum=
+            GL_velocity=
+            GL_initialAttenuation=
+            GL_reserved2=
+            GL_endloopAddrsCoarseOffset=
+            GL_coarseTune=
+            GL_fineTune=
+            GL_sampleModes=
+            GL_reserved3=
+            GL_scaleTuning=
+            GL_exclusiveClass=
+            GL_overridingRootKey=
+            GL_unused5=
+
+
+    PresetName=Instr bnk0 num10
+        Bank=0
+        Program=10
+
+        Instrument=Instr bnk0 num10
+            L_LowKey=0
+            L_HighKey=127
+            L_LowVelocity=0
+            L_HighVelocity=127
+            L_reverbEffectsSend=250
+
+        GlobalLayer
+            GL_startAddrsOffset=
+            GL_endAddrsOffset=
+            GL_startloopAddrsOffset=
+            GL_endloopAddrsOffset=
+            GL_startAddrsCoarseOffset=
+            GL_modLfoToPitch=
+            GL_vibLfoToPitch=
+            GL_modEnvToPitch=
+            GL_initialFilterFc=
+            GL_initialFilterQ=
+            GL_modLfoToFilterFc=
+            GL_modEnvToFilterFc=
+            GL_endAddrsCoarseOffset=
+            GL_modLfoToVolume=
+            GL_unused1=
+            GL_chorusEffectsSend=
+            GL_reverbEffectsSend=
+            GL_pan=
+            GL_unused2=
+            GL_unused3=
+            GL_unused4=
+            GL_delayModLFO=
+            GL_freqModLFO=
+            GL_delayVibLFO=
+            GL_freqVibLFO=
+            GL_delayModEnv=
+            GL_attackModEnv=
+            GL_holdModEnv=
+            GL_decayModEnv=
+            GL_sustainModEnv=
+            GL_releaseModEnv=
+            GL_keynumToModEnvHold=
+            GL_keynumToModEnvDecay=
+            GL_delayVolEnv=
+            GL_attackVolEnv=
+            GL_holdVolEnv=
+            GL_decayVolEnv=
+            GL_sustainVolEnv=
+            GL_releaseVolEnv=
+            GL_keynumToVolEnvHold=
+            GL_keynumToVolEnvDecay=
+            GL_reserved1=
+            GL_startloopAddrsCoarseOffset=
+            GL_keynum=
+            GL_velocity=
+            GL_initialAttenuation=
+            GL_reserved2=
+            GL_endloopAddrsCoarseOffset=
+            GL_coarseTune=
+            GL_fineTune=
+            GL_sampleModes=
+            GL_reserved3=
+            GL_scaleTuning=
+            GL_exclusiveClass=
+            GL_overridingRootKey=
+            GL_unused5=
+
+
+    PresetName=Instr bnk0 num11
+        Bank=0
+        Program=11
+
+        Instrument=Instr bnk0 num11
+            L_LowKey=0
+            L_HighKey=127
+            L_LowVelocity=0
+            L_HighVelocity=127
+            L_reverbEffectsSend=250
+
+        GlobalLayer
+            GL_startAddrsOffset=
+            GL_endAddrsOffset=
+            GL_startloopAddrsOffset=
+            GL_endloopAddrsOffset=
+            GL_startAddrsCoarseOffset=
+            GL_modLfoToPitch=
+            GL_vibLfoToPitch=
+            GL_modEnvToPitch=
+            GL_initialFilterFc=
+            GL_initialFilterQ=
+            GL_modLfoToFilterFc=
+            GL_modEnvToFilterFc=
+            GL_endAddrsCoarseOffset=
+            GL_modLfoToVolume=
+            GL_unused1=
+            GL_chorusEffectsSend=
+            GL_reverbEffectsSend=
+            GL_pan=
+            GL_unused2=
+            GL_unused3=
+            GL_unused4=
+            GL_delayModLFO=
+            GL_freqModLFO=
+            GL_delayVibLFO=
+            GL_freqVibLFO=
+            GL_delayModEnv=
+            GL_attackModEnv=
+            GL_holdModEnv=
+            GL_decayModEnv=
+            GL_sustainModEnv=
+            GL_releaseModEnv=
+            GL_keynumToModEnvHold=
+            GL_keynumToModEnvDecay=
+            GL_delayVolEnv=
+            GL_attackVolEnv=
+            GL_holdVolEnv=
+            GL_decayVolEnv=
+            GL_sustainVolEnv=
+            GL_releaseVolEnv=
+            GL_keynumToVolEnvHold=
+            GL_keynumToVolEnvDecay=
+            GL_reserved1=
+            GL_startloopAddrsCoarseOffset=
+            GL_keynum=
+            GL_velocity=
+            GL_initialAttenuation=
+            GL_reserved2=
+            GL_endloopAddrsCoarseOffset=
+            GL_coarseTune=
+            GL_fineTune=
+            GL_sampleModes=
+            GL_reserved3=
+            GL_scaleTuning=
+            GL_exclusiveClass=
+            GL_overridingRootKey=
+            GL_unused5=
+
+
+    PresetName=Instr bnk0 num12
+        Bank=0
+        Program=12
+
+        Instrument=Instr bnk0 num12
+            L_LowKey=0
+            L_HighKey=127
+            L_LowVelocity=0
+            L_HighVelocity=127
+            L_reverbEffectsSend=250
+
+        GlobalLayer
+            GL_startAddrsOffset=
+            GL_endAddrsOffset=
+            GL_startloopAddrsOffset=
+            GL_endloopAddrsOffset=
+            GL_startAddrsCoarseOffset=
+            GL_modLfoToPitch=
+            GL_vibLfoToPitch=
+            GL_modEnvToPitch=
+            GL_initialFilterFc=
+            GL_initialFilterQ=
+            GL_modLfoToFilterFc=
+            GL_modEnvToFilterFc=
+            GL_endAddrsCoarseOffset=
+            GL_modLfoToVolume=
+            GL_unused1=
+            GL_chorusEffectsSend=
+            GL_reverbEffectsSend=
+            GL_pan=
+            GL_unused2=
+            GL_unused3=
+            GL_unused4=
+            GL_delayModLFO=
+            GL_freqModLFO=
+            GL_delayVibLFO=
+            GL_freqVibLFO=
+            GL_delayModEnv=
+            GL_attackModEnv=
+            GL_holdModEnv=
+            GL_decayModEnv=
+            GL_sustainModEnv=
+            GL_releaseModEnv=
+            GL_keynumToModEnvHold=
+            GL_keynumToModEnvDecay=
+            GL_delayVolEnv=
+            GL_attackVolEnv=
+            GL_holdVolEnv=
+            GL_decayVolEnv=
+            GL_sustainVolEnv=
+            GL_releaseVolEnv=
+            GL_keynumToVolEnvHold=
+            GL_keynumToVolEnvDecay=
+            GL_reserved1=
+            GL_startloopAddrsCoarseOffset=
+            GL_keynum=
+            GL_velocity=
+            GL_initialAttenuation=
+            GL_reserved2=
+            GL_endloopAddrsCoarseOffset=
+            GL_coarseTune=
+            GL_fineTune=
+            GL_sampleModes=
+            GL_reserved3=
+            GL_scaleTuning=
+            GL_exclusiveClass=
+            GL_overridingRootKey=
+            GL_unused5=
+
+
+    PresetName=Instr bnk0 num13
+        Bank=0
+        Program=13
+
+        Instrument=Instr bnk0 num13
+            L_LowKey=0
+            L_HighKey=127
+            L_LowVelocity=0
+            L_HighVelocity=127
+            L_reverbEffectsSend=250
+
+        GlobalLayer
+            GL_startAddrsOffset=
+            GL_endAddrsOffset=
+            GL_startloopAddrsOffset=
+            GL_endloopAddrsOffset=
+            GL_startAddrsCoarseOffset=
+            GL_modLfoToPitch=
+            GL_vibLfoToPitch=
+            GL_modEnvToPitch=
+            GL_initialFilterFc=
+            GL_initialFilterQ=
+            GL_modLfoToFilterFc=
+            GL_modEnvToFilterFc=
+            GL_endAddrsCoarseOffset=
+            GL_modLfoToVolume=
+            GL_unused1=
+            GL_chorusEffectsSend=
+            GL_reverbEffectsSend=
+            GL_pan=
+            GL_unused2=
+            GL_unused3=
+            GL_unused4=
+            GL_delayModLFO=
+            GL_freqModLFO=
+            GL_delayVibLFO=
+            GL_freqVibLFO=
+            GL_delayModEnv=
+            GL_attackModEnv=
+            GL_holdModEnv=
+            GL_decayModEnv=
+            GL_sustainModEnv=
+            GL_releaseModEnv=
+            GL_keynumToModEnvHold=
+            GL_keynumToModEnvDecay=
+            GL_delayVolEnv=
+            GL_attackVolEnv=
+            GL_holdVolEnv=
+            GL_decayVolEnv=
+            GL_sustainVolEnv=
+            GL_releaseVolEnv=
+            GL_keynumToVolEnvHold=
+            GL_keynumToVolEnvDecay=
+            GL_reserved1=
+            GL_startloopAddrsCoarseOffset=
+            GL_keynum=
+            GL_velocity=
+            GL_initialAttenuation=
+            GL_reserved2=
+            GL_endloopAddrsCoarseOffset=
+            GL_coarseTune=
+            GL_fineTune=
+            GL_sampleModes=
+            GL_reserved3=
+            GL_scaleTuning=
+            GL_exclusiveClass=
+            GL_overridingRootKey=
+            GL_unused5=
+
+
+    PresetName=Instr bnk0 num14
+        Bank=0
+        Program=14
+
+        Instrument=Instr bnk0 num14
+            L_LowKey=0
+            L_HighKey=127
+            L_LowVelocity=0
+            L_HighVelocity=127
+            L_reverbEffectsSend=250
+
+        GlobalLayer
+            GL_startAddrsOffset=
+            GL_endAddrsOffset=
+            GL_startloopAddrsOffset=
+            GL_endloopAddrsOffset=
+            GL_startAddrsCoarseOffset=
+            GL_modLfoToPitch=
+            GL_vibLfoToPitch=
+            GL_modEnvToPitch=
+            GL_initialFilterFc=
+            GL_initialFilterQ=
+            GL_modLfoToFilterFc=
+            GL_modEnvToFilterFc=
+            GL_endAddrsCoarseOffset=
+            GL_modLfoToVolume=
+            GL_unused1=
+            GL_chorusEffectsSend=
+            GL_reverbEffectsSend=
+            GL_pan=
+            GL_unused2=
+            GL_unused3=
+            GL_unused4=
+            GL_delayModLFO=
+            GL_freqModLFO=
+            GL_delayVibLFO=
+            GL_freqVibLFO=
+            GL_delayModEnv=
+            GL_attackModEnv=
+            GL_holdModEnv=
+            GL_decayModEnv=
+            GL_sustainModEnv=
+            GL_releaseModEnv=
+            GL_keynumToModEnvHold=
+            GL_keynumToModEnvDecay=
+            GL_delayVolEnv=
+            GL_attackVolEnv=
+            GL_holdVolEnv=
+            GL_decayVolEnv=
+            GL_sustainVolEnv=
+            GL_releaseVolEnv=
+            GL_keynumToVolEnvHold=
+            GL_keynumToVolEnvDecay=
+            GL_reserved1=
+            GL_startloopAddrsCoarseOffset=
+            GL_keynum=
+            GL_velocity=
+            GL_initialAttenuation=
+            GL_reserved2=
+            GL_endloopAddrsCoarseOffset=
+            GL_coarseTune=
+            GL_fineTune=
+            GL_sampleModes=
+            GL_reserved3=
+            GL_scaleTuning=
+            GL_exclusiveClass=
+            GL_overridingRootKey=
+            GL_unused5=
+
+
+    PresetName=Instr bnk0 num15
+        Bank=0
+        Program=15
+
+        Instrument=Instr bnk0 num15
+            L_LowKey=0
+            L_HighKey=127
+            L_LowVelocity=0
+            L_HighVelocity=127
+            L_reverbEffectsSend=250
+
+        GlobalLayer
+            GL_startAddrsOffset=
+            GL_endAddrsOffset=
+            GL_startloopAddrsOffset=
+            GL_endloopAddrsOffset=
+            GL_startAddrsCoarseOffset=
+            GL_modLfoToPitch=
+            GL_vibLfoToPitch=
+            GL_modEnvToPitch=
+            GL_initialFilterFc=
+            GL_initialFilterQ=
+            GL_modLfoToFilterFc=
+            GL_modEnvToFilterFc=
+            GL_endAddrsCoarseOffset=
+            GL_modLfoToVolume=
+            GL_unused1=
+            GL_chorusEffectsSend=
+            GL_reverbEffectsSend=
+            GL_pan=
+            GL_unused2=
+            GL_unused3=
+            GL_unused4=
+            GL_delayModLFO=
+            GL_freqModLFO=
+            GL_delayVibLFO=
+            GL_freqVibLFO=
+            GL_delayModEnv=
+            GL_attackModEnv=
+            GL_holdModEnv=
+            GL_decayModEnv=
+            GL_sustainModEnv=
+            GL_releaseModEnv=
+            GL_keynumToModEnvHold=
+            GL_keynumToModEnvDecay=
+            GL_delayVolEnv=
+            GL_attackVolEnv=
+            GL_holdVolEnv=
+            GL_decayVolEnv=
+            GL_sustainVolEnv=
+            GL_releaseVolEnv=
+            GL_keynumToVolEnvHold=
+            GL_keynumToVolEnvDecay=
+            GL_reserved1=
+            GL_startloopAddrsCoarseOffset=
+            GL_keynum=
+            GL_velocity=
+            GL_initialAttenuation=
+            GL_reserved2=
+            GL_endloopAddrsCoarseOffset=
+            GL_coarseTune=
+            GL_fineTune=
+            GL_sampleModes=
+            GL_reserved3=
+            GL_scaleTuning=
+            GL_exclusiveClass=
+            GL_overridingRootKey=
+            GL_unused5=
+
+
+    PresetName=Instr bnk0 num16
+        Bank=0
+        Program=16
+
+        Instrument=Instr bnk0 num16
+            L_LowKey=0
+            L_HighKey=127
+            L_LowVelocity=0
+            L_HighVelocity=127
+            L_reverbEffectsSend=250
+
+        GlobalLayer
+            GL_startAddrsOffset=
+            GL_endAddrsOffset=
+            GL_startloopAddrsOffset=
+            GL_endloopAddrsOffset=
+            GL_startAddrsCoarseOffset=
+            GL_modLfoToPitch=
+            GL_vibLfoToPitch=
+            GL_modEnvToPitch=
+            GL_initialFilterFc=
+            GL_initialFilterQ=
+            GL_modLfoToFilterFc=
+            GL_modEnvToFilterFc=
+            GL_endAddrsCoarseOffset=
+            GL_modLfoToVolume=
+            GL_unused1=
+            GL_chorusEffectsSend=
+            GL_reverbEffectsSend=
+            GL_pan=
+            GL_unused2=
+            GL_unused3=
+            GL_unused4=
+            GL_delayModLFO=
+            GL_freqModLFO=
+            GL_delayVibLFO=
+            GL_freqVibLFO=
+            GL_delayModEnv=
+            GL_attackModEnv=
+            GL_holdModEnv=
+            GL_decayModEnv=
+            GL_sustainModEnv=
+            GL_releaseModEnv=
+            GL_keynumToModEnvHold=
+            GL_keynumToModEnvDecay=
+            GL_delayVolEnv=
+            GL_attackVolEnv=
+            GL_holdVolEnv=
+            GL_decayVolEnv=
+            GL_sustainVolEnv=
+            GL_releaseVolEnv=
+            GL_keynumToVolEnvHold=
+            GL_keynumToVolEnvDecay=
+            GL_reserved1=
+            GL_startloopAddrsCoarseOffset=
+            GL_keynum=
+            GL_velocity=
+            GL_initialAttenuation=
+            GL_reserved2=
+            GL_endloopAddrsCoarseOffset=
+            GL_coarseTune=
+            GL_fineTune=
+            GL_sampleModes=
+            GL_reserved3=
+            GL_scaleTuning=
+            GL_exclusiveClass=
+            GL_overridingRootKey=
+            GL_unused5=
+
+
+    PresetName=Instr bnk0 num17
+        Bank=0
+        Program=17
+
+        Instrument=Instr bnk0 num17
+            L_LowKey=0
+            L_HighKey=127
+            L_LowVelocity=0
+            L_HighVelocity=127
+            L_reverbEffectsSend=250
+
+        GlobalLayer
+            GL_startAddrsOffset=
+            GL_endAddrsOffset=
+            GL_startloopAddrsOffset=
+            GL_endloopAddrsOffset=
+            GL_startAddrsCoarseOffset=
+            GL_modLfoToPitch=
+            GL_vibLfoToPitch=
+            GL_modEnvToPitch=
+            GL_initialFilterFc=
+            GL_initialFilterQ=
+            GL_modLfoToFilterFc=
+            GL_modEnvToFilterFc=
+            GL_endAddrsCoarseOffset=
+            GL_modLfoToVolume=
+            GL_unused1=
+            GL_chorusEffectsSend=
+            GL_reverbEffectsSend=
+            GL_pan=
+            GL_unused2=
+            GL_unused3=
+            GL_unused4=
+            GL_delayModLFO=
+            GL_freqModLFO=
+            GL_delayVibLFO=
+            GL_freqVibLFO=
+            GL_delayModEnv=
+            GL_attackModEnv=
+            GL_holdModEnv=
+            GL_decayModEnv=
+            GL_sustainModEnv=
+            GL_releaseModEnv=
+            GL_keynumToModEnvHold=
+            GL_keynumToModEnvDecay=
+            GL_delayVolEnv=
+            GL_attackVolEnv=
+            GL_holdVolEnv=
+            GL_decayVolEnv=
+            GL_sustainVolEnv=
+            GL_releaseVolEnv=
+            GL_keynumToVolEnvHold=
+            GL_keynumToVolEnvDecay=
+            GL_reserved1=
+            GL_startloopAddrsCoarseOffset=
+            GL_keynum=
+            GL_velocity=
+            GL_initialAttenuation=
+            GL_reserved2=
+            GL_endloopAddrsCoarseOffset=
+            GL_coarseTune=
+            GL_fineTune=
+            GL_sampleModes=
+            GL_reserved3=
+            GL_scaleTuning=
+            GL_exclusiveClass=
+            GL_overridingRootKey=
+            GL_unused5=
+
+
+    PresetName=Instr bnk0 num18
+        Bank=0
+        Program=18
+
+        Instrument=Instr bnk0 num18
+            L_LowKey=0
+            L_HighKey=127
+            L_LowVelocity=0
+            L_HighVelocity=127
+            L_reverbEffectsSend=250
+
+        GlobalLayer
+            GL_startAddrsOffset=
+            GL_endAddrsOffset=
+            GL_startloopAddrsOffset=
+            GL_endloopAddrsOffset=
+            GL_startAddrsCoarseOffset=
+            GL_modLfoToPitch=
+            GL_vibLfoToPitch=
+            GL_modEnvToPitch=
+            GL_initialFilterFc=
+            GL_initialFilterQ=
+            GL_modLfoToFilterFc=
+            GL_modEnvToFilterFc=
+            GL_endAddrsCoarseOffset=
+            GL_modLfoToVolume=
+            GL_unused1=
+            GL_chorusEffectsSend=
+            GL_reverbEffectsSend=
+            GL_pan=
+            GL_unused2=
+            GL_unused3=
+            GL_unused4=
+            GL_delayModLFO=
+            GL_freqModLFO=
+            GL_delayVibLFO=
+            GL_freqVibLFO=
+            GL_delayModEnv=
+            GL_attackModEnv=
+            GL_holdModEnv=
+            GL_decayModEnv=
+            GL_sustainModEnv=
+            GL_releaseModEnv=
+            GL_keynumToModEnvHold=
+            GL_keynumToModEnvDecay=
+            GL_delayVolEnv=
+            GL_attackVolEnv=
+            GL_holdVolEnv=
+            GL_decayVolEnv=
+            GL_sustainVolEnv=
+            GL_releaseVolEnv=
+            GL_keynumToVolEnvHold=
+            GL_keynumToVolEnvDecay=
+            GL_reserved1=
+            GL_startloopAddrsCoarseOffset=
+            GL_keynum=
+            GL_velocity=
+            GL_initialAttenuation=
+            GL_reserved2=
+            GL_endloopAddrsCoarseOffset=
+            GL_coarseTune=
+            GL_fineTune=
+            GL_sampleModes=
+            GL_reserved3=
+            GL_scaleTuning=
+            GL_exclusiveClass=
+            GL_overridingRootKey=
+            GL_unused5=
+
+
+    PresetName=Instr bnk0 num19
+        Bank=0
+        Program=19
+
+        Instrument=Instr bnk0 num19
+            L_LowKey=0
+            L_HighKey=127
+            L_LowVelocity=0
+            L_HighVelocity=127
+            L_reverbEffectsSend=250
+
+        GlobalLayer
+            GL_startAddrsOffset=
+            GL_endAddrsOffset=
+            GL_startloopAddrsOffset=
+            GL_endloopAddrsOffset=
+            GL_startAddrsCoarseOffset=
+            GL_modLfoToPitch=
+            GL_vibLfoToPitch=
+            GL_modEnvToPitch=
+            GL_initialFilterFc=
+            GL_initialFilterQ=
+            GL_modLfoToFilterFc=
+            GL_modEnvToFilterFc=
+            GL_endAddrsCoarseOffset=
+            GL_modLfoToVolume=
+            GL_unused1=
+            GL_chorusEffectsSend=
+            GL_reverbEffectsSend=
+            GL_pan=
+            GL_unused2=
+            GL_unused3=
+            GL_unused4=
+            GL_delayModLFO=
+            GL_freqModLFO=
+            GL_delayVibLFO=
+            GL_freqVibLFO=
+            GL_delayModEnv=
+            GL_attackModEnv=
+            GL_holdModEnv=
+            GL_decayModEnv=
+            GL_sustainModEnv=
+            GL_releaseModEnv=
+            GL_keynumToModEnvHold=
+            GL_keynumToModEnvDecay=
+            GL_delayVolEnv=
+            GL_attackVolEnv=
+            GL_holdVolEnv=
+            GL_decayVolEnv=
+            GL_sustainVolEnv=
+            GL_releaseVolEnv=
+            GL_keynumToVolEnvHold=
+            GL_keynumToVolEnvDecay=
+            GL_reserved1=
+            GL_startloopAddrsCoarseOffset=
+            GL_keynum=
+            GL_velocity=
+            GL_initialAttenuation=
+            GL_reserved2=
+            GL_endloopAddrsCoarseOffset=
+            GL_coarseTune=
+            GL_fineTune=
+            GL_sampleModes=
+            GL_reserved3=
+            GL_scaleTuning=
+            GL_exclusiveClass=
+            GL_overridingRootKey=
+            GL_unused5=
+
+
+    PresetName=Instr bnk0 num20
+        Bank=0
+        Program=20
+
+        Instrument=Instr bnk0 num20
+            L_LowKey=0
+            L_HighKey=127
+            L_LowVelocity=0
+            L_HighVelocity=127
+            L_reverbEffectsSend=250
+
+        GlobalLayer
+            GL_startAddrsOffset=
+            GL_endAddrsOffset=
+            GL_startloopAddrsOffset=
+            GL_endloopAddrsOffset=
+            GL_startAddrsCoarseOffset=
+            GL_modLfoToPitch=
+            GL_vibLfoToPitch=
+            GL_modEnvToPitch=
+            GL_initialFilterFc=
+            GL_initialFilterQ=
+            GL_modLfoToFilterFc=
+            GL_modEnvToFilterFc=
+            GL_endAddrsCoarseOffset=
+            GL_modLfoToVolume=
+            GL_unused1=
+            GL_chorusEffectsSend=
+            GL_reverbEffectsSend=
+            GL_pan=
+            GL_unused2=
+            GL_unused3=
+            GL_unused4=
+            GL_delayModLFO=
+            GL_freqModLFO=
+            GL_delayVibLFO=
+            GL_freqVibLFO=
+            GL_delayModEnv=
+            GL_attackModEnv=
+            GL_holdModEnv=
+            GL_decayModEnv=
+            GL_sustainModEnv=
+            GL_releaseModEnv=
+            GL_keynumToModEnvHold=
+            GL_keynumToModEnvDecay=
+            GL_delayVolEnv=
+            GL_attackVolEnv=
+            GL_holdVolEnv=
+            GL_decayVolEnv=
+            GL_sustainVolEnv=
+            GL_releaseVolEnv=
+            GL_keynumToVolEnvHold=
+            GL_keynumToVolEnvDecay=
+            GL_reserved1=
+            GL_startloopAddrsCoarseOffset=
+            GL_keynum=
+            GL_velocity=
+            GL_initialAttenuation=
+            GL_reserved2=
+            GL_endloopAddrsCoarseOffset=
+            GL_coarseTune=
+            GL_fineTune=
+            GL_sampleModes=
+            GL_reserved3=
+            GL_scaleTuning=
+            GL_exclusiveClass=
+            GL_overridingRootKey=
+            GL_unused5=
+
+
+    PresetName=Instr bnk0 num21
+        Bank=0
+        Program=21
+
+        Instrument=Instr bnk0 num21
+            L_LowKey=0
+            L_HighKey=127
+            L_LowVelocity=0
+            L_HighVelocity=127
+            L_reverbEffectsSend=250
+
+        GlobalLayer
+            GL_startAddrsOffset=
+            GL_endAddrsOffset=
+            GL_startloopAddrsOffset=
+            GL_endloopAddrsOffset=
+            GL_startAddrsCoarseOffset=
+            GL_modLfoToPitch=
+            GL_vibLfoToPitch=
+            GL_modEnvToPitch=
+            GL_initialFilterFc=
+            GL_initialFilterQ=
+            GL_modLfoToFilterFc=
+            GL_modEnvToFilterFc=
+            GL_endAddrsCoarseOffset=
+            GL_modLfoToVolume=
+            GL_unused1=
+            GL_chorusEffectsSend=
+            GL_reverbEffectsSend=
+            GL_pan=
+            GL_unused2=
+            GL_unused3=
+            GL_unused4=
+            GL_delayModLFO=
+            GL_freqModLFO=
+            GL_delayVibLFO=
+            GL_freqVibLFO=
+            GL_delayModEnv=
+            GL_attackModEnv=
+            GL_holdModEnv=
+            GL_decayModEnv=
+            GL_sustainModEnv=
+            GL_releaseModEnv=
+            GL_keynumToModEnvHold=
+            GL_keynumToModEnvDecay=
+            GL_delayVolEnv=
+            GL_attackVolEnv=
+            GL_holdVolEnv=
+            GL_decayVolEnv=
+            GL_sustainVolEnv=
+            GL_releaseVolEnv=
+            GL_keynumToVolEnvHold=
+            GL_keynumToVolEnvDecay=
+            GL_reserved1=
+            GL_startloopAddrsCoarseOffset=
+            GL_keynum=
+            GL_velocity=
+            GL_initialAttenuation=
+            GL_reserved2=
+            GL_endloopAddrsCoarseOffset=
+            GL_coarseTune=
+            GL_fineTune=
+            GL_sampleModes=
+            GL_reserved3=
+            GL_scaleTuning=
+            GL_exclusiveClass=
+            GL_overridingRootKey=
+            GL_unused5=
+
+
+    PresetName=Instr bnk0 num22
+        Bank=0
+        Program=22
+
+        Instrument=Instr bnk0 num22
+            L_LowKey=0
+            L_HighKey=127
+            L_LowVelocity=0
+            L_HighVelocity=127
+            L_reverbEffectsSend=250
+
+        GlobalLayer
+            GL_startAddrsOffset=
+            GL_endAddrsOffset=
+            GL_startloopAddrsOffset=
+            GL_endloopAddrsOffset=
+            GL_startAddrsCoarseOffset=
+            GL_modLfoToPitch=
+            GL_vibLfoToPitch=
+            GL_modEnvToPitch=
+            GL_initialFilterFc=
+            GL_initialFilterQ=
+            GL_modLfoToFilterFc=
+            GL_modEnvToFilterFc=
+            GL_endAddrsCoarseOffset=
+            GL_modLfoToVolume=
+            GL_unused1=
+            GL_chorusEffectsSend=
+            GL_reverbEffectsSend=
+            GL_pan=
+            GL_unused2=
+            GL_unused3=
+            GL_unused4=
+            GL_delayModLFO=
+            GL_freqModLFO=
+            GL_delayVibLFO=
+            GL_freqVibLFO=
+            GL_delayModEnv=
+            GL_attackModEnv=
+            GL_holdModEnv=
+            GL_decayModEnv=
+            GL_sustainModEnv=
+            GL_releaseModEnv=
+            GL_keynumToModEnvHold=
+            GL_keynumToModEnvDecay=
+            GL_delayVolEnv=
+            GL_attackVolEnv=
+            GL_holdVolEnv=
+            GL_decayVolEnv=
+            GL_sustainVolEnv=
+            GL_releaseVolEnv=
+            GL_keynumToVolEnvHold=
+            GL_keynumToVolEnvDecay=
+            GL_reserved1=
+            GL_startloopAddrsCoarseOffset=
+            GL_keynum=
+            GL_velocity=
+            GL_initialAttenuation=
+            GL_reserved2=
+            GL_endloopAddrsCoarseOffset=
+            GL_coarseTune=
+            GL_fineTune=
+            GL_sampleModes=
+            GL_reserved3=
+            GL_scaleTuning=
+            GL_exclusiveClass=
+            GL_overridingRootKey=
+            GL_unused5=
+
+
+    PresetName=Instr bnk0 num23
+        Bank=0
+        Program=23
+
+        Instrument=Instr bnk0 num23
+            L_LowKey=0
+            L_HighKey=127
+            L_LowVelocity=0
+            L_HighVelocity=127
+            L_reverbEffectsSend=250
+
+        GlobalLayer
+            GL_startAddrsOffset=
+            GL_endAddrsOffset=
+            GL_startloopAddrsOffset=
+            GL_endloopAddrsOffset=
+            GL_startAddrsCoarseOffset=
+            GL_modLfoToPitch=
+            GL_vibLfoToPitch=
+            GL_modEnvToPitch=
+            GL_initialFilterFc=
+            GL_initialFilterQ=
+            GL_modLfoToFilterFc=
+            GL_modEnvToFilterFc=
+            GL_endAddrsCoarseOffset=
+            GL_modLfoToVolume=
+            GL_unused1=
+            GL_chorusEffectsSend=
+            GL_reverbEffectsSend=
+            GL_pan=
+            GL_unused2=
+            GL_unused3=
+            GL_unused4=
+            GL_delayModLFO=
+            GL_freqModLFO=
+            GL_delayVibLFO=
+            GL_freqVibLFO=
+            GL_delayModEnv=
+            GL_attackModEnv=
+            GL_holdModEnv=
+            GL_decayModEnv=
+            GL_sustainModEnv=
+            GL_releaseModEnv=
+            GL_keynumToModEnvHold=
+            GL_keynumToModEnvDecay=
+            GL_delayVolEnv=
+            GL_attackVolEnv=
+            GL_holdVolEnv=
+            GL_decayVolEnv=
+            GL_sustainVolEnv=
+            GL_releaseVolEnv=
+            GL_keynumToVolEnvHold=
+            GL_keynumToVolEnvDecay=
+            GL_reserved1=
+            GL_startloopAddrsCoarseOffset=
+            GL_keynum=
+            GL_velocity=
+            GL_initialAttenuation=
+            GL_reserved2=
+            GL_endloopAddrsCoarseOffset=
+            GL_coarseTune=
+            GL_fineTune=
+            GL_sampleModes=
+            GL_reserved3=
+            GL_scaleTuning=
+            GL_exclusiveClass=
+            GL_overridingRootKey=
+            GL_unused5=
+
+
+[Info]
+Version=2.1
+Engine=EMU8000 
+Name=SynthFile 
+ROMName=
+ROMVersion=0.0
+Date=Tue Nov 28 16:56:16 2023
+ 
+Designer=
+Product=
+Copyright=
+Editor=Polyphone 
+Comments=
