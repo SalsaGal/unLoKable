@@ -53,7 +53,10 @@ fn main() {
     let shifted = z_pans
         .zip(z_atten)
         .map(|((_, pan), (line, atten))| {
-            (line, function.signal_power_shift(pan, atten) as u32 * 25)
+            (
+                line,
+                (function.signal_power_shift(pan, atten) * 25.0) as u32,
+            )
         })
         .collect::<Vec<_>>();
 
