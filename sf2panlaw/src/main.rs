@@ -70,7 +70,7 @@ fn main() {
         .into()
     }))
     .unwrap();
-    write!(output, "{}", lines.join("\n")).unwrap();
+    write!(output, "{}", lines.join("\r\n")).unwrap();
 }
 
 fn u16_to_i16(x: u16) -> i16 {
