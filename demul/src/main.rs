@@ -32,6 +32,9 @@ fn main() {
                 }
             }
             Chunk::Data { size } => data_slices.push(get_bytes(&mut body, size as usize)),
+            Chunk::Padding { size } => {
+                get_bytes(&mut body, size as usize);
+            }
         }
     }
 
@@ -91,6 +94,7 @@ fn main() {
 enum Chunk {
     Audio { size: u32 },
     Data { size: u32 },
+    Padding { size: u32 },
 }
 
 impl Chunk {
@@ -106,6 +110,13 @@ impl Chunk {
             }
             1 => {
                 let data = Self::Data {
+                    size: parse_u32(bytes)?,
+                };
+                get_bytes(bytes, 8);
+                Some(data)
+            }
+            2 => {
+                let data = Self::Padding {
                     size: parse_u32(bytes)?,
                 };
                 get_bytes(bytes, 8);
