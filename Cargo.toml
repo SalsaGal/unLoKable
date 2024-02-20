@@ -8,5 +8,5 @@ members = [
     "demus",
     "msqsplit",
     "seqrepeat", "sf2panlaw",
-    "sound",
+    "sound", "vagheader",
 ]
