@@ -7,6 +7,6 @@ members = [
     "demul",
     "demus",
     "msqsplit",
-    "seqrepeat",
+    "seqrepeat", "sf2panlaw",
     "sound",
 ]
