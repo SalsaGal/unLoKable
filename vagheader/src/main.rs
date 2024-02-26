@@ -31,7 +31,7 @@ fn main() {
         .write_all(
             &[
                 [0x56, 0x41, 0x47, 0x70],
-                [0x0, 0x0, 0x0, 0x20],
+                [0x0, 0x0, 0x0, 0x3],
                 [0; 4],
                 (file_len as u32).to_be_bytes(),
                 (args.sample_rate.get().to_be_bytes()),
