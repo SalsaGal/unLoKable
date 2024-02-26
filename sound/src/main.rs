@@ -37,8 +37,6 @@ fn main() {
     );
     let smp_file = SmpFile::parse(&snd_file, &mut smp_bytes.iter(), smp_bytes.len() as u32);
 
-    dbg!(&snd_file.sequences);
-
     let output_folder = args
         .output
         .unwrap_or_else(|| args.snd_path.with_extension(""));
@@ -262,11 +260,11 @@ impl SmpFile {
             body_size: u32::from_le_bytes(four_bytes(bytes)),
             waves: (0..snd.header.num_waves as usize)
                 .map(|i| {
-                    let start = snd.wave_offsets[i];
+                    let start = 8 + snd.wave_offsets[i];
                     let end = if i == snd.header.num_waves as usize - 1 {
                         file_size
                     } else {
-                        snd.wave_offsets[i + 1]
+                        8 + snd.wave_offsets[i + 1]
                     };
                     start..end
                 })
