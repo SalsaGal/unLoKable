@@ -49,20 +49,6 @@ fn pan_convert(pan: f32) -> i32 {
     (pan * 1000.0 - 500.0) as i32
 }
 
-fn percentage_to_decibels(mut percentage: f32, factor: f32) -> i32 {
-    if percentage <= 0.0 {
-        percentage = 100.0;
-    }
-    (-(10.0 * f32::log10(percentage / 100.0)) * factor) as i32
-}
-
-#[test]
-fn test_maths() {
-    assert_eq!(percentage_to_decibels(100.0, 10.0), 0);
-    assert_eq!(percentage_to_decibels(50.0, 10.0), 30);
-    assert_eq!(percentage_to_decibels(10.0, 10.0), 100);
-}
-
 macro_rules! le_bytes {
     ($bytes: ident) => {
         i32::from_le_bytes([
@@ -473,7 +459,7 @@ fn main() {
             write!(
                 &mut info_file,
                 "            Z_sustainVolEnv={}\r\n",
-                percentage_to_decibels(program_zone.volume_env.sustain, 10.0)
+                ((100.0 - program_zone.volume_env.sustain) * 10.0) as i32
             )
             .unwrap();
             write!(
@@ -497,7 +483,7 @@ fn main() {
             write!(
                 &mut info_file,
                 "            Z_initialAttenuation={}\r\n",
-                percentage_to_decibels(program_zone.volume_env_atten, 25.0),
+                (10.0 * program_zone.volume_env_atten) as i32,
             )
             .unwrap();
             write!(
