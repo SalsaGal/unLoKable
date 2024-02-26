@@ -37,6 +37,8 @@ fn main() {
     );
     let smp_file = SmpFile::parse(&snd_file, &mut smp_bytes.iter(), smp_bytes.len() as u32);
 
+    dbg!(&snd_file.sequences);
+
     let output_folder = args
         .output
         .unwrap_or_else(|| args.snd_path.with_extension(""));
@@ -59,8 +61,9 @@ fn main() {
 
     for (i, wave) in smp_file.waves.into_iter().enumerate() {
         let output_path = samples_folder.join(format!(
-            "{}_{i:04}.msq",
-            output_folder.file_name().unwrap().to_string_lossy()
+            "{}_{i:04}.{}",
+            output_folder.file_name().unwrap().to_string_lossy(),
+            if args.dreamcast { "dcs" } else { "vag" }
         ));
 
         let mut output_file = File::create(output_path).unwrap();
@@ -134,12 +137,17 @@ struct SndProgram {
 
 impl SndProgram {
     fn parse(bytes: &mut Iter<u8>) -> Self {
-        Self {
+        let program = Self {
             num_zones: u16::from_be_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
             first_tone: u16::from_be_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
             volume: *bytes.next().unwrap(),
             pan_pos: *bytes.next().unwrap(),
-        }
+        };
+
+        bytes.next().unwrap();
+        bytes.next().unwrap();
+
+        program
     }
 }
 
