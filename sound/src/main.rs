@@ -10,7 +10,7 @@ struct Args {
     #[clap(short, long)]
     dreamcast: bool,
     #[clap(short)]
-    cent_tuning: bool,
+    cents_tuning: bool,
     #[clap(short, long)]
     output: Option<PathBuf>,
 }
@@ -30,7 +30,11 @@ fn main() {
     let snd_bytes = std::fs::read(&args.snd_path).unwrap();
     let smp_bytes = std::fs::read(&args.smp_path).unwrap();
 
-    let snd_file = SndFile::parse(&mut snd_bytes.iter(), snd_bytes.len() as u32);
+    let snd_file = SndFile::parse(
+        &mut snd_bytes.iter(),
+        snd_bytes.len() as u32,
+        args.cents_tuning,
+    );
     let smp_file = SmpFile::parse(&snd_file, &mut smp_bytes.iter(), smp_bytes.len() as u32);
 
     let output_folder = args
@@ -157,14 +161,18 @@ struct SndZone {
 }
 
 impl SndZone {
-    fn parse(bytes: &mut Iter<u8>) -> Self {
+    fn parse(bytes: &mut Iter<u8>, cents_tuning: bool) -> Self {
         Self {
             priority: *bytes.next().unwrap(),
             parent_program: *bytes.next().unwrap(),
             volume: *bytes.next().unwrap(),
             pan_pos: *bytes.next().unwrap(),
             root_key: *bytes.next().unwrap(),
-            pitch_fine_tuning: *bytes.next().unwrap(),
+            pitch_fine_tuning: if cents_tuning {
+                ((*bytes.next().unwrap() as f32) * 100.0 / 128.0) as u8
+            } else {
+                *bytes.next().unwrap()
+            },
             note_low: *bytes.next().unwrap(),
             note_high: *bytes.next().unwrap(),
             node: *bytes.next().unwrap(),
@@ -188,7 +196,7 @@ struct SndFile {
 }
 
 impl SndFile {
-    fn parse(bytes: &mut Iter<u8>, file_size: u32) -> Self {
+    fn parse(bytes: &mut Iter<u8>, file_size: u32, cents_tuning: bool) -> Self {
         let header = SndHeader::parse(bytes);
         assert_eq!(header.magic_number, 0x61534e44);
 
@@ -196,7 +204,7 @@ impl SndFile {
             .map(|_| SndProgram::parse(bytes))
             .collect();
         let zones = (0..header.num_zones)
-            .map(|_| SndZone::parse(bytes))
+            .map(|_| SndZone::parse(bytes, cents_tuning))
             .collect();
         let wave_offsets = (0..header.num_waves)
             .map(|_| u32::from_le_bytes(four_bytes(bytes)))
