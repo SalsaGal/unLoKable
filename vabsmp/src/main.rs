@@ -24,6 +24,7 @@ struct VabFile {
     header: VabHeader,
     programs: Vec<Program>,
     tones: Vec<Vec<Tone>>,
+    vag_sizes: Vec<u16>,
 }
 
 impl VabFile {
@@ -55,10 +56,21 @@ impl VabFile {
             })
             .collect();
 
+        bytes.next().unwrap();
+        bytes.next().unwrap();
+
+        let vag_sizes: Vec<u16> = (0..header.vags_number)
+            .map(|_| u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]))
+            .collect();
+        for _ in 0..512 - vag_sizes.len() * 2 - 2 {
+            bytes.next().unwrap();
+        }
+
         Self {
             header,
             programs,
             tones,
+            vag_sizes,
         }
     }
 }
