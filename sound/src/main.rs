@@ -89,6 +89,7 @@ fn main() {
     }
 }
 
+#[derive(Debug)]
 struct SndHeader {
     magic_number: u32,
     header_size: i32,
@@ -119,6 +120,7 @@ impl SndHeader {
     }
 }
 
+#[derive(Debug)]
 struct SndProgram {
     num_zones: u16,
     first_tone: u16,
@@ -137,6 +139,7 @@ impl SndProgram {
     }
 }
 
+#[derive(Debug)]
 struct SndZone {
     priority: u8,
     parent_program: u8,
@@ -173,6 +176,7 @@ impl SndZone {
     }
 }
 
+#[derive(Debug)]
 struct SndFile {
     header: SndHeader,
     programs: Vec<SndProgram>,
@@ -227,6 +231,7 @@ impl SndFile {
     }
 }
 
+#[derive(Debug)]
 pub struct SmpFile {
     magic_number: u32,
     body_size: u32,
