@@ -13,9 +13,53 @@ fn main() {
     let file = std::fs::read(args.input).unwrap();
     let mut file_iter = file.iter();
 
-    let header = VabHeader::parse(&mut file_iter);
-    if (file.len() as u32) < header.total_size {
-        panic!("File size mismatch!");
+    let vab_file = VabFile::parse(&mut file_iter, &file);
+    dbg!(vab_file);
+
+    dbg!(file.len() - file_iter.as_slice().len());
+}
+
+#[derive(Debug)]
+struct VabFile {
+    header: VabHeader,
+    programs: Vec<Program>,
+    tones: Vec<Vec<Tone>>,
+}
+
+impl VabFile {
+    fn parse(bytes: &mut Iter<u8>, file: &[u8]) -> Self {
+        let header = VabHeader::parse(bytes);
+        if (file.len() as u32) < header.total_size {
+            panic!("File size mismatch!");
+        }
+
+        let programs: Vec<Program> = (0..header.programs_number)
+            .map(|_| Program::parse(bytes))
+            .collect();
+        for _ in 0..16 * (128 - header.programs_number) {
+            bytes.next().unwrap();
+        }
+
+        let tones = programs
+            .iter()
+            .map(|program| {
+                let tones = (0..program.tones_number)
+                    .map(|_| Tone::parse(bytes))
+                    .collect();
+
+                for _ in 0..32 * (16 - program.tones_number as usize) {
+                    bytes.next().unwrap();
+                }
+
+                tones
+            })
+            .collect();
+
+        Self {
+            header,
+            programs,
+            tones,
+        }
     }
 }
 
@@ -94,6 +138,32 @@ struct Program {
     _pad2: u32,
 }
 
+impl Program {
+    fn parse(bytes: &mut Iter<u8>) -> Self {
+        Self {
+            tones_number: *bytes.next().unwrap(),
+            volume: *bytes.next().unwrap(),
+            priority: *bytes.next().unwrap(),
+            mode: *bytes.next().unwrap(),
+            pan: *bytes.next().unwrap(),
+            _pad0: *bytes.next().unwrap(),
+            attribute: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+            _pad1: u32::from_le_bytes([
+                *bytes.next().unwrap(),
+                *bytes.next().unwrap(),
+                *bytes.next().unwrap(),
+                *bytes.next().unwrap(),
+            ]),
+            _pad2: u32::from_le_bytes([
+                *bytes.next().unwrap(),
+                *bytes.next().unwrap(),
+                *bytes.next().unwrap(),
+                *bytes.next().unwrap(),
+            ]),
+        }
+    }
+}
+
 #[derive(Debug)]
 struct Tone {
     priority: u8,
@@ -120,4 +190,35 @@ struct Tone {
     _pad3: u16,
     _pad4: u16,
     _pad5: u16,
+}
+
+impl Tone {
+    fn parse(bytes: &mut Iter<u8>) -> Self {
+        Self {
+            priority: *bytes.next().unwrap(),
+            reverb_mode: *bytes.next().unwrap(),
+            volume: *bytes.next().unwrap(),
+            pan: *bytes.next().unwrap(),
+            unity_key: *bytes.next().unwrap(),
+            pitch_tune: *bytes.next().unwrap(),
+            key_low: *bytes.next().unwrap(),
+            key_high: *bytes.next().unwrap(),
+            vibrato_width: *bytes.next().unwrap(),
+            vibrato_time: *bytes.next().unwrap(),
+            port_width: *bytes.next().unwrap(),
+            port_hold: *bytes.next().unwrap(),
+            pitch_bend_minimum: *bytes.next().unwrap(),
+            pitch_bend_maximum: *bytes.next().unwrap(),
+            _pad0: *bytes.next().unwrap(),
+            _pad1: *bytes.next().unwrap(),
+            adsr1: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+            adsr2: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+            parent_program: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+            sample_number: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+            _pad2: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+            _pad3: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+            _pad4: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+            _pad5: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+        }
+    }
 }
