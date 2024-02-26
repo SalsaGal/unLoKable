@@ -224,13 +224,14 @@ impl SndFile {
             .map(|_| u32::from_le_bytes(four_bytes(bytes)))
             .collect();
 
+        let sequences_start = file_size - bytes.as_slice().len() as u32;
         let mut sequences = vec![];
         for i in (0..header.num_sequences).map(|i| i as usize) {
-            let start = sequence_offsets[i];
+            let start = sequences_start + sequence_offsets[i];
             let end = if i == header.num_sequences as usize - 1 {
                 file_size
             } else {
-                sequence_offsets[i + 1]
+                sequences_start + sequence_offsets[i + 1]
             };
             sequences.push(start..end);
         }
