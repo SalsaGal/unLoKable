@@ -7,6 +7,10 @@ use clap::Parser;
 struct Args {
     input: PathBuf,
     sample_rate: NonZeroU32,
+    #[clap(long)]
+    long: bool,
+    #[clap(long)]
+    short: bool,
     #[clap(short, long)]
     output: Option<PathBuf>,
 }
@@ -44,5 +48,8 @@ fn main() {
             .collect::<Vec<_>>(),
         )
         .unwrap();
+    if !args.short {
+        output.write_all(&[0; 16]).unwrap();
+    }
     output.write_all(&file).unwrap();
 }
