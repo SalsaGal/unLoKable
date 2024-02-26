@@ -1,4 +1,4 @@
-use std::{fs::File, io::Write, ops::Range, path::PathBuf};
+use std::{fs::File, io::Write, ops::Range, path::PathBuf, slice::Iter};
 
 use clap::Parser;
 
@@ -15,12 +15,12 @@ struct Args {
     output: Option<PathBuf>,
 }
 
-fn four_bytes(bytes: &mut impl Iterator<Item = u8>) -> [u8; 4] {
+fn four_bytes(bytes: &mut Iter<u8>) -> [u8; 4] {
     [
-        bytes.next().unwrap(),
-        bytes.next().unwrap(),
-        bytes.next().unwrap(),
-        bytes.next().unwrap(),
+        *bytes.next().unwrap(),
+        *bytes.next().unwrap(),
+        *bytes.next().unwrap(),
+        *bytes.next().unwrap(),
     ]
 }
 
@@ -30,12 +30,8 @@ fn main() {
     let snd_bytes = std::fs::read(&args.snd_path).unwrap();
     let smp_bytes = std::fs::read(&args.smp_path).unwrap();
 
-    let snd_file = SndFile::parse(&mut snd_bytes.iter().copied(), snd_bytes.len() as u32);
-    let smp_file = SmpFile::parse(
-        &snd_file,
-        &mut smp_bytes.iter().copied(),
-        smp_bytes.len() as u32,
-    );
+    let snd_file = SndFile::parse(&mut snd_bytes.iter(), snd_bytes.len() as u32);
+    let smp_file = SmpFile::parse(&snd_file, &mut smp_bytes.iter(), smp_bytes.len() as u32);
 
     let output_folder = args
         .output
@@ -107,7 +103,7 @@ struct SndHeader {
 }
 
 impl SndHeader {
-    fn parse(bytes: &mut impl Iterator<Item = u8>) -> Self {
+    fn parse(bytes: &mut Iter<u8>) -> Self {
         Self {
             magic_number: u32::from_le_bytes(four_bytes(bytes)),
             header_size: i32::from_le_bytes(four_bytes(bytes)),
@@ -131,12 +127,12 @@ struct SndProgram {
 }
 
 impl SndProgram {
-    fn parse(bytes: &mut impl Iterator<Item = u8>) -> Self {
+    fn parse(bytes: &mut Iter<u8>) -> Self {
         Self {
-            num_zones: u16::from_be_bytes([bytes.next().unwrap(), bytes.next().unwrap()]),
-            first_tone: u16::from_be_bytes([bytes.next().unwrap(), bytes.next().unwrap()]),
-            volume: bytes.next().unwrap(),
-            pan_pos: bytes.next().unwrap(),
+            num_zones: u16::from_be_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+            first_tone: u16::from_be_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+            volume: *bytes.next().unwrap(),
+            pan_pos: *bytes.next().unwrap(),
         }
     }
 }
@@ -158,21 +154,21 @@ struct SndZone {
 }
 
 impl SndZone {
-    fn parse(bytes: &mut impl Iterator<Item = u8>) -> Self {
+    fn parse(bytes: &mut Iter<u8>) -> Self {
         Self {
-            priority: bytes.next().unwrap(),
-            parent_program: bytes.next().unwrap(),
-            volume: bytes.next().unwrap(),
-            pan_pos: bytes.next().unwrap(),
-            root_key: bytes.next().unwrap(),
-            pitch_fine_tuning: bytes.next().unwrap(),
-            note_low: bytes.next().unwrap(),
-            note_high: bytes.next().unwrap(),
-            node: bytes.next().unwrap(),
-            max_pitch_range: bytes.next().unwrap(),
-            adsr1: u16::from_be_bytes([bytes.next().unwrap(), bytes.next().unwrap()]),
-            adsr2: u16::from_be_bytes([bytes.next().unwrap(), bytes.next().unwrap()]),
-            wave_index: u16::from_be_bytes([bytes.next().unwrap(), bytes.next().unwrap()]),
+            priority: *bytes.next().unwrap(),
+            parent_program: *bytes.next().unwrap(),
+            volume: *bytes.next().unwrap(),
+            pan_pos: *bytes.next().unwrap(),
+            root_key: *bytes.next().unwrap(),
+            pitch_fine_tuning: *bytes.next().unwrap(),
+            note_low: *bytes.next().unwrap(),
+            note_high: *bytes.next().unwrap(),
+            node: *bytes.next().unwrap(),
+            max_pitch_range: *bytes.next().unwrap(),
+            adsr1: u16::from_be_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+            adsr2: u16::from_be_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+            wave_index: u16::from_be_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
         }
     }
 }
@@ -188,7 +184,7 @@ struct SndFile {
 }
 
 impl SndFile {
-    fn parse(bytes: &mut impl Iterator<Item = u8>, file_size: u32) -> Self {
+    fn parse(bytes: &mut Iter<u8>, file_size: u32) -> Self {
         let header = SndHeader::parse(bytes);
         assert_eq!(header.magic_number, 0x61534e44);
 
@@ -238,7 +234,7 @@ pub struct SmpFile {
 }
 
 impl SmpFile {
-    fn parse(snd: &SndFile, bytes: &mut impl Iterator<Item = u8>, file_size: u32) -> Self {
+    fn parse(snd: &SndFile, bytes: &mut Iter<u8>, file_size: u32) -> Self {
         Self {
             magic_number: u32::from_le_bytes(four_bytes(bytes)),
             body_size: u32::from_le_bytes(four_bytes(bytes)),
