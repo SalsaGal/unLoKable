@@ -126,6 +126,55 @@ fn main() {
             ])
             .unwrap();
     }
+    let mut current_parent_program = 0;
+    let mut current_parent_program_streak = 0;
+    for zone in &snd_file.zones {
+        if zone.parent_program != current_parent_program {
+            vbi_output
+                .write_all(
+                    &std::iter::repeat(0)
+                        .take(32 * (16 - current_parent_program_streak))
+                        .collect::<Vec<_>>(),
+                )
+                .unwrap();
+            current_parent_program = zone.parent_program;
+            current_parent_program_streak = 0;
+        }
+
+        vbi_output
+            .write_all(
+                &[
+                    [zone.priority, zone.mode],
+                    [zone.volume, zone.pan_pos],
+                    [zone.root_key, zone.pitch_fine_tuning],
+                    [zone.note_low, zone.note_high],
+                    [0; 2],
+                    [0; 2],
+                    [zone.max_pitch_range, zone.max_pitch_range],
+                    [0; 2],
+                    zone.adsr1.to_le_bytes(),
+                    zone.adsr2.to_le_bytes(),
+                    [zone.parent_program, 0],
+                    zone.wave_index.to_le_bytes(),
+                    [0; 2],
+                    [0; 2],
+                    [0; 2],
+                    [0; 2],
+                ]
+                .into_iter()
+                .flatten()
+                .collect::<Vec<u8>>(),
+            )
+            .unwrap();
+        current_parent_program_streak += 1;
+    }
+    vbi_output
+        .write_all(
+            &std::iter::repeat(0)
+                .take(32 * (16 - current_parent_program_streak))
+                .collect::<Vec<_>>(),
+        )
+        .unwrap();
 }
 
 #[derive(Debug)]
@@ -193,7 +242,7 @@ struct SndZone {
     pitch_fine_tuning: u8,
     note_low: u8,
     note_high: u8,
-    node: u8,
+    mode: u8,
     max_pitch_range: u8,
     adsr1: u16,
     adsr2: u16,
@@ -215,7 +264,7 @@ impl SndZone {
             },
             note_low: *bytes.next().unwrap(),
             note_high: *bytes.next().unwrap(),
-            node: *bytes.next().unwrap(),
+            mode: *bytes.next().unwrap(),
             max_pitch_range: *bytes.next().unwrap(),
             adsr1: u16::from_be_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
             adsr2: u16::from_be_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
