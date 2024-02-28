@@ -175,6 +175,24 @@ fn main() {
                 .collect::<Vec<_>>(),
         )
         .unwrap();
+
+    let snd_info_output_path = output_folder.join(format!(
+        "{}_info.txt",
+        output_folder.file_name().unwrap().to_string_lossy()
+    ));
+    let mut snd_info_output = File::create(snd_info_output_path).unwrap();
+    writeln!(
+        snd_info_output,
+        "Number of programs: {}",
+        snd_file.header.num_programs
+    )
+    .unwrap();
+    writeln!(
+        snd_info_output,
+        "Number of zones: {}",
+        snd_file.header.num_zones
+    )
+    .unwrap();
 }
 
 #[derive(Debug)]
