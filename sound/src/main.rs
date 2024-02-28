@@ -92,6 +92,40 @@ fn main() {
         let range = wave.start as usize..wave.end as usize;
         output_file.write_all(&smp_bytes[range]).unwrap();
     }
+
+    let vbi_output_path = output_folder.join(
+        PathBuf::from(
+            output_folder
+                .file_name()
+                .unwrap()
+                .to_string_lossy()
+                .as_ref(),
+        )
+        .with_extension("vbi"),
+    );
+    let mut vbi_output = File::create(vbi_output_path).unwrap();
+    for program in &snd_file.programs {
+        vbi_output
+            .write_all(&[
+                (program.num_zones >> 8) as u8,
+                program.volume,
+                0,
+                0,
+                program.pan_pos,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+            ])
+            .unwrap();
+    }
 }
 
 #[derive(Debug)]
