@@ -37,12 +37,12 @@ fn main() {
         Function::Attenuate
     };
     let file = std::fs::read_to_string(&args.input).unwrap();
-    let mut lines = file.lines().map(|s| s.to_owned()).collect::<Vec<_>>();
+    let mut lines = file.lines().map(std::borrow::ToOwned::to_owned).collect::<Vec<_>>();
 
     let z_pans = lines.iter().enumerate().filter_map(|(i, x)| {
         x.trim()
             .strip_prefix("Z_pan=")
-            .map(|value| (i, u16_to_i16(value.parse::<u16>().unwrap()) as f32 / 500.0))
+            .map(|value| (i, f32::from(u16_to_i16(value.parse::<u16>().unwrap())) / 500.0))
     });
     let z_atten = lines.iter().enumerate().filter_map(|(i, x)| {
         x.trim()

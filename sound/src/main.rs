@@ -276,7 +276,7 @@ impl SndZone {
             pan_pos: *bytes.next().unwrap(),
             root_key: *bytes.next().unwrap(),
             pitch_fine_tuning: if cents_tuning {
-                ((*bytes.next().unwrap() as f32) * 100.0 / 128.0) as u8
+                (f32::from(*bytes.next().unwrap()) * 100.0 / 128.0) as u8
             } else {
                 *bytes.next().unwrap()
             },
@@ -305,7 +305,7 @@ struct SndFile {
 impl SndFile {
     fn parse(bytes: &mut Iter<u8>, file_size: u32, cents_tuning: bool) -> Self {
         let header = SndHeader::parse(bytes);
-        assert_eq!(header.magic_number, 0x61534e44);
+        assert_eq!(header.magic_number, 0x6153_4e44);
 
         let programs = (0..header.num_programs)
             .map(|_| SndProgram::parse(bytes))
@@ -335,15 +335,7 @@ impl SndFile {
             sequences.push(start..end);
         }
 
-        Self {
-            programs,
-            zones,
-            wave_offsets,
-            sequence_offsets,
-            labels,
-            sequences,
-            header,
-        }
+        Self { header, programs, zones, wave_offsets, sequence_offsets, labels, sequences }
     }
 }
 
