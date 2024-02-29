@@ -32,7 +32,21 @@ fn main() {
         let mut out_file = File::create(path).unwrap();
 
         let header = if args.ads {
-            todo!()
+            [
+                [0x53, 0x53, 0x68, 0x64],
+                [0x18, 0, 0, 0],
+                [0x10, 0, 0, 0],
+                args.sample_rate.get().to_le_bytes(),
+                [1, 0, 0, 0],
+                [0; 4],
+                [0xff; 4],
+                [0xff; 4],
+                [0x53, 0x53, 0x62, 0x64],
+                (range.len() as u32).to_le_bytes(),
+            ]
+            .into_iter()
+            .flatten()
+            .collect::<Vec<_>>()
         } else {
             [
                 [0x56, 0x41, 0x47, 0x70],
