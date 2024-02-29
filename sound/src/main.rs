@@ -218,6 +218,19 @@ fn main() {
                 .collect::<Vec<_>>(),
         )
         .unwrap();
+    vh_output.write_all(&[0; 2]).unwrap();
+    for wave in &smp_file.waves {
+        let size = (wave.end - wave.start) / 8;
+        let size = (size as u16).to_le_bytes();
+        vh_output.write_all(&size).unwrap();
+    }
+    vh_output
+        .write_all(
+            &std::iter::repeat(0)
+                .take(512 - (1 + smp_file.waves.len()) * 2)
+                .collect::<Vec<_>>(),
+        )
+        .unwrap();
 
     let snd_info_output_path = output_folder.join(format!(
         "{}_info.txt",
