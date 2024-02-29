@@ -126,6 +126,14 @@ fn main() {
             ])
             .unwrap();
     }
+    vbi_output
+        .write_all(
+            &std::iter::repeat(0)
+                .take(16 * (128 - snd_file.header.num_programs as usize))
+                .collect::<Vec<_>>(),
+        )
+        .unwrap();
+
     let mut current_parent_program = 0;
     let mut current_parent_program_streak = 0;
     for zone in &snd_file.zones {
@@ -284,9 +292,9 @@ impl SndZone {
             note_high: *bytes.next().unwrap(),
             mode: *bytes.next().unwrap(),
             max_pitch_range: *bytes.next().unwrap(),
-            adsr1: u16::from_be_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            adsr2: u16::from_be_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            wave_index: u16::from_be_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+            adsr1: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+            adsr2: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+            wave_index: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]) + 1,
         }
     }
 }
@@ -335,7 +343,15 @@ impl SndFile {
             sequences.push(start..end);
         }
 
-        Self { header, programs, zones, wave_offsets, sequence_offsets, labels, sequences }
+        Self {
+            header,
+            programs,
+            zones,
+            wave_offsets,
+            sequence_offsets,
+            labels,
+            sequences,
+        }
     }
 }
 
