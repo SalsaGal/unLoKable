@@ -30,7 +30,10 @@ struct VabFile {
 impl VabFile {
     fn parse(bytes: &mut Iter<u8>, file: &[u8]) -> Self {
         let header = VabHeader::parse(bytes);
-        assert!((file.len() as u32) >= header.total_size, "File size mismatch!");
+        assert!(
+            (file.len() as u32) >= header.total_size,
+            "File size mismatch!"
+        );
 
         let programs: Vec<Program> = (0..header.programs_number)
             .map(|_| Program::parse(bytes))
@@ -54,11 +57,9 @@ impl VabFile {
             })
             .collect();
 
-        bytes.next().unwrap();
-        bytes.next().unwrap();
-
         let vag_sizes: Vec<u16> = (0..header.vags_number)
             .map(|_| u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]))
+            .skip(1)
             .collect();
         for _ in 0..512 - vag_sizes.len() * 2 - 2 {
             bytes.next().unwrap();
