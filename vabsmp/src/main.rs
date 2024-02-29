@@ -1,4 +1,4 @@
-use std::{path::PathBuf, slice::Iter};
+use std::{ops::Range, path::PathBuf, slice::Iter};
 
 use clap::Parser;
 
@@ -24,7 +24,8 @@ struct VabFile {
     header: VabHeader,
     programs: Vec<Program>,
     tones: Vec<Vec<Tone>>,
-    vag_sizes: Vec<u32>,
+    vag_sizes: Vec<usize>,
+    vag_ranges: Vec<Range<usize>>,
 }
 
 impl VabFile {
@@ -57,9 +58,9 @@ impl VabFile {
             })
             .collect();
 
-        let vag_sizes: Vec<u32> = (0..header.vags_number)
+        let vag_sizes: Vec<usize> = (0..header.vags_number)
             .map(|_| {
-                u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]) as u32 * 8
+                u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]) as usize * 8
             })
             .skip(1)
             .collect();
@@ -67,11 +68,20 @@ impl VabFile {
             bytes.next().unwrap();
         }
 
+        let vag_ranges = vag_sizes
+            .iter()
+            .fold((vec![], 0), |(mut acc, cursor), size| {
+                acc.push(cursor..cursor + *size);
+                (acc, cursor + *size)
+            })
+            .0;
+
         Self {
             header,
             programs,
             tones,
             vag_sizes,
+            vag_ranges,
         }
     }
 }
