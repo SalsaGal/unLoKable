@@ -26,8 +26,9 @@ fn main() {
     std::fs::create_dir(&output_path).unwrap();
     for (i, range) in vab_file.vag_ranges.iter().enumerate() {
         let path = output_path.join(format!(
-            "{}_{i:04}.bin",
-            output_path.file_name().unwrap().to_string_lossy()
+            "{}_{i:04}.{}",
+            output_path.file_name().unwrap().to_string_lossy(),
+            if args.ads { "ads" } else { "vag" }
         ));
         let mut out_file = File::create(path).unwrap();
 
