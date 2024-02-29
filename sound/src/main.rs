@@ -73,7 +73,7 @@ fn main() {
                         [0x56, 0x41, 0x47, 0x70], // Magic number
                         [0, 0, 0, 3],             // Version number,
                         [0; 4],                   // Padding
-                        sample_length.to_le_bytes(),
+                        sample_length.to_be_bytes(),
                         [0x00, 0x00, 0xAC, 0x44], // Sample rate
                         [0; 4],                   // Padding
                         [0; 4],
