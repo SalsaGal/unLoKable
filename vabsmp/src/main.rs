@@ -30,6 +30,29 @@ fn main() {
             output_path.file_name().unwrap().to_string_lossy()
         ));
         let mut out_file = File::create(path).unwrap();
+
+        let header = if args.ads {
+            todo!()
+        } else {
+            [
+                [0x56, 0x41, 0x47, 0x70],
+                [0, 0, 0, 3],
+                [0; 4],
+                (range.len() as u32).to_be_bytes(),
+                args.sample_rate.get().to_be_bytes(),
+                [0; 4],
+                [0; 4],
+                [0; 4],
+                [0; 4],
+                [0; 4],
+                [0; 4],
+                [0; 4],
+            ]
+            .into_iter()
+            .flatten()
+            .collect::<Vec<_>>()
+        };
+        out_file.write_all(&header).unwrap();
         out_file.write_all(&file[range.clone()]).unwrap();
     }
 }
