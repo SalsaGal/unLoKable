@@ -169,6 +169,23 @@ fn main() {
         )
         .unwrap();
 
+    let vb_output_path = output_folder.join(
+        PathBuf::from(
+            output_folder
+                .file_name()
+                .unwrap()
+                .to_string_lossy()
+                .as_ref(),
+        )
+        .with_extension("vb"),
+    );
+    let mut vb_output = File::create(vb_output_path).unwrap();
+    for waves in &smp_file.waves {
+        vb_output
+            .write_all(&smp_bytes[waves.start as usize..waves.end as usize])
+            .unwrap();
+    }
+
     let mut current_parent_program = 0;
     let mut current_parent_program_streak = 0;
     for zone in &snd_file.zones {
