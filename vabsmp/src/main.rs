@@ -1,22 +1,37 @@
-use std::{ops::Range, path::PathBuf, slice::Iter};
+use std::{fs::File, io::Write, num::NonZeroU32, ops::Range, path::PathBuf, slice::Iter};
 
 use clap::Parser;
 
 #[derive(Parser)]
 struct Args {
-    input: PathBuf,
+    vab_path: PathBuf,
+    sample_rate: NonZeroU32,
+    #[clap(long)]
+    vag: bool,
+    #[clap(long)]
+    ads: bool,
 }
 
 fn main() {
     let args = Args::parse();
 
-    let file = std::fs::read(args.input).unwrap();
+    let file = std::fs::read(&args.vab_path).unwrap();
     let mut file_iter = file.iter();
 
     let vab_file = VabFile::parse(&mut file_iter, &file);
-    dbg!(vab_file);
 
     dbg!(file.len() - file_iter.as_slice().len());
+
+    let output_path = args.vab_path.with_extension("");
+    std::fs::create_dir(&output_path).unwrap();
+    for (i, range) in vab_file.vag_ranges.iter().enumerate() {
+        let path = output_path.join(format!(
+            "{}_{i:04}.bin",
+            output_path.file_name().unwrap().to_string_lossy()
+        ));
+        let mut out_file = File::create(path).unwrap();
+        out_file.write_all(&file[range.clone()]).unwrap();
+    }
 }
 
 #[derive(Debug)]
@@ -58,11 +73,13 @@ impl VabFile {
             })
             .collect();
 
+        bytes.next().unwrap();
+        bytes.next().unwrap();
+
         let vag_sizes: Vec<usize> = (0..header.vags_number)
             .map(|_| {
                 u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]) as usize * 8
             })
-            .skip(1)
             .collect();
         for _ in 0..512 - vag_sizes.len() * 2 - 2 {
             bytes.next().unwrap();
