@@ -57,7 +57,7 @@ fn main() {
         output_file.write_all(&snd_bytes[range]).unwrap();
     }
 
-    for (i, wave) in smp_file.waves.into_iter().enumerate() {
+    for (i, wave) in smp_file.waves.iter().enumerate() {
         let output_path = samples_folder.join(format!(
             "{}_{i:04}.{}",
             output_folder.file_name().unwrap().to_string_lossy(),
@@ -93,7 +93,7 @@ fn main() {
         output_file.write_all(&smp_bytes[range]).unwrap();
     }
 
-    let vbi_output_path = output_folder.join(
+    let vh_output_path = output_folder.join(
         PathBuf::from(
             output_folder
                 .file_name()
@@ -101,11 +101,46 @@ fn main() {
                 .to_string_lossy()
                 .as_ref(),
         )
-        .with_extension("vbi"),
+        .with_extension("vh"),
     );
-    let mut vbi_output = File::create(vbi_output_path).unwrap();
+    let mut vh_output = File::create(vh_output_path).unwrap();
+    vh_output
+        .write_all(
+            &[
+                [0x70, 0x42, 0x41, 0x56],
+                [7, 0, 0, 0],
+                [0; 4],
+                (32 + 2048
+                    + snd_file.header.num_programs * 512
+                    + 512
+                    + smp_file
+                        .waves
+                        .iter()
+                        .map(|range| range.end as i32 - range.start as i32)
+                        .sum::<i32>())
+                .to_le_bytes(),
+                [
+                    0,
+                    0,
+                    snd_file.header.num_programs.to_le_bytes()[0],
+                    snd_file.header.num_programs.to_le_bytes()[1],
+                ],
+                [
+                    snd_file.header.num_zones.to_le_bytes()[0],
+                    snd_file.header.num_zones.to_le_bytes()[1],
+                    snd_file.header.num_waves.to_le_bytes()[0],
+                    snd_file.header.num_waves.to_le_bytes()[1],
+                ],
+                [0x7f, 0x40, 0, 0],
+                [0; 4],
+            ]
+            .into_iter()
+            .flatten()
+            .collect::<Vec<_>>(),
+        )
+        .unwrap();
     for program in &snd_file.programs {
-        vbi_output
+        vh_output
             .write_all(&[
                 (program.num_zones >> 8) as u8,
                 program.volume,
@@ -126,7 +161,7 @@ fn main() {
             ])
             .unwrap();
     }
-    vbi_output
+    vh_output
         .write_all(
             &std::iter::repeat(0)
                 .take(16 * (128 - snd_file.header.num_programs as usize))
@@ -138,7 +173,7 @@ fn main() {
     let mut current_parent_program_streak = 0;
     for zone in &snd_file.zones {
         if zone.parent_program != current_parent_program {
-            vbi_output
+            vh_output
                 .write_all(
                     &std::iter::repeat(0)
                         .take(32 * (16 - current_parent_program_streak))
@@ -149,7 +184,7 @@ fn main() {
             current_parent_program_streak = 0;
         }
 
-        vbi_output
+        vh_output
             .write_all(
                 &[
                     [zone.priority, zone.mode],
@@ -176,7 +211,7 @@ fn main() {
             .unwrap();
         current_parent_program_streak += 1;
     }
-    vbi_output
+    vh_output
         .write_all(
             &std::iter::repeat(0)
                 .take(32 * (16 - current_parent_program_streak))
