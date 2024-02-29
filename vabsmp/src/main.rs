@@ -122,9 +122,10 @@ impl VabFile {
             bytes.next().unwrap();
         }
 
+        let start_of_samples = file.len() - bytes.as_ref().len();
         let vag_ranges = vag_sizes
             .iter()
-            .fold((vec![], 0), |(mut acc, cursor), size| {
+            .fold((vec![], start_of_samples), |(mut acc, cursor), size| {
                 acc.push(cursor..cursor + *size);
                 (acc, cursor + *size)
             })
