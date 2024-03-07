@@ -391,8 +391,15 @@ impl SndFile {
         let zones = (0..header.num_zones)
             .map(|_| SndZone::parse(bytes, cents_tuning))
             .collect();
+        let mut wave_offsets_start = None;
         let wave_offsets = (0..header.num_waves)
-            .map(|_| u32::from_le_bytes(four_bytes(bytes)))
+            .map(|_| {
+                let num = u32::from_le_bytes(four_bytes(bytes));
+                if wave_offsets_start.is_none() {
+                    wave_offsets_start = Some(num);
+                }
+                num - wave_offsets_start.unwrap()
+            })
             .collect();
         let sequence_offsets = (0..header.num_sequences)
             .map(|_| u32::from_le_bytes(four_bytes(bytes)))
