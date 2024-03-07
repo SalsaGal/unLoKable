@@ -369,7 +369,9 @@ impl SndZone {
             max_pitch_range: *bytes.next().unwrap(),
             adsr1: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
             adsr2: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            wave_index: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]) + 1,
+            wave_index: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
+                .checked_add(1)
+                .unwrap_or(1),
         }
     }
 }
