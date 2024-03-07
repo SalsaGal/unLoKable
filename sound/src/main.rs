@@ -404,23 +404,32 @@ impl SndFile {
 
 #[derive(Debug)]
 pub struct SmpFile {
-    magic_number: u32,
+    magic_number: Option<u32>,
     body_size: u32,
     waves: Vec<Range<u32>>,
 }
 
 impl SmpFile {
     fn parse(snd: &SndFile, bytes: &mut Iter<u8>, file_size: u32) -> Self {
+        const MAGIC: u32 = 0x61534d50;
+        let first_bytes = u32::from_le_bytes(four_bytes(bytes));
+
+        let (magic_number, body_size, header_size) = if first_bytes == MAGIC {
+            (Some(first_bytes), u32::from_le_bytes(four_bytes(bytes)), 8)
+        } else {
+            (None, first_bytes, 4)
+        };
+
         Self {
-            magic_number: u32::from_le_bytes(four_bytes(bytes)),
-            body_size: u32::from_le_bytes(four_bytes(bytes)),
+            magic_number,
+            body_size,
             waves: (0..snd.header.num_waves as usize)
                 .map(|i| {
-                    let start = 8 + snd.wave_offsets[i];
+                    let start = header_size + snd.wave_offsets[i];
                     let end = if i == snd.header.num_waves as usize - 1 {
                         file_size
                     } else {
-                        8 + snd.wave_offsets[i + 1]
+                        header_size + snd.wave_offsets[i + 1]
                     };
                     start..end
                 })
