@@ -66,14 +66,23 @@ fn main() {
     std::fs::create_dir(&samples_folder).unwrap();
 
     for (i, sequence) in snd_file.sequences.into_iter().enumerate() {
+        let range = sequence.start as usize..sequence.end as usize;
+        let bytes = &snd_bytes[range];
+        let extension = match bytes[0..4] {
+            [0x51, 0x53, 0x4d, 0x61] => "msq",
+            [0x51, 0x45, 0x53, 0x61] => "cds",
+            _ => panic!(
+                "Unsupported sequence magic number, {}_{i:04}",
+                output_folder.file_name().unwrap().to_string_lossy()
+            ),
+        };
+
         let output_path = sequences_folder.join(format!(
-            "{}_{i:04}.msq",
+            "{}_{i:04}.{extension}",
             output_folder.file_name().unwrap().to_string_lossy()
         ));
-
         let mut output_file = File::create(output_path).unwrap();
-        let range = sequence.start as usize..sequence.end as usize;
-        output_file.write_all(&snd_bytes[range]).unwrap();
+        output_file.write_all(bytes).unwrap();
     }
 
     for (i, wave) in smp_file.waves.iter().enumerate() {
