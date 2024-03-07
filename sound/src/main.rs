@@ -15,6 +15,25 @@ struct Args {
     output: Option<PathBuf>,
 }
 
+fn align(x: impl Into<i64>) -> i64 {
+    let x = x.into();
+    if x % 4 == 0 {
+        x
+    } else {
+        x - x % 4 + 4
+    }
+}
+
+#[test]
+fn rounding() {
+    assert_eq!(align(40), 40);
+    assert_eq!(align(41u8), 44);
+    assert_eq!(align(42u16), 44);
+    assert_eq!(align(43u32), 44);
+    assert_eq!(align(44), 44);
+    assert_eq!(align(45), 48);
+}
+
 fn four_bytes(bytes: &mut Iter<u8>) -> [u8; 4] {
     [
         *bytes.next().unwrap(),
@@ -268,7 +287,7 @@ impl SndHeader {
     fn parse(bytes: &mut Iter<u8>) -> Self {
         Self {
             magic_number: u32::from_le_bytes(four_bytes(bytes)),
-            header_size: i32::from_le_bytes(four_bytes(bytes)),
+            header_size: align(i32::from_le_bytes(four_bytes(bytes))) as i32,
             bank_version: i32::from_le_bytes(four_bytes(bytes)),
             num_programs: i32::from_le_bytes(four_bytes(bytes)),
             num_zones: i32::from_le_bytes(four_bytes(bytes)),
@@ -361,6 +380,10 @@ impl SndFile {
     fn parse(bytes: &mut Iter<u8>, file_size: u32, cents_tuning: bool) -> Self {
         let header = SndHeader::parse(bytes);
         assert_eq!(header.magic_number, 0x6153_4e44);
+
+        while file_size - (bytes.as_slice().len() as u32) < header.header_size as u32 {
+            bytes.next();
+        }
 
         let programs = (0..header.num_programs)
             .map(|_| SndProgram::parse(bytes))
