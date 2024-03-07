@@ -1,12 +1,22 @@
 use std::{fs::File, io::Write, ops::Range, path::PathBuf, slice::Iter};
 
-use clap::Parser;
+use clap::{Parser, ValueEnum};
+
+#[derive(Clone, Copy, Debug, Default, ValueEnum)]
+enum Version {
+    #[default]
+    SoulReaver,
+    Intermediate,
+    OldAF,
+}
 
 #[derive(Parser)]
 #[command(version)]
 struct Args {
     snd_path: PathBuf,
     smp_path: PathBuf,
+    #[clap(short)]
+    file_version: Option<Version>,
     #[clap(short, long)]
     dreamcast: bool,
     #[clap(short)]
@@ -52,6 +62,7 @@ fn main() {
     let snd_file = SndFile::parse(
         &mut snd_bytes.iter(),
         snd_bytes.len() as u32,
+        args.file_version.unwrap_or_default(),
         args.cents_tuning,
     );
     let smp_file = SmpFile::parse(&snd_file, &mut smp_bytes.iter(), smp_bytes.len() as u32);
@@ -144,8 +155,8 @@ fn main() {
                     + smp_file
                         .waves
                         .iter()
-                        .map(|range| range.end as i32 - range.start as i32)
-                        .sum::<i32>())
+                        .map(|range| range.end - range.start)
+                        .sum::<u32>())
                 .to_le_bytes(),
                 [
                     0,
@@ -281,30 +292,80 @@ fn main() {
 #[derive(Debug)]
 struct SndHeader {
     magic_number: u32,
-    header_size: i32,
-    bank_version: i32,
-    num_programs: i32,
-    num_zones: i32,
-    num_waves: i32,
-    num_sequences: i32,
-    num_labels: i32,
-    reverb_mode: i32,
-    reverb_depth: i32,
+    header_size: u32,
+    bank_version: Option<u32>,
+    num_programs: u32,
+    num_zones: u32,
+    num_waves: u32,
+    num_sequences: u32,
+    num_labels: u32,
+    reverb_mode: u32,
+    reverb_depth: u32,
 }
 
 impl SndHeader {
-    fn parse(bytes: &mut Iter<u8>) -> Self {
-        Self {
-            magic_number: u32::from_le_bytes(four_bytes(bytes)),
-            header_size: align(i32::from_le_bytes(four_bytes(bytes))) as i32,
-            bank_version: i32::from_le_bytes(four_bytes(bytes)),
-            num_programs: i32::from_le_bytes(four_bytes(bytes)),
-            num_zones: i32::from_le_bytes(four_bytes(bytes)),
-            num_waves: i32::from_le_bytes(four_bytes(bytes)),
-            num_sequences: i32::from_le_bytes(four_bytes(bytes)),
-            num_labels: i32::from_le_bytes(four_bytes(bytes)),
-            reverb_mode: i32::from_le_bytes(four_bytes(bytes)),
-            reverb_depth: i32::from_le_bytes(four_bytes(bytes)),
+    fn parse(bytes: &mut Iter<u8>, version: Version) -> Self {
+        match version {
+            Version::SoulReaver => Self {
+                magic_number: u32::from_le_bytes(four_bytes(bytes)),
+                header_size: align(u32::from_le_bytes(four_bytes(bytes))) as u32,
+                bank_version: Some(u32::from_le_bytes(four_bytes(bytes))),
+                num_programs: u32::from_le_bytes(four_bytes(bytes)),
+                num_zones: u32::from_le_bytes(four_bytes(bytes)),
+                num_waves: u32::from_le_bytes(four_bytes(bytes)),
+                num_sequences: u32::from_le_bytes(four_bytes(bytes)),
+                num_labels: u32::from_le_bytes(four_bytes(bytes)),
+                reverb_mode: u32::from_le_bytes(four_bytes(bytes)),
+                reverb_depth: u32::from_le_bytes(four_bytes(bytes)),
+            },
+            Version::Intermediate => Self {
+                magic_number: u32::from_le_bytes(four_bytes(bytes)),
+                header_size: align(u32::from_le_bytes(four_bytes(bytes))) as u32,
+                bank_version: Some(u16::from_le_bytes([
+                    *bytes.next().unwrap(),
+                    *bytes.next().unwrap(),
+                ]) as u32),
+                num_programs: {
+                    let _pad = bytes.next();
+                    *bytes.next().unwrap() as u32
+                },
+                num_zones: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
+                    as u32,
+                num_waves: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
+                    as u32,
+                num_sequences: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
+                    as u32,
+                num_labels: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
+                    as u32,
+                reverb_mode: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
+                    as u32,
+                reverb_depth: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
+                    as u32,
+            },
+            Version::OldAF => Self {
+                magic_number: u32::from_le_bytes(four_bytes(bytes)),
+                header_size: align(u16::from_le_bytes([
+                    *bytes.next().unwrap(),
+                    *bytes.next().unwrap(),
+                ])) as u32,
+                bank_version: None,
+                num_programs: {
+                    let _pad = bytes.next();
+                    *bytes.next().unwrap() as u32
+                },
+                num_zones: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
+                    as u32,
+                num_waves: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
+                    as u32,
+                num_sequences: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
+                    as u32,
+                num_labels: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
+                    as u32,
+                reverb_mode: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
+                    as u32,
+                reverb_depth: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
+                    as u32,
+            },
         }
     }
 }
@@ -388,8 +449,8 @@ struct SndFile {
 }
 
 impl SndFile {
-    fn parse(bytes: &mut Iter<u8>, file_size: u32, cents_tuning: bool) -> Self {
-        let header = SndHeader::parse(bytes);
+    fn parse(bytes: &mut Iter<u8>, file_size: u32, version: Version, cents_tuning: bool) -> Self {
+        let header = SndHeader::parse(bytes, version);
         assert_eq!(header.magic_number, 0x6153_4e44);
 
         while file_size - (bytes.as_slice().len() as u32) < header.header_size as u32 {
