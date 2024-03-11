@@ -1,14 +1,3 @@
 # Able
 
-A tool designed to take music data from `smp` and `snd` files and outputs the files required to recreate soundtrack on for modern editors.
-
-## Usage
-
-```
-Usage: able [OPTIONS] [SND FILE] [SMP FILE]
-Rips audio from the Legacy of Kain
-  -h  Displays this help message
-  -o  Specifies the path for the output directory, eg `-o song`
-  -v  Displays extra information about files being loaded
-```
-
+A set of tools made in Rust designed to extract music data from several old and proprietary file formats from Crystal Dynamics, then convert them into modern formats. More information can be found on the [wiki](https://github.com/SalsaGal/able/wiki).
