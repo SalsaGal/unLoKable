@@ -6,8 +6,8 @@ use clap::{Parser, ValueEnum};
 enum Version {
     #[default]
     SoulReaver,
-    Intermediate,
-    OldAF,
+    Prototype,
+    Gex,
 }
 
 #[derive(Parser)]
@@ -320,7 +320,7 @@ impl SndHeader {
                 reverb_mode: u32::from_le_bytes(four_bytes(bytes)),
                 reverb_depth: u32::from_le_bytes(four_bytes(bytes)),
             },
-            Version::Intermediate => Self {
+            Version::Prototype => Self {
                 magic_number: u32::from_le_bytes(four_bytes(bytes)),
                 header_size: align(u32::from_le_bytes(four_bytes(bytes))) as u32,
                 bank_version: Some(u16::from_le_bytes([
@@ -344,7 +344,7 @@ impl SndHeader {
                 reverb_depth: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
                     as u32,
             },
-            Version::OldAF => Self {
+            Version::Gex => Self {
                 magic_number: u32::from_le_bytes(four_bytes(bytes)),
                 header_size: align(u16::from_le_bytes([
                     *bytes.next().unwrap(),
