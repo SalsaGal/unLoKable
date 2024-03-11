@@ -28,25 +28,6 @@ struct Args {
     output: Option<PathBuf>,
 }
 
-fn align(x: impl Into<i64>) -> i64 {
-    let x = x.into();
-    if x % 4 == 0 {
-        x
-    } else {
-        x - x % 4 + 4
-    }
-}
-
-#[test]
-fn rounding() {
-    assert_eq!(align(40), 40);
-    assert_eq!(align(41u8), 44);
-    assert_eq!(align(42u16), 44);
-    assert_eq!(align(43u32), 44);
-    assert_eq!(align(44), 44);
-    assert_eq!(align(45), 48);
-}
-
 fn four_bytes(bytes: &mut Iter<u8>) -> [u8; 4] {
     [
         *bytes.next().unwrap(),
@@ -292,9 +273,42 @@ fn main() {
 }
 
 #[derive(Debug)]
+struct HeaderSize {
+    size: i64,
+    adjusted: bool,
+}
+
+impl HeaderSize {
+    fn new(x: impl Into<i64>) -> Self {
+        let x = x.into();
+        if x % 4 == 0 {
+            Self {
+                size: x,
+                adjusted: false,
+            }
+        } else {
+            Self {
+                size: x - x % 4 + 4,
+                adjusted: true,
+            }
+        }
+    }
+}
+
+#[test]
+fn rounding() {
+    assert_eq!(HeaderSize::new(40).size, 40);
+    assert_eq!(HeaderSize::new(41u8).size, 44);
+    assert_eq!(HeaderSize::new(42u16).size, 44);
+    assert_eq!(HeaderSize::new(43u32).size, 44);
+    assert_eq!(HeaderSize::new(44).size, 44);
+    assert_eq!(HeaderSize::new(45).size, 48);
+}
+
+#[derive(Debug)]
 struct SndHeader {
     magic_number: u32,
-    header_size: u32,
+    header_size: HeaderSize,
     bank_version: Option<u32>,
     num_programs: u32,
     num_zones: u32,
@@ -310,7 +324,7 @@ impl SndHeader {
         match version {
             Version::SoulReaver => Self {
                 magic_number: u32::from_le_bytes(four_bytes(bytes)),
-                header_size: align(u32::from_le_bytes(four_bytes(bytes))) as u32,
+                header_size: HeaderSize::new(u32::from_le_bytes(four_bytes(bytes))),
                 bank_version: Some(u32::from_le_bytes(four_bytes(bytes))),
                 num_programs: u32::from_le_bytes(four_bytes(bytes)),
                 num_zones: u32::from_le_bytes(four_bytes(bytes)),
@@ -322,7 +336,7 @@ impl SndHeader {
             },
             Version::Prototype => Self {
                 magic_number: u32::from_le_bytes(four_bytes(bytes)),
-                header_size: align(u32::from_le_bytes(four_bytes(bytes))) as u32,
+                header_size: HeaderSize::new(u32::from_le_bytes(four_bytes(bytes))),
                 bank_version: Some(u16::from_le_bytes([
                     *bytes.next().unwrap(),
                     *bytes.next().unwrap(),
@@ -346,10 +360,10 @@ impl SndHeader {
             },
             Version::Gex => Self {
                 magic_number: u32::from_le_bytes(four_bytes(bytes)),
-                header_size: align(u16::from_le_bytes([
+                header_size: HeaderSize::new(u16::from_le_bytes([
                     *bytes.next().unwrap(),
                     *bytes.next().unwrap(),
-                ])) as u32,
+                ])),
                 bank_version: None,
                 num_programs: {
                     let _pad = bytes.next();
@@ -451,7 +465,7 @@ impl SndFile {
         let header = SndHeader::parse(bytes, version);
         assert_eq!(header.magic_number, 0x6153_4e44);
 
-        while file_size - (bytes.as_slice().len() as u32) < header.header_size as u32 {
+        while file_size - (bytes.as_slice().len() as u32) < header.header_size.size as u32 {
             bytes.next();
         }
 
