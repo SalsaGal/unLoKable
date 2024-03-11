@@ -1,4 +1,4 @@
-use std::{fs::File, io::Write, ops::Range, path::PathBuf, slice::Iter};
+use std::{fmt::Display, fs::File, io::Write, ops::Range, path::PathBuf, slice::Iter};
 
 use clap::{Parser, ValueEnum};
 
@@ -270,12 +270,40 @@ fn main() {
                 .collect::<Vec<_>>(),
         )
         .unwrap();
+
+    println!("SND header");
+    println!("Header bytes: {}", snd_file.header.header_size);
+    if let Some(version) = snd_file.header.bank_version {
+        let minor = version.to_le_bytes()[0];
+        let major = version.to_le_bytes()[1];
+        println!(
+            "SND version: {major}.{minor} ({:?})",
+            args.file_version.unwrap_or_default()
+        );
+    } else {
+        println!("SND version: Gex");
+    }
+    println!(
+        "System: {}",
+        if args.dreamcast {
+            "Dreamcast"
+        } else {
+            "PlayStation"
+        },
+    );
+    println!("Reverb mode: {}", snd_file.header.reverb_mode);
+    println!("Reverb depth: {}", snd_file.header.reverb_depth);
+    println!("Instruments: {}", snd_file.header.num_programs);
+    println!("Zones: {}", snd_file.header.num_zones);
+    println!("Samples: {}", snd_file.header.num_waves);
+    println!("Sequences: {}", snd_file.header.num_sequences);
+    println!("Labels: {}", snd_file.header.num_labels);
 }
 
 #[derive(Debug)]
 struct HeaderSize {
     size: i64,
-    adjusted: bool,
+    original: Option<i64>,
 }
 
 impl HeaderSize {
@@ -284,13 +312,22 @@ impl HeaderSize {
         if x % 4 == 0 {
             Self {
                 size: x,
-                adjusted: false,
+                original: None,
             }
         } else {
             Self {
                 size: x - x % 4 + 4,
-                adjusted: true,
+                original: Some(x),
             }
+        }
+    }
+}
+
+impl Display for HeaderSize {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self.original {
+            Some(original) => write!(f, "{original} ({}) bytes", self.size),
+            None => write!(f, "{} bytes", self.size),
         }
     }
 }
