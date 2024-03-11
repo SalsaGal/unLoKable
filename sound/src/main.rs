@@ -13,14 +13,17 @@ enum Version {
 #[derive(Parser)]
 #[command(version)]
 struct Args {
+    /// The `snd` path to load from.
     snd_path: PathBuf,
+    /// The `smp` path to load from.
     smp_path: PathBuf,
+    /// What version the `snd` file is.
     #[clap(short)]
     file_version: Option<Version>,
+    /// Whether on the Dreamcast platform or not.
     #[clap(short, long)]
     dreamcast: bool,
-    #[clap(short)]
-    cents_tuning: bool,
+    /// Folder to put output files in.
     #[clap(short, long)]
     output: Option<PathBuf>,
 }
@@ -63,7 +66,6 @@ fn main() {
         &mut snd_bytes.iter(),
         snd_bytes.len() as u32,
         args.file_version.unwrap_or_default(),
-        args.cents_tuning,
     );
     let smp_file = SmpFile::parse(&snd_file, &mut smp_bytes.iter(), smp_bytes.len() as u32);
 
@@ -412,18 +414,14 @@ struct SndZone {
 }
 
 impl SndZone {
-    fn parse(bytes: &mut Iter<u8>, cents_tuning: bool) -> Self {
+    fn parse(bytes: &mut Iter<u8>) -> Self {
         Self {
             priority: *bytes.next().unwrap(),
             parent_program: *bytes.next().unwrap(),
             volume: *bytes.next().unwrap(),
             pan_pos: *bytes.next().unwrap(),
             root_key: *bytes.next().unwrap(),
-            pitch_fine_tuning: if cents_tuning {
-                (f32::from(*bytes.next().unwrap()) * 100.0 / 128.0) as u8
-            } else {
-                *bytes.next().unwrap()
-            },
+            pitch_fine_tuning: *bytes.next().unwrap(),
             note_low: *bytes.next().unwrap(),
             note_high: *bytes.next().unwrap(),
             mode: *bytes.next().unwrap(),
@@ -449,7 +447,7 @@ struct SndFile {
 }
 
 impl SndFile {
-    fn parse(bytes: &mut Iter<u8>, file_size: u32, version: Version, cents_tuning: bool) -> Self {
+    fn parse(bytes: &mut Iter<u8>, file_size: u32, version: Version) -> Self {
         let header = SndHeader::parse(bytes, version);
         assert_eq!(header.magic_number, 0x6153_4e44);
 
@@ -461,7 +459,7 @@ impl SndFile {
             .map(|_| SndProgram::parse(bytes))
             .collect();
         let zones = (0..header.num_zones)
-            .map(|_| SndZone::parse(bytes, cents_tuning))
+            .map(|_| SndZone::parse(bytes))
             .collect();
         let mut wave_offsets_start = None;
         let wave_offsets = (0..header.num_waves)
