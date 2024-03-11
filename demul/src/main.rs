@@ -91,8 +91,7 @@ fn main() {
     for i in 0..channels {
         write!(
             &mut rate_file,
-            "{project_name}_audio_ch{i}.bin 1 {} 0 16\r\n",
-            sample_rate,
+            "{project_name}_audio_ch{i}.bin 1 {sample_rate} 0 16\r\n",
         )
         .unwrap();
     }
