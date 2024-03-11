@@ -16,15 +16,19 @@ fn main() {
 
     let mul_file = std::fs::read(&args.input).unwrap();
 
+    let sample_rate = u32::from_le_bytes([mul_file[0], mul_file[1], mul_file[2], mul_file[3]]);
     let channels = u32::from_le_bytes([mul_file[12], mul_file[13], mul_file[14], mul_file[15]]);
 
     // TODO Use slices instead of `Vec<Vec<>>`s
     let mut body = mul_file[0x800..].iter().copied().enumerate();
     let mut audio_slices = (0..channels).map(|_| vec![]).collect::<Vec<_>>();
     let mut data_slices = vec![];
+    let mut audio_chunks = 0;
+    let mut padding_chunks = 0;
     while let Some(current_chunk) = Chunk::parse(&mut body) {
         match current_chunk {
             Chunk::Audio { size } => {
+                audio_chunks += 1;
                 let split_size = size / channels;
                 let bytes = get_bytes(&mut body, size as usize);
                 for (i, slice) in bytes.chunks(split_size as usize).enumerate() {
@@ -33,6 +37,7 @@ fn main() {
             }
             Chunk::Data { size } => data_slices.push(get_bytes(&mut body, size as usize)),
             Chunk::Padding { size } => {
+                padding_chunks += 1;
                 get_bytes(&mut body, size as usize);
             }
         }
@@ -42,7 +47,7 @@ fn main() {
     let output_dir = args.output.unwrap_or_else(|| args.input.with_extension(""));
     std::fs::create_dir(&output_dir).unwrap();
     if !audio_slices.is_empty() {
-        for (i, slices) in audio_slices.into_iter().enumerate() {
+        for (i, slices) in audio_slices.iter().enumerate() {
             let mut out = File::create(format!(
                 "{}/{}_audio_ch{i}.bin",
                 output_dir.to_string_lossy(),
@@ -51,8 +56,9 @@ fn main() {
             .unwrap();
             out.write_all(
                 &slices
-                    .into_iter()
+                    .iter()
                     .flatten()
+                    .copied()
                     .map(|(_, x)| x)
                     .collect::<Vec<_>>(),
             )
@@ -68,8 +74,9 @@ fn main() {
         .unwrap();
         out.write_all(
             &data_slices
-                .into_iter()
+                .iter()
                 .flatten()
+                .copied()
                 .map(|(_, x)| x)
                 .collect::<Vec<_>>(),
         )
@@ -85,10 +92,21 @@ fn main() {
         write!(
             &mut rate_file,
             "{project_name}_audio_ch{i}.bin 1 {} 0 16\r\n",
-            u32::from_le_bytes([mul_file[0], mul_file[1], mul_file[2], mul_file[3]]),
+            sample_rate,
         )
         .unwrap();
     }
+
+    println!("MUL file");
+    println!("Audio channels: {channels}");
+    println!("Audio sample rate: {sample_rate}");
+    println!(
+        "Total chunks: {}",
+        data_slices.len() + audio_chunks + padding_chunks
+    );
+    println!("Data chunks: {}", data_slices.len());
+    println!("Audio chunks: {audio_chunks}");
+    println!("Padding chunks: {padding_chunks}");
 }
 
 enum Chunk {
