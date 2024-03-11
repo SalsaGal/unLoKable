@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::{fs::File, io::Write, num::NonZeroU32, ops::Range, path::PathBuf, slice::Iter};
 
 use clap::Parser;

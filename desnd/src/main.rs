@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::{fmt::Display, fs::File, io::Write, ops::Range, path::PathBuf, slice::Iter};
 
 use clap::{Parser, ValueEnum};
