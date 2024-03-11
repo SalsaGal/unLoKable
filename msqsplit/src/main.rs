@@ -45,6 +45,17 @@ fn main() {
             .unwrap();
         output.write_all(&track).unwrap();
     }
+
+    println!("MSQ header");
+    println!("Quarter note time: {}", header.quarter_note_time);
+    println!("PPQN: {}", header.ppqn);
+    println!("BPM: {}", 60_000_000 / header.quarter_note_time);
+    println!(
+        "Version: {}.{}",
+        header.version.to_be_bytes()[0],
+        header.version.to_be_bytes()[1]
+    );
+    println!("Tracks/Channels: {}", header.num_tracks);
 }
 
 fn convert(bytes: Vec<u8>, debug: bool) -> (MsqHeader, Vec<Vec<u8>>) {
@@ -100,7 +111,7 @@ struct MsqHeader {
     magic: u32,
     quarter_note_time: u32,
     ppqn: u16,
-    _version: u16,
+    version: u16,
     num_tracks: u16,
     _padding: u16,
 }
@@ -121,7 +132,7 @@ impl MsqHeader {
                 *bytes.next().unwrap(),
             ]),
             ppqn: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            _version: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+            version: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
             num_tracks: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
             _padding: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
         }
