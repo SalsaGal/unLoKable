@@ -5,7 +5,7 @@ use clap::Parser;
 const HEADER_VERSION_114: i32 = 270;
 const HEADER_VERSION_120: i32 = 276;
 
-#[derive(Clone, Copy, Default, PartialEq, Eq, clap::ValueEnum)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, clap::ValueEnum)]
 pub enum Platform {
     Console,
     #[default]
@@ -19,9 +19,6 @@ struct Args {
     mus_path: PathBuf,
     /// `sam` file to read
     sam_path: PathBuf,
-    /// Whether to display debug information or not
-    #[clap(short)]
-    debug: bool,
     /// Tells program to use PC format. This is the default.
     #[clap(long, short)]
     pc: bool,
@@ -137,9 +134,8 @@ fn main() {
 
     let header = MusHeader::parse(&mut mus_bytes);
     assert_eq!(header.magic, 0x4D75_7321, "Invalid magic number");
-    if args.debug {
-        dbg!(&header);
-    }
+    #[cfg(debug_assertions)]
+    dbg!(&header);
 
     let msq_tables = (0..header.num_sequences)
         .map(|_| MsqTable {
@@ -147,16 +143,14 @@ fn main() {
             offset: le_bytes!(mus_bytes),
         })
         .collect::<Vec<_>>();
-    if args.debug {
-        dbg!(&msq_tables);
-    }
+    #[cfg(debug_assertions)]
+    dbg!(&msq_tables);
 
     let layers = (0..header.num_presets + header.num_programs)
         .map(|_| le_bytes!(mus_bytes))
         .collect::<Vec<_>>();
-    if args.debug {
-        dbg!(&layers);
-    }
+    #[cfg(debug_assertions)]
+    dbg!(&layers);
 
     let wave_entries = (0..header.num_waves)
         .map(|_| WaveEntry {
@@ -171,9 +165,8 @@ fn main() {
             snd_handle: le_bytes!(mus_bytes),
         })
         .collect::<Vec<_>>();
-    if args.debug {
-        dbg!(&wave_entries);
-    }
+    #[cfg(debug_assertions)]
+    dbg!(&wave_entries);
 
     let mut program_entries = Vec::with_capacity(header.num_programs as usize);
     let mut program_zones = Vec::with_capacity(header.num_programs as usize);
@@ -209,9 +202,8 @@ fn main() {
             });
         }
     }
-    if args.debug {
-        dbg!(&program_entries, &program_zones);
-    }
+    #[cfg(debug_assertions)]
+    dbg!(&program_entries, &program_zones);
 
     let mut preset_entries = Vec::with_capacity(header.num_presets as usize);
     let mut preset_zones = Vec::with_capacity(header.num_presets as usize);
@@ -222,6 +214,7 @@ fn main() {
             midi_preset_number: le_bytes!(mus_bytes),
             num_zones: le_bytes!(mus_bytes),
         });
+        #[cfg(debug_assertions)]
         dbg!(&preset_entries);
         preset_zones.push(Vec::with_capacity(
             preset_entries.last().unwrap().num_zones as usize,
@@ -237,9 +230,8 @@ fn main() {
             });
         }
     }
-    if args.debug {
-        dbg!(&preset_entries, &preset_zones);
-    }
+    #[cfg(debug_assertions)]
+    dbg!(&preset_entries, &preset_zones);
 
     // Definitely doable with iterators, but too lazy to work it out right now
     let mut sequences: Vec<(i32, Option<i32>)> = Vec::with_capacity(header.num_sequences as usize);
@@ -257,25 +249,11 @@ fn main() {
             None => &mus_file[start as usize..header.offset_to_labels_offsets_table as usize],
         })
         .collect::<Vec<_>>();
-    if args.debug {
-        dbg!(&sequences);
-    }
+    #[cfg(debug_assertions)]
+    dbg!(&sequences);
 
     let sequences_dir = args.mus_path.with_extension("").join("sequences");
     let samples_dir = args.mus_path.with_extension("").join("samples");
-    if sequences_dir.exists() {
-        print!("Directory already exists, delete? [y/(n)]: ");
-        std::io::stdout().flush().unwrap();
-        let mut input = String::new();
-        std::io::stdin().read_line(&mut input).unwrap();
-        if input.trim() == "y" {
-            std::fs::remove_dir_all(&sequences_dir).unwrap();
-            std::fs::remove_dir_all(&samples_dir).unwrap();
-        } else {
-            println!("Abandoning");
-            return;
-        }
-    }
     std::fs::create_dir_all(&sequences_dir).unwrap();
     for (i, sequence) in sequences.into_iter().enumerate() {
         let path = sequences_dir.join(format!(
@@ -642,6 +620,15 @@ fn main() {
     )
     .unwrap();
     write!(&mut info_file, "Editor=Demus\r\n").unwrap();
+
+    print!(
+        "{}",
+        header.display(
+            platform,
+            program_zones.iter().fold(0, |acc, xs| acc + xs.len()),
+            preset_zones.iter().fold(0, |acc, xs| acc + xs.len()),
+        )
+    );
 }
 
 #[derive(Debug)]
@@ -698,6 +685,45 @@ impl MusHeader {
             num_programs: le_bytes!(bytes),
             num_presets: le_bytes!(bytes),
         }
+    }
+
+    fn display(&self, platform: Platform, sequence_zones: usize, preset_zones: usize) -> String {
+        // TODO Reformat this
+        let mut formatted = String::new();
+        formatted.push_str("MUS header\n");
+        formatted.push_str(&format!("Header bytes: {} bytes\n", self.header_size));
+        formatted.push_str(&format!(
+            "MUS version: {}\n",
+            match self.version_number {
+                HEADER_VERSION_114 => "1.14",
+                HEADER_VERSION_120 => "1.20",
+                _ => "UNKNOWN",
+            }
+        ));
+        formatted.push_str(&format!("System: {platform:?}\n"));
+        formatted.push_str(&format!("Reverb volume: {}\n", self.reverb_volume));
+        formatted.push_str(&format!("Reverb type: {}\n", self.reverb_type));
+        formatted.push_str(&format!("Sequences: {}\n", self.num_sequences));
+        if let Some(num_streams) = self.num_streams {
+            formatted.push_str(&format!("Streams: {num_streams}\n"));
+        }
+        if let Some(stream_bpm) = self.stream_bpm {
+            formatted.push_str(&format!("Stream BPM: {stream_bpm}\n"));
+        }
+        formatted.push_str(&format!("Labels: {}\n", self.num_labels));
+        formatted.push_str(&format!(
+            "Samples: {} ({})\n",
+            self.num_waves,
+            match platform {
+                Platform::PC => "PCM16LE",
+                Platform::Console => "SONY_4BIT_ADPCM",
+            }
+        ));
+        formatted.push_str(&format!("Instruments: {}\n", self.num_sequences));
+        formatted.push_str(&format!("Instrument zones: {sequence_zones}\n"));
+        formatted.push_str(&format!("Presets: {}\n", self.num_presets));
+        formatted.push_str(&format!("Preset zones: {preset_zones}\n"));
+        formatted
     }
 }
 
