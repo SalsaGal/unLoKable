@@ -50,9 +50,8 @@ fn main() {
     };
     assert_eq!(0x5145_5361, header.magic, "invalid magic number");
 
-    if args.debug {
-        dbg_hex!(&header);
-    }
+    #[cfg(debug_assertions)]
+    dbg_hex!(&header);
 
     // Balance the tokens
     let body = content_iter.collect::<Vec<_>>();
@@ -75,14 +74,13 @@ fn main() {
         tokens.insert(tokens.len() - 1, Token::Data(&[0]));
         loop_terminator_count += 1;
     }
-    if args.debug {
-        dbg_hex!(&tokens);
-    }
+    #[cfg(debug_assertions)]
+    dbg_hex!(&tokens);
 
-    let lexemes = lex_file(tokens);
-    if args.debug {
-        dbg_hex!(&lexemes);
-    }
+    let lexemes = lex_file(&tokens);
+    #[cfg(debug_assertions)]
+    dbg_hex!(&lexemes);
+    #[cfg(debug_assertions)]
     for lexeme in &lexemes {
         lexeme.visualise(0);
     }
@@ -143,6 +141,25 @@ fn main() {
         })
         .unwrap();
     output_file.write_all(&output[0..output_end + 3]).unwrap();
+
+    println!("CDS file");
+    println!(
+        "Quarter note time: {}",
+        header.quarter_note_time.swap_bytes()
+    );
+    println!("PPQN: {}", header.ppqn.swap_bytes());
+    println!(
+        "BPM: {}",
+        60_000_000 / header.quarter_note_time.swap_bytes()
+    );
+    println!("Version: 0.{}", header.version.swap_bytes());
+    println!(
+        "Local loops: {}",
+        tokens
+            .iter()
+            .filter(|token| matches!(token, Token::LoopStart(_)))
+            .count()
+    );
 }
 
 fn dictionary(file: &mut Vec<u8>, quarter_note_time: u32, has_infinite_loop: bool) {
@@ -303,7 +320,7 @@ impl Lexeme {
     }
 }
 
-fn lex_file(tokens: Vec<Token>) -> Vec<Lexeme> {
+fn lex_file(tokens: &[Token]) -> Vec<Lexeme> {
     let mut lexemes: Vec<Either<Token, Lexeme>> =
         tokens.iter().copied().map(Either::Left).collect::<Vec<_>>();
 
