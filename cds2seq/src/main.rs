@@ -152,7 +152,11 @@ fn main() {
         "BPM: {}",
         60_000_000 / header.quarter_note_time.swap_bytes()
     );
-    println!("Version: 0.{}", header.version.swap_bytes());
+    println!(
+        "Version: {}.{}",
+        header.version.to_le_bytes()[0],
+        header.version.to_le_bytes()[1],
+    );
     println!(
         "Local loops: {}",
         tokens
