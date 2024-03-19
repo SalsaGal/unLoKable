@@ -22,8 +22,6 @@ fn main() {
 
     let vab_file = VabFile::parse(&mut file_iter, file.len());
 
-    dbg!(file.len() - file_iter.as_slice().len());
-
     let output_path = args.vab_path.with_extension("");
     std::fs::create_dir(&output_path).unwrap();
     for (i, range) in vab_file.vag_ranges.iter().enumerate() {
@@ -117,6 +115,8 @@ impl VabFile {
                 tones
             })
             .collect::<Vec<_>>();
+
+        println!("Samples found: {}", header.vags_number);
 
         bytes.next().unwrap();
         bytes.next().unwrap();
