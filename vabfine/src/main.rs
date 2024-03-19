@@ -7,6 +7,7 @@ use clap::Parser;
 #[derive(Parser)]
 struct Args {
     vab_path: PathBuf,
+    /// DEFAULT
     #[clap(long)]
     cents: bool,
     #[clap(long)]
@@ -66,7 +67,7 @@ impl VabFile {
             .map(|program| {
                 let tones = (0..program.tones_number)
                     .map(|_| Tone::parse(bytes, psx))
-                    .collect();
+                    .collect::<Vec<_>>();
 
                 for _ in 0..32 * (16 - program.tones_number as usize) {
                     bytes.next().unwrap();
@@ -74,7 +75,20 @@ impl VabFile {
 
                 tones
             })
-            .collect();
+            .collect::<Vec<_>>();
+
+        let pitch_finetunings = tones
+            .iter()
+            .map(|tones| tones.iter().len())
+            .inspect(|x| println!("{x}"))
+            .sum::<usize>();
+        let nonzero_finetunings = tones
+            .iter()
+            .map(|tones| tones.iter().filter(|t| t.pitch_tune != 0).count())
+            .sum::<usize>();
+
+        println!("Tones found: {pitch_finetunings}");
+        println!("Changed Non-zero Pitch Finetunings: {nonzero_finetunings}");
 
         bytes.next().unwrap();
         bytes.next().unwrap();
