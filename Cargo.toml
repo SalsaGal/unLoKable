@@ -9,5 +9,5 @@ members = [
     "desnd",
     "msqsplit",
     "seqrepeat", "sf2panlaw",
-    "vabfine", "vabsmp", "vagheader",
+    "vabfine", "vabsmp", "vagheader", "vagsanitizer",
 ]
