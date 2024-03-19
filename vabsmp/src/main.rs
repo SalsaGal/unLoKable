@@ -20,7 +20,7 @@ fn main() {
     let file = std::fs::read(&args.vab_path).unwrap();
     let mut file_iter = file.iter();
 
-    let vab_file = VabFile::parse(&mut file_iter, &file);
+    let vab_file = VabFile::parse(&mut file_iter, file.len());
 
     dbg!(file.len() - file_iter.as_slice().len());
 
@@ -84,17 +84,22 @@ struct VabFile {
 }
 
 impl VabFile {
-    fn parse(bytes: &mut Iter<u8>, file: &[u8]) -> Self {
+    fn parse(bytes: &mut Iter<u8>, file_len: usize) -> Self {
         let header = VabHeader::parse(bytes);
         assert!(
-            (file.len() as u32) >= header.total_size,
+            (file_len as u32) >= header.total_size,
             "File size mismatch!"
         );
 
-        let programs: Vec<Program> = (0..header.programs_number)
-            .map(|_| Program::parse(bytes))
-            .collect();
-        for _ in 0..16 * (128 - header.programs_number) {
+        let mut programs = Vec::with_capacity(header.programs_number as usize);
+        let mut program_space = 0;
+        while programs.len() < header.programs_number as usize {
+            if let Some(program) = Program::parse(bytes) {
+                programs.push(program)
+            }
+            program_space += 1;
+        }
+        for _ in 0..16 * (128 - program_space) {
             bytes.next().unwrap();
         }
 
@@ -103,7 +108,7 @@ impl VabFile {
             .map(|program| {
                 let tones = (0..program.tones_number)
                     .map(|_| Tone::parse(bytes))
-                    .collect();
+                    .collect::<Vec<_>>();
 
                 for _ in 0..32 * (16 - program.tones_number as usize) {
                     bytes.next().unwrap();
@@ -111,7 +116,7 @@ impl VabFile {
 
                 tones
             })
-            .collect();
+            .collect::<Vec<_>>();
 
         bytes.next().unwrap();
         bytes.next().unwrap();
@@ -125,7 +130,7 @@ impl VabFile {
             bytes.next().unwrap();
         }
 
-        let start_of_samples = file.len() - bytes.as_ref().len();
+        let start_of_samples = file_len - bytes.as_ref().len();
         let vag_ranges = vag_sizes
             .iter()
             .fold((vec![], start_of_samples), |(mut acc, cursor), size| {
@@ -220,8 +225,8 @@ struct Program {
 }
 
 impl Program {
-    fn parse(bytes: &mut Iter<u8>) -> Self {
-        Self {
+    fn parse(bytes: &mut Iter<u8>) -> Option<Self> {
+        let program = Self {
             tones_number: *bytes.next().unwrap(),
             volume: *bytes.next().unwrap(),
             priority: *bytes.next().unwrap(),
@@ -241,6 +246,12 @@ impl Program {
                 *bytes.next().unwrap(),
                 *bytes.next().unwrap(),
             ]),
+        };
+
+        if program.tones_number == 0 {
+            None
+        } else {
+            Some(program)
         }
     }
 }
