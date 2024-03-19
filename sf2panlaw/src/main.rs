@@ -22,6 +22,7 @@ struct Args {
     input: PathBuf,
     #[clap(short, long)]
     output: Option<PathBuf>,
+    /// DEFAULT
     #[clap(long)]
     attenuate: bool,
     #[clap(long)]
@@ -37,12 +38,18 @@ fn main() {
         Function::Attenuate
     };
     let file = std::fs::read_to_string(&args.input).unwrap();
-    let mut lines = file.lines().map(std::borrow::ToOwned::to_owned).collect::<Vec<_>>();
+    let mut lines = file
+        .lines()
+        .map(std::borrow::ToOwned::to_owned)
+        .collect::<Vec<_>>();
 
     let z_pans = lines.iter().enumerate().filter_map(|(i, x)| {
-        x.trim()
-            .strip_prefix("Z_pan=")
-            .map(|value| (i, f32::from(u16_to_i16(value.parse::<u16>().unwrap())) / 500.0))
+        x.trim().strip_prefix("Z_pan=").map(|value| {
+            (
+                i,
+                f32::from(u16_to_i16(value.parse::<u16>().unwrap())) / 500.0,
+            )
+        })
     });
     let z_atten = lines.iter().enumerate().filter_map(|(i, x)| {
         x.trim()
