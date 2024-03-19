@@ -43,21 +43,36 @@ fn main() {
         .map(std::borrow::ToOwned::to_owned)
         .collect::<Vec<_>>();
 
-    let z_pans = lines.iter().enumerate().filter_map(|(i, x)| {
-        x.trim().strip_prefix("Z_pan=").map(|value| {
-            (
-                i,
-                f32::from(u16_to_i16(value.parse::<u16>().unwrap())) / 500.0,
-            )
+    let z_pans = lines
+        .iter()
+        .enumerate()
+        .filter_map(|(i, x)| {
+            x.trim().strip_prefix("Z_pan=").map(|value| {
+                (
+                    i,
+                    f32::from(u16_to_i16(value.parse::<u16>().unwrap())) / 500.0,
+                )
+            })
         })
-    });
+        .collect::<Vec<_>>();
     let z_atten = lines.iter().enumerate().filter_map(|(i, x)| {
         x.trim()
             .strip_prefix("Z_initialAttenuation=")
             .map(|value| (i, value.parse::<u32>().unwrap() as f32 / 25.0))
     });
 
+    let pair_count = z_pans.len();
+    let changed_attenuations = z_pans.iter().filter(|(_, x)| *x != 0.0).count();
+    println!("Pair count: {pair_count}");
+    println!("Changed Attenuations: {changed_attenuations}");
+
+    if changed_attenuations == 0 {
+        eprintln!("No attenuations changed, aborting");
+        return;
+    }
+
     let shifted = z_pans
+        .into_iter()
         .zip(z_atten)
         .map(|((_, pan), (line, atten))| {
             (
@@ -73,8 +88,13 @@ fn main() {
 
     let mut output = File::create(args.output.unwrap_or_else(|| {
         format!(
-            "{}_panlawupd.{}",
+            "{}_{}.{}",
             args.input.with_extension("").to_string_lossy(),
+            if args.amplify {
+                "amplified"
+            } else {
+                "attenuated"
+            },
             args.input.extension().unwrap().to_string_lossy(),
         )
         .into()
