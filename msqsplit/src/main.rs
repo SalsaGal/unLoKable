@@ -35,7 +35,7 @@ fn main() {
                     &[0x51, 0x45, 0x53, 0x61],
                     header.quarter_note_time.to_ne_bytes().as_slice(),
                     header.ppqn.to_ne_bytes().as_slice(),
-                    &[0x43, 0x00],
+                    header.version.to_ne_bytes().as_slice(),
                 ]
                 .into_iter()
                 .flatten()
