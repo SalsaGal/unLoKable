@@ -55,10 +55,15 @@ impl VabFile {
             "File size mismatch!"
         );
 
-        let programs: Vec<Program> = (0..header.programs_number)
-            .map(|_| Program::parse(bytes))
-            .collect();
-        for _ in 0..16 * (128 - header.programs_number) {
+        let mut programs = Vec::with_capacity(header.programs_number as usize);
+        let mut program_space = 0;
+        while programs.len() < header.programs_number as usize {
+            if let Some(program) = Program::parse(bytes) {
+                programs.push(program)
+            }
+            program_space += 1;
+        }
+        for _ in 0..16 * (128 - program_space) {
             bytes.next().unwrap();
         }
 
@@ -77,11 +82,7 @@ impl VabFile {
             })
             .collect::<Vec<_>>();
 
-        let pitch_finetunings = tones
-            .iter()
-            .map(|tones| tones.iter().len())
-            .inspect(|x| println!("{x}"))
-            .sum::<usize>();
+        let pitch_finetunings = tones.iter().map(|tones| tones.iter().len()).sum::<usize>();
         let nonzero_finetunings = tones
             .iter()
             .map(|tones| tones.iter().filter(|t| t.pitch_tune != 0).count())
@@ -197,8 +198,8 @@ struct Program {
 }
 
 impl Program {
-    fn parse(bytes: &mut IterMut<u8>) -> Self {
-        Self {
+    fn parse(bytes: &mut IterMut<u8>) -> Option<Self> {
+        let program = Self {
             tones_number: *bytes.next().unwrap(),
             volume: *bytes.next().unwrap(),
             priority: *bytes.next().unwrap(),
@@ -218,6 +219,12 @@ impl Program {
                 *bytes.next().unwrap(),
                 *bytes.next().unwrap(),
             ]),
+        };
+
+        if program.tones_number == 0 {
+            None
+        } else {
+            Some(program)
         }
     }
 }
