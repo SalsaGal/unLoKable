@@ -162,7 +162,7 @@ fn main() {
             size: le_bytes!(mus_bytes) * 2,
             loop_end: le_bytes!(mus_bytes),
             sample_rate: le_bytes!(mus_bytes),
-            original_pitch: le_bytes!(mus_bytes) / 256,
+            original_pitch: le_bytes!(mus_bytes),
             loop_info: le_bytes!(mus_bytes),
             snd_handle: le_bytes!(mus_bytes),
         })
@@ -366,10 +366,15 @@ fn main() {
         write!(
             &mut info_file,
             "        Key={}\r\n",
-            wave_entry.original_pitch,
+            semitone_tuning(wave_entry.original_pitch),
         )
         .unwrap();
-        write!(&mut info_file, "        FineTune=0\r\n").unwrap();
+        write!(
+            &mut info_file,
+            "        FineTune={}\r\n",
+            cents_tuning(wave_entry.original_pitch)
+        )
+        .unwrap();
         write!(&mut info_file, "        Type=1\r\n").unwrap();
     }
 
@@ -428,6 +433,12 @@ fn main() {
                 &mut info_file,
                 "            Z_attackVolEnv={}\r\n",
                 secs_to_timecent(program_zone.volume_env.attack)
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_holdVolEnv={}\r\n",
+                secs_to_timecent(program_zone.volume_env.hold)
             )
             .unwrap();
             write!(
@@ -512,6 +523,12 @@ fn main() {
                 &mut info_file,
                 "            Z_attackModEnv={}\r\n",
                 secs_to_timecent(program_zone.modul_env.attack)
+            )
+            .unwrap();
+            write!(
+                &mut info_file,
+                "            Z_holdModEnv={}\r\n",
+                secs_to_timecent(program_zone.modul_env.hold)
             )
             .unwrap();
             write!(
