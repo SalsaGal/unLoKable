@@ -738,7 +738,7 @@ impl MusHeader {
                 Platform::Console => "SONY_4BIT_ADPCM",
             }
         ));
-        formatted.push_str(&format!("Instruments: {}\n", self.num_sequences));
+        formatted.push_str(&format!("Instruments: {}\n", self.num_programs));
         formatted.push_str(&format!("Instrument zones: {sequence_zones}\n"));
         formatted.push_str(&format!("Presets: {}\n", self.num_presets));
         formatted.push_str(&format!("Preset zones: {preset_zones}\n"));
