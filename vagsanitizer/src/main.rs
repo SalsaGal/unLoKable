@@ -22,7 +22,8 @@ fn main() {
     );
     let changed = sanitized(&mut vag_bytes);
 
-    if changed {
+    if changed != 0 {
+        println!("{changed} bad chunks fixed!");
         let mut output = File::create(args.output.unwrap_or_else(|| {
             format!(
                 "{}_clean.{}",
@@ -34,17 +35,17 @@ fn main() {
         .unwrap();
         output.write_all(&vag_bytes).unwrap();
     } else {
-        eprintln!("No changes made");
+        println!("No bad chunks were found!");
     }
 }
 
-fn sanitized(bytes: &mut [u8]) -> bool {
+fn sanitized(bytes: &mut [u8]) -> usize {
     let mut last_valid = 0;
-    let mut changed = false;
+    let mut changed = 0;
     for line in bytes.chunks_mut(16).skip(48 / 16) {
         if line[0] == 0xff {
             line[0] = last_valid;
-            changed = true;
+            changed += 1;
         } else {
             last_valid = line[0];
         }
