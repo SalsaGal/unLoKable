@@ -15,6 +15,11 @@ fn main() {
     let args = Args::parse();
 
     let mut vag_bytes = std::fs::read(&args.input).unwrap();
+    assert_eq!(
+        vag_bytes[0..4],
+        [0x56, 0x41, 0x47, 0x70],
+        "invalid magic number"
+    );
     let changed = sanitized(&mut vag_bytes);
 
     if changed {
