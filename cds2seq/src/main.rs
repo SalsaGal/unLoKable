@@ -7,7 +7,7 @@ use std::{fs::File, path::PathBuf};
 #[derive(Parser)]
 #[command(version)]
 struct Args {
-    /// msq file to read
+    /// `cds` file to read
     input: PathBuf,
     /// Whether to display debug information or not
     #[clap(long, short)]
