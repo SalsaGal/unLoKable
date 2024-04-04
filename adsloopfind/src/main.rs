@@ -1,19 +1,23 @@
 use std::path::PathBuf;
 
+use clap::Parser;
+
 const MAGIC_NUMBER: [u8; 4] = [0x53, 0x53, 0x68, 0x64];
 
+#[derive(Parser)]
+struct Args {
+    /// The `ads` file to find loops in
+    ads_input: PathBuf,
+}
+
 fn main() {
-    let ads_path = PathBuf::from(
-        std::env::args()
-            .nth(1)
-            .expect("`ads` path must be supplied"),
-    );
-    let ads_file = std::fs::read(&ads_path).unwrap();
+    let args = Args::parse();
+    let ads_file = std::fs::read(&args.ads_input).unwrap();
 
     if let Some((lb, le)) = find_loops(&ads_file) {
         print!(
             "{lb} {le} {}\r\n",
-            ads_path
+            args.ads_input
                 .with_extension("wav")
                 .file_name()
                 .unwrap()
