@@ -239,14 +239,14 @@ fn main() {
                     .collect::<Vec<u8>>(),
                 )
                 .unwrap();
-            vh_output
-                .write_all(
-                    &std::iter::repeat(0)
-                        .take(32 * (16 - program.num_zones as usize))
-                        .collect::<Vec<_>>(),
-                )
-                .unwrap();
         }
+        vh_output
+            .write_all(
+                &std::iter::repeat(0)
+                    .take(32 * (16 - program.num_zones as usize))
+                    .collect::<Vec<_>>(),
+            )
+            .unwrap();
     }
     vh_output.write_all(&[0; 2]).unwrap();
 
