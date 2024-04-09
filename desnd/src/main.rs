@@ -210,56 +210,46 @@ fn main() {
             .unwrap();
     }
 
-    let mut current_parent_program = 0;
-    let mut current_parent_program_streak = 0;
-    for zone in &snd_file.zones {
-        if zone.parent_program != current_parent_program {
+    let mut zone_iter = snd_file.zones.iter();
+    for program in &snd_file.programs {
+        for _ in 0..program.num_zones {
+            let zone = zone_iter.next().unwrap();
+            vh_output
+                .write_all(
+                    &[
+                        [zone.priority, zone.mode],
+                        [zone.volume, zone.pan_pos],
+                        [zone.root_key, zone.pitch_fine_tuning],
+                        [zone.note_low, zone.note_high],
+                        [0; 2],
+                        [0; 2],
+                        [zone.max_pitch_range, zone.max_pitch_range],
+                        [0; 2],
+                        zone.adsr1.to_le_bytes(),
+                        zone.adsr2.to_le_bytes(),
+                        [zone.parent_program, 0],
+                        zone.wave_index.to_le_bytes(),
+                        [0; 2],
+                        [0; 2],
+                        [0; 2],
+                        [0; 2],
+                    ]
+                    .into_iter()
+                    .flatten()
+                    .collect::<Vec<u8>>(),
+                )
+                .unwrap();
             vh_output
                 .write_all(
                     &std::iter::repeat(0)
-                        .take(32 * (16 - current_parent_program_streak))
+                        .take(32 * (16 - program.num_zones as usize))
                         .collect::<Vec<_>>(),
                 )
                 .unwrap();
-            current_parent_program = zone.parent_program;
-            current_parent_program_streak = 0;
         }
-
-        vh_output
-            .write_all(
-                &[
-                    [zone.priority, zone.mode],
-                    [zone.volume, zone.pan_pos],
-                    [zone.root_key, zone.pitch_fine_tuning],
-                    [zone.note_low, zone.note_high],
-                    [0; 2],
-                    [0; 2],
-                    [zone.max_pitch_range, zone.max_pitch_range],
-                    [0; 2],
-                    zone.adsr1.to_le_bytes(),
-                    zone.adsr2.to_le_bytes(),
-                    [zone.parent_program, 0],
-                    zone.wave_index.to_le_bytes(),
-                    [0; 2],
-                    [0; 2],
-                    [0; 2],
-                    [0; 2],
-                ]
-                .into_iter()
-                .flatten()
-                .collect::<Vec<u8>>(),
-            )
-            .unwrap();
-        current_parent_program_streak += 1;
     }
-    vh_output
-        .write_all(
-            &std::iter::repeat(0)
-                .take(32 * (16 - current_parent_program_streak))
-                .collect::<Vec<_>>(),
-        )
-        .unwrap();
     vh_output.write_all(&[0; 2]).unwrap();
+
     for wave in &smp_file.waves {
         let size = (wave.end - wave.start) / 8;
         let size = (size as u16).to_le_bytes();
@@ -436,8 +426,8 @@ struct SndProgram {
 impl SndProgram {
     fn parse(bytes: &mut Iter<u8>) -> Self {
         let program = Self {
-            num_zones: u16::from_be_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            first_tone: u16::from_be_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+            num_zones: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+            first_tone: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
             volume: *bytes.next().unwrap(),
             pan_pos: *bytes.next().unwrap(),
         };
