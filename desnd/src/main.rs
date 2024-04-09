@@ -166,7 +166,7 @@ fn main() {
     for program in &snd_file.programs {
         vh_output
             .write_all(&[
-                (program.num_zones >> 8) as u8,
+                program.num_zones.to_ne_bytes()[0],
                 program.volume,
                 0,
                 0,
