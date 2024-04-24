@@ -131,3 +131,19 @@ msqsplit [msq_file]
 ```
 
 CDS files can be later converted to SEQ using cds2seq and then to MIDI using loveemu's [seq2mid](https://github.com/loveemu/seq2mid). Before converting the SEQ files to MIDI, you may want to check whether they need to be looped or not using seqrepeat (preferably with the marker option enabled by default). If you want to have all the MIDI tracks from an MSQ file to be re-grouped/re-merged, you first need to convert all the MIDI files from Type 0 (SMF0) to Type 1 (SMF1). Then you can use VirtuosicAI's [MIDI Merger Lite](https://github.com/VirtuosicAI/MIDI-Merger-Lite) to merge them into a single MIDI file while having the option 'Skip the 1st track of non-primary MIDIs' enabled.
+
+### seqrepeat
+
+This program takes a Sony PlayStation sequence file (SEQ) and extends its runtime by repeating a marked section or the entire file.
+
+#### Usage
+
+```
+seqrepeat [seq_file] [reading_count]
+
+Options:
+
+-m Whether to read from the tempo marker rather than the entire file
+```
+
+If a reading count of 1 is specified, the resulting output file will be exactly the same as the input one. This program does not currently seek standard loop markers for SEQ files. Instead it uses the first tempo change command as a reference loop start marker. Support for standard loop markers may be added in the future with a different argument/option.
