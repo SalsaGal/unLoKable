@@ -213,3 +213,21 @@ Options:
 ```
 
 The samplerate must always be greater than 0.
+
+### vagheader
+
+This program takes a raw binary file (presumed to be a headerless audio stream) and adds a simple Sony VAG header to it. There are many complex variants of the VAG header, but this program uses the simplest one. Only mono samples are currently supported.
+
+#### Usage
+
+```
+vagheader [input_file] [samplerate]
+
+Options:
+
+--long (Default)
+--short
+-o, --output (Output filename.)
+```
+
+The long version of the header uses occupies 64 bytes (48 bytes + 16 zero-padding bytes), while the short version only uses 48 bytes. The samplerate must always be greater than 0. By default the output will be an .vag file with the same name as the input file.
