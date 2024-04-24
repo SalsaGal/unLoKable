@@ -62,3 +62,28 @@ Output audio rate text file layout:
 Channels is always set to 1.
 Interleave is always set to 0.
 Codec is always set to 16 (`SONY_4BIT_ADPCM`).
+
+### demus
+
+This program takes a MUS and a SAM file and decompiles their contents.
+
+Most of the information from the MUS file gets converted to simple ASCII text and is saved into a txt file with the same name. The resulting text file follows a data layout specifically tuned to be used with SF2Comp (sf2comp.exe), a SoundFont compiler command-line utility for Windows. Note that in order for the utility to work, you need to retrieve `sfedt32.dll` separately and paste it into the same folder where the utility is located, it is not bundled directly with SF2Comp due to copyright. The help.txt file should be bundled with the utility inside the 'sf2cmp10.zip' file. Consult that for compile and decompile commands.
+
+The samples are exported as ADS files and the sequences as MSQ files. The samples loop information gets exported onto a text file (*_smploopinfo.txt) that is formatted to be used with [LoopingAudioConverter](https://github.com/libertyernie/LoopingAudioConverter). If the samples come from a PlayStation 2 build of the game, the sample loop info text file needs to be re-built using the adsloopfind utility on each ads file. Preferably doable using a batch script, like 'adsloopfind_folder.bat'. Otherwise, the sample loop info text file can be used directly.
+
+The ADS files need to be converted to WAV first, using tools such as [VGSC 2.0](https://wiki.vg-resource.com/Video_Game_Sound_Converter), [vgmstream](https://vgmstream.org/), [foobar2000](https://www.foobar2000.org/) with the vgmstream plugin and many others...
+Once converted, LoopingAudioConverter is able to append the loop information to them as 'RIFF smpl' chunks. To use the sample loop info text file with LoopingAudioConverter, place it into the same folder, rename the file to 'loop.txt' and it should be automatically loaded once you launch the program. The remaining instructions should be on the 'About.html' file.
+
+#### Usage
+
+```
+demus [mus_file] [sam_file]
+
+Options:
+
+-p, --pc (Tells the program to use the PC format. This is the default.)
+-c, --console (Tells the program to use the console format.)
+-o, --output (Output folder of the files. Defaults to the input with a different extension.)
+```
+
+The only difference between the PC version and the console version is the sample codec. The program currently supports PC and PlayStation 2 versions of the samples, but more codecs may be added in the future. The PC version uses PCM16_LE formatted samples while the PlayStation 2 version uses SONY_4BIT_ADPCM (VAG).
