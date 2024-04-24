@@ -177,3 +177,21 @@ If a SoundFont has a 3.01dB pan law and the attenuation function is used, the re
 | 3.01dB | Amplify   | 6.02dB     |
 
 There is some accuracy loss during the amplification/attenuation process, so make sure to use original source files as references. Then the text file can be compiled with SF2Comp alongside its samples.
+
+### vabfine
+
+This program takes a VAB file and changes the finetuning scale of each zone.
+
+#### Usage
+
+```
+vabfine [vab_file]
+
+Options:
+
+--cents (Default)
+--psx
+-o, --output (Output filename.)
+```
+
+This utility helps those users who would like to do fine adjustments of incorrectly finetuned samples in SoundFonts converted from VAB files. Sony VAB editors mistakingly report the finetuning scale to be adjustable between 0 and 99 (cents) when in reality it's between 0 and 127. With this utility you can change the scale in either direction, however some accuracy is lost during the scale conversion. The 'cents' option changes the scale from 0-127 to 0-99 and the 'psx' option the opposite.
