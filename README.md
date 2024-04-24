@@ -195,3 +195,21 @@ Options:
 ```
 
 This utility helps those users who would like to do fine adjustments of incorrectly finetuned samples in SoundFonts converted from VAB files. Sony VAB editors mistakingly report the finetuning scale to be adjustable between 0 and 99 (cents) when in reality it's between 0 and 127. With this utility you can change the scale in either direction, however some accuracy is lost during the scale conversion. The 'cents' option changes the scale from 0-127 to 0-99 and the 'psx' option the opposite.
+
+### vabsmp
+
+This program takes a VAB file and exports its samples in either VAG or ADS format.
+
+#### Usage
+
+```
+vabsmp [vab_file] [samplerate]
+
+Options:
+
+--vag (Default)
+--ads
+-o, --output (Output folder of the files. Defaults to the input with a different extension.)
+```
+
+The samplerate must always be greater than 0.
