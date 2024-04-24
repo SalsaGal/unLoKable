@@ -147,3 +147,33 @@ Options:
 ```
 
 If a reading count of 1 is specified, the resulting output file will be exactly the same as the input one. This program does not currently seek standard loop markers for SEQ files. Instead it uses the first tempo change command as a reference loop start marker. Support for standard loop markers may be added in the future with a different argument/option.
+
+### sf2panlaw
+
+This program takes text files generated with SF2Comp and changes the pan law of each zone present in the sets of instruments.
+
+#### Usage
+
+```
+sf2panlaw [text_file]
+
+Options:
+
+--attenuate (Default)
+--amplify
+-o, --output (Output filename.)
+```
+
+By default SoundFonts have a 3.01dB pan law. The attenuation function on this program allows you to decrease the pan law by 3.01dB and the amplification does the opposite.
+
+#### Example
+
+If a SoundFont has a 3.01dB pan law and the attenuation function is used, the resulting text file will use a 0dB pan law, also known as 'linear'.
+
+| Input  | Function  | Output     |
+| ------ | --------- | ---------- |
+| 3.01dB | Attenuate | Linear/0dB |
+| 0dB    | Amplify   | 3.01dB     |
+| 3.01dB | Amplify   | 6.02dB     |
+
+There is some accuracy loss during the amplification/attenuation process, so make sure to use original source files as references. Then the text file can be compiled with SF2Comp alongside its samples.
