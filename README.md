@@ -231,3 +231,19 @@ Options:
 ```
 
 The long version of the header uses occupies 64 bytes (48 bytes + 16 zero-padding bytes), while the short version only uses 48 bytes. The samplerate must always be greater than 0. By default the output will be an .vag file with the same name as the input file.
+
+### vagsanitizer
+
+This program takes a VAG file and fixes an issue that some early revisions of the VAG format suffer from.
+
+#### Usage
+
+```
+vagsanitizer [vag_file]
+
+Options:
+
+-o, --output (Output filename.)
+```
+
+Some players and converters are not able to handle a shift/filter byte that is set to 0xFF. The usual symptom is the audio being highly distorted and clipping. This utility checks every first byte of each chunk and if it's equal to 0xFF, it substitutes it with the shift/filter value of the previous chunk. Refer to the [wiki article for the VAG format](https://github.com/SalsaGal/unLoKable/wiki/File-Format:-VAG).
