@@ -8,9 +8,9 @@ struct Args {
     input: PathBuf,
     /// The number of the passes in the final file.
     count: NonZeroUsize,
-    /// Whether to read from the marker rather than the entire file.
+    /// Whether to read from the tempo marker rather than the entire file.
     #[clap(short)]
-    marker: bool,
+    tempo: bool,
     /// `seq` to write to.
     #[clap(short)]
     output: Option<PathBuf>,
@@ -30,7 +30,7 @@ fn main() {
         "Invalid magic number",
     );
 
-    let beginning = match args.marker {
+    let beginning = match args.tempo {
         // 0xff51XXXXXX
         true => {
             &file[0..file
