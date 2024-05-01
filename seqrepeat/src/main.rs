@@ -28,7 +28,10 @@ fn main() {
     let file = std::fs::read(&args.input).expect("unable to load file");
     let mut bytes = file.iter().copied();
 
-    let loops = args.loop_marker.then_some(find_loops(&file)).flatten();
+    let (loop_start, loop_end) = args
+        .loop_marker
+        .then_some(find_loops(&file))
+        .unwrap_or_default();
 
     // Check magic number
     let header = Header::load(&mut bytes);
@@ -54,9 +57,10 @@ fn main() {
         }
         false => &file[0..15],
     };
-    let to_copy = match loops {
-        Some((start, end)) => &file[start + 6..end + 3],
-        None => {
+    let to_copy = match (loop_start, loop_end) {
+        (Some(start), Some(end)) => &file[start + 6..end + 3],
+        (Some(start), None) => &file[start + 6..],
+        _ => {
             &file[beginning.len()
                 ..file
                     .windows(3)
@@ -75,7 +79,7 @@ fn main() {
         if i < args.count.get() - 1 {
             output.splice(
                 output.len() - 3..,
-                header.dummy_string(&file, args.loop_marker, loops),
+                header.dummy_string(&file, args.loop_marker, loop_start),
             );
         }
     }
@@ -92,7 +96,7 @@ fn main() {
     out.write_all(&output).unwrap();
 }
 
-fn find_loops(file: &[u8]) -> Option<(usize, usize)> {
+fn find_loops(file: &[u8]) -> (Option<usize>, Option<usize>) {
     let mut start = None;
     let mut end = None;
     for (index, bytes) in file.windows(3).enumerate() {
@@ -105,7 +109,7 @@ fn find_loops(file: &[u8]) -> Option<(usize, usize)> {
         }
     }
 
-    start.and_then(|start| end.map(|end| (start, end)))
+    (start, end)
 }
 
 struct Header {
@@ -141,13 +145,8 @@ impl Header {
         }
     }
 
-    fn dummy_string(
-        &self,
-        file: &[u8],
-        loop_marker: bool,
-        loops: Option<(usize, usize)>,
-    ) -> Vec<u8> {
-        if let Some((start, _)) = loops {
+    fn dummy_string(&self, file: &[u8], loop_marker: bool, loop_start: Option<usize>) -> Vec<u8> {
+        if let Some(start) = loop_start {
             vec![file[start], 0x63, 0x1e]
         } else if loop_marker {
             vec![0xb0, 0x63, 0x1e]
