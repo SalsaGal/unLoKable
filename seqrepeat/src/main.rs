@@ -41,11 +41,10 @@ fn main() {
         "Invalid magic number",
     );
 
-    let beginning = match args.tempo {
+    let beginning_index = match args.tempo {
         // 0xff51XXXXXX
         true => {
-            &file[0..file
-                .windows(2)
+            file.windows(2)
                 .enumerate()
                 .find(|(_, w)| *w == [0xff, 0x51])
                 .unwrap_or_else(|| {
@@ -53,10 +52,11 @@ fn main() {
                     (10, &[])
                 })
                 .0
-                + 5]
+                + 5
         }
-        false => &file[0..15],
+        false => 15,
     };
+    let beginning = &file[0..beginning_index];
     let to_copy = match (loop_start, loop_end) {
         (Some(start), Some(end)) => &file[start + 6..end + 3],
         (Some(start), None) => &file[start + 6..],
@@ -74,6 +74,9 @@ fn main() {
 
     let mut output = Vec::with_capacity(bytes.len());
     output.write_all(beginning).unwrap();
+    if let Some(start) = loop_start {
+        output.write_all(&file[beginning_index..start + 6]).unwrap();
+    }
     for i in 0..args.count.get() {
         output.write_all(to_copy).unwrap();
         if i < args.count.get() - 1 {
@@ -82,6 +85,9 @@ fn main() {
                 header.dummy_string(&file, args.loop_marker, loop_start),
             );
         }
+    }
+    if let Some(end) = loop_end {
+        output.write_all(&file[end + 3..]).unwrap();
     }
 
     let mut out = File::create(
