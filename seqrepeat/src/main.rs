@@ -11,7 +11,7 @@ struct Args {
     /// Whether to read from the tempo marker rather than the entire file.
     #[clap(short)]
     tempo: bool,
-    /// Whether to read from the loop markers.
+    /// Whether to read from the loop markers. [DEFAULT]
     #[clap(short)]
     loop_marker: bool,
     /// `seq` to write to.
