@@ -22,6 +22,8 @@ fn main() {
     let file = std::fs::read(&args.input).expect("unable to load file");
     let mut bytes = file.iter().copied();
 
+    dbg!(find_loops(&file));
+
     // Check magic number
     let header = Header::load(&mut bytes);
     assert_eq!(
@@ -74,6 +76,22 @@ fn main() {
     )
     .unwrap();
     out.write_all(&output).unwrap();
+}
+
+fn find_loops(file: &[u8]) -> Option<(usize, usize)> {
+    let mut start = None;
+    let mut end = None;
+    for (index, bytes) in file.windows(3).enumerate() {
+        if bytes[0] & 0xf0 == 0xb0 && bytes[1] == 0x63 {
+            if bytes[2] == 0x14 {
+                start = Some(index);
+            } else if bytes[2] == 0x1e {
+                end = Some(index);
+            }
+        }
+    }
+
+    start.and_then(|start| end.map(|end| (start, end)))
 }
 
 struct Header {
