@@ -10,8 +10,8 @@ struct Args {
     count: NonZeroUsize,
     /// Whether to read from the tempo marker rather than the entire file.
     #[clap(short)]
-    tempo: bool,
-    /// Whether to read from the loop markers. [DEFAULT]
+    tempo_marker: bool,
+    /// Whether to read from the loop markers.
     #[clap(short)]
     loop_marker: bool,
     /// `seq` to write to.
@@ -20,10 +20,7 @@ struct Args {
 }
 
 fn main() {
-    let mut args = Args::parse();
-    if !args.tempo {
-        args.loop_marker = true;
-    }
+    let args = Args::parse();
 
     let file = std::fs::read(&args.input).expect("unable to load file");
     let mut bytes = file.iter().copied();
@@ -41,7 +38,7 @@ fn main() {
         "Invalid magic number",
     );
 
-    let beginning_index = match args.tempo {
+    let beginning_index = match args.tempo_marker {
         // 0xff51XXXXXX
         true => {
             file.windows(2)
