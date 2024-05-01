@@ -143,10 +143,11 @@ seqrepeat [seq_file] [reading_count]
 
 Options:
 
--m Whether to read from the tempo marker rather than the entire file
+-t Whether to read from the tempo marker rather than the entire file
+-l Whether to read from the loop markers
 ```
 
-If a reading count of 1 is specified, the resulting output file will be exactly the same as the input one. This program does not currently seek standard loop markers for SEQ files. Instead it uses the first tempo change command as a reference loop start marker. Support for standard loop markers may be added in the future with a different argument/option.
+If a reading count of 1 is specified, the resulting output file will be exactly the same as the input one. The program supports both standard `seq` loops and tempo change commands as a reference for looping.
 
 ### sf2panlaw
 
