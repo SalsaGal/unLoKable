@@ -147,7 +147,7 @@ Options:
 -l Whether to read from the loop markers
 ```
 
-If a reading count of 1 is specified, the resulting output file will be exactly the same as the input one. The program supports both standard `seq` loops and tempo change commands as a reference for looping.
+If a reading count of 1 is specified, the resulting output file will be exactly the same as the input one. The program supports both standard `seq` loops and tempo change commands as a reference for looping. If no argument is provided, the program will repeat the entire body.
 
 ### sf2panlaw
 
