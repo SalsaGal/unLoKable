@@ -8,6 +8,10 @@ members = [
     "demus",
     "desnd",
     "msqsplit",
-    "seqrepeat", "sf2panlaw",
-    "vabfine", "vabsmp", "vagheader", "vagsanitizer",
+    "seqrepeat",
+    "sf2panlaw",
+    "vabfine",
+    "vabsmp",
+    "vagheader",
+    "vagsanitizer",
 ]
