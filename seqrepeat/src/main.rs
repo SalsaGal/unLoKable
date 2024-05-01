@@ -11,18 +11,24 @@ struct Args {
     /// Whether to read from the tempo marker rather than the entire file.
     #[clap(short)]
     tempo: bool,
+    /// Whether to read from the loop markers.
+    #[clap(short)]
+    loop_marker: bool,
     /// `seq` to write to.
     #[clap(short)]
     output: Option<PathBuf>,
 }
 
 fn main() {
-    let args = Args::parse();
+    let mut args = Args::parse();
+    if !args.tempo {
+        args.loop_marker = true;
+    }
 
     let file = std::fs::read(&args.input).expect("unable to load file");
     let mut bytes = file.iter().copied();
 
-    dbg!(find_loops(&file));
+    let loops = args.loop_marker.then_some(find_loops(&file)).flatten();
 
     // Check magic number
     let header = Header::load(&mut bytes);
@@ -48,21 +54,29 @@ fn main() {
         }
         false => &file[0..15],
     };
-    let to_copy = &file[beginning.len()
-        ..file
-            .windows(3)
-            .enumerate()
-            .find(|(_, w)| w.len() == 3 && w == &[0xff, 0x2f, 0x00])
-            .unwrap()
-            .0
-            + 3];
+    let to_copy = match loops {
+        Some((start, end)) => &file[start + 6..end + 3],
+        None => {
+            &file[beginning.len()
+                ..file
+                    .windows(3)
+                    .enumerate()
+                    .find(|(_, w)| w.len() == 3 && w == &[0xff, 0x2f, 0x00])
+                    .unwrap()
+                    .0
+                    + 3]
+        }
+    };
 
     let mut output = Vec::with_capacity(bytes.len());
     output.write_all(beginning).unwrap();
     for i in 0..args.count.get() {
         output.write_all(to_copy).unwrap();
         if i < args.count.get() - 1 {
-            output.splice(output.len() - 3.., header.dummy_string());
+            output.splice(
+                output.len() - 3..,
+                header.dummy_string(&file, args.loop_marker, loops),
+            );
         }
     }
 
@@ -127,7 +141,18 @@ impl Header {
         }
     }
 
-    fn dummy_string(&self) -> [u8; 5] {
-        [0xff, 0x51, self.tempo[0], self.tempo[1], self.tempo[2]]
+    fn dummy_string(
+        &self,
+        file: &[u8],
+        loop_marker: bool,
+        loops: Option<(usize, usize)>,
+    ) -> Vec<u8> {
+        if let Some((start, _)) = loops {
+            vec![file[start], 0x63, 0x1e]
+        } else if loop_marker {
+            vec![0xb0, 0x63, 0x1e]
+        } else {
+            vec![0xff, 0x51, self.tempo[0], self.tempo[1], self.tempo[2]]
+        }
     }
 }
