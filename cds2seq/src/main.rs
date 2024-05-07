@@ -97,11 +97,10 @@ fn main() {
     let mut i = 0;
     while i < output.len() {
         let mut chunk = output.iter().skip(i).take(4);
-        // TODO this might crash
-        if *chunk.next().unwrap() == 0xff
-            && *chunk.next().unwrap() == 0x32
-            && *chunk.next().unwrap() == 0x01
-        {
+        if matches!(
+            [chunk.next(), chunk.next(), chunk.next()],
+            [Some(0xff), Some(0x32), Some(0x01)]
+        ) {
             has_infinite_loop = true;
             output.splice(i..i + 4, [0xff, 0x2f, 0x00]);
             i += 3;
