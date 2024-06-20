@@ -275,29 +275,29 @@ enum Token<'a> {
 fn parse_file(bytes: &[u8]) -> Vec<Token> {
     let mut i = 0;
     let mut tokens = vec![];
-    while i < bytes.len() {
-        // TODO Use match layout from dictionary
-        if bytes[i] == 0xff {
-            if bytes[i + 1] == 0x2e && bytes[i + 2] == 0x01 {
+    while i < bytes.len() - 2 {
+        match &bytes[i..i + 2] {
+            [0xff, 0x2e, 0x01] => {
                 tokens.push(Token::LoopStart(bytes[i + 3]));
                 i += 4;
-                continue;
-            } else if bytes[i + 1] == 0x2f && bytes[i + 2] == 0 {
+            }
+            [0xff, 0x2f, 0x00] => {
                 tokens.push(Token::LoopFinish);
                 i += 3;
-                continue;
-            } else if bytes[i + 1] == 0x44 && bytes[i + 2] == 0 {
+            }
+            [0xff, 0x44, 0x00] => {
                 tokens.push(Token::GlobalEnding);
                 i += 3;
-                continue;
+            }
+            _ => {
+                if let Some(Token::Data(data)) = tokens.last_mut() {
+                    *data = &bytes[i - data.len()..=i];
+                } else {
+                    tokens.push(Token::Data(&bytes[i..=i]));
+                }
+                i += 1;
             }
         }
-        if let Some(Token::Data(data)) = tokens.last_mut() {
-            *data = &bytes[i - data.len()..=i];
-        } else {
-            tokens.push(Token::Data(&bytes[i..=i]));
-        }
-        i += 1;
     }
 
     tokens
