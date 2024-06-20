@@ -93,7 +93,7 @@ impl VabFile {
         let mut program_space = 0;
         while programs.len() < header.programs_number as usize {
             if let Some(program) = Program::parse(bytes) {
-                programs.push(program)
+                programs.push(program);
             }
             program_space += 1;
         }
