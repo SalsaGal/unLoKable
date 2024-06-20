@@ -707,42 +707,47 @@ impl MusHeader {
     }
 
     fn display(&self, platform: Platform, sequence_zones: usize, preset_zones: usize) -> String {
-        // TODO Reformat this
-        let mut formatted = String::new();
-        formatted.push_str("MUS header\n");
-        formatted.push_str(&format!("Header bytes: {} bytes\n", self.header_size));
-        formatted.push_str(&format!(
-            "MUS version: {}\n",
+        format!(
+            "MUS header\n\
+            Header bytes: {} bytes\n\
+            MUS version: {}\n\
+            System: {platform:?}\n\
+            Reverb volume: {}\n\
+            Reverb type: {}\n\
+            Sequences: {}\n\
+            {}\
+            {}\
+            Labels: {}\n\
+            Samples: {} ({})\n\
+            Instruments: {}\n\
+            Instrument Zones: {sequence_zones}\n\
+            Presets: {}\n\
+            Preset zones: {preset_zones}\n\
+            ",
+            self.header_size,
             match self.version_number {
                 HEADER_VERSION_114 => "1.14",
                 HEADER_VERSION_120 => "1.20",
                 _ => "UNKNOWN",
-            }
-        ));
-        formatted.push_str(&format!("System: {platform:?}\n"));
-        formatted.push_str(&format!("Reverb volume: {}\n", self.reverb_volume));
-        formatted.push_str(&format!("Reverb type: {}\n", self.reverb_type));
-        formatted.push_str(&format!("Sequences: {}\n", self.num_sequences));
-        if let Some(num_streams) = self.num_streams {
-            formatted.push_str(&format!("Streams: {num_streams}\n"));
-        }
-        if let Some(stream_bpm) = self.stream_bpm {
-            formatted.push_str(&format!("Stream BPM: {stream_bpm}\n"));
-        }
-        formatted.push_str(&format!("Labels: {}\n", self.num_labels));
-        formatted.push_str(&format!(
-            "Samples: {} ({})\n",
+            },
+            self.reverb_volume,
+            self.reverb_type,
+            self.num_sequences,
+            self.num_streams
+                .map(|num| format!("Streams: {num}\n"))
+                .unwrap_or_default(),
+            self.stream_bpm
+                .map(|bpm| format!("Streams BPM: {bpm}\n"))
+                .unwrap_or_default(),
+            self.num_labels,
             self.num_waves,
             match platform {
                 Platform::PC => "PCM16LE",
                 Platform::Console => "SONY_4BIT_ADPCM",
-            }
-        ));
-        formatted.push_str(&format!("Instruments: {}\n", self.num_programs));
-        formatted.push_str(&format!("Instrument zones: {sequence_zones}\n"));
-        formatted.push_str(&format!("Presets: {}\n", self.num_presets));
-        formatted.push_str(&format!("Preset zones: {preset_zones}\n"));
-        formatted
+            },
+            self.num_programs,
+            self.num_presets,
+        )
     }
 }
 
