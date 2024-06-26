@@ -154,5 +154,5 @@ fn parse_u32(bytes: &mut impl Iterator<Item = (usize, u8)>) -> Option<u32> {
 }
 
 fn get_bytes(bytes: &mut impl Iterator<Item = (usize, u8)>, count: usize) -> Vec<(usize, u8)> {
-    (0..count).map(|_| bytes.next().unwrap()).collect()
+    bytes.take(count).collect()
 }
