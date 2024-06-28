@@ -276,7 +276,7 @@ fn parse_file(bytes: &[u8]) -> Vec<Token> {
     let mut i = 0;
     let mut tokens = vec![];
     while i < bytes.len() - 2 {
-        match &bytes[i..i + 2] {
+        match &bytes[i..i + 3] {
             [0xff, 0x2e, 0x01] => {
                 tokens.push(Token::LoopStart(bytes[i + 3]));
                 i += 4;
