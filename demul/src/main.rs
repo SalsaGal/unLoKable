@@ -19,8 +19,7 @@ fn main() {
     let sample_rate = u32::from_le_bytes([mul_file[0], mul_file[1], mul_file[2], mul_file[3]]);
     let channels = u32::from_le_bytes([mul_file[12], mul_file[13], mul_file[14], mul_file[15]]);
 
-    // TODO Use slices instead of `Vec<Vec<>>`s
-    let mut body = mul_file[0x800..].iter().copied().enumerate();
+    let mut body = &mul_file[0x800..];
     let mut audio_slices = (0..channels).map(|_| vec![]).collect::<Vec<_>>();
     let mut data_slices = vec![];
     let mut audio_chunks = 0;
@@ -32,7 +31,7 @@ fn main() {
                 let split_size = size / channels;
                 let bytes = get_bytes(&mut body, size as usize);
                 for (i, slice) in bytes.chunks(split_size as usize).enumerate() {
-                    audio_slices[i].push(slice.to_vec());
+                    audio_slices[i].push(slice);
                 }
             }
             Chunk::Data { size } => data_slices.push(get_bytes(&mut body, size as usize)),
@@ -57,9 +56,9 @@ fn main() {
             out.write_all(
                 &slices
                     .iter()
+                    .copied()
                     .flatten()
                     .copied()
-                    .map(|(_, x)| x)
                     .collect::<Vec<_>>(),
             )
             .unwrap();
@@ -75,9 +74,8 @@ fn main() {
         out.write_all(
             &data_slices
                 .iter()
-                .flatten()
+                .flat_map(|data| data.iter())
                 .copied()
-                .map(|(_, x)| x)
                 .collect::<Vec<_>>(),
         )
         .unwrap();
@@ -115,7 +113,7 @@ enum Chunk {
 }
 
 impl Chunk {
-    fn parse(bytes: &mut impl Iterator<Item = (usize, u8)>) -> Option<Self> {
+    fn parse(bytes: &mut &[u8]) -> Option<Self> {
         let variant = parse_u32(bytes)?;
         match variant {
             0 => {
@@ -144,15 +142,19 @@ impl Chunk {
     }
 }
 
-fn parse_u32(bytes: &mut impl Iterator<Item = (usize, u8)>) -> Option<u32> {
-    Some(u32::from_le_bytes([
-        bytes.next()?.1,
-        bytes.next()?.1,
-        bytes.next()?.1,
-        bytes.next()?.1,
-    ]))
+fn parse_u32(bytes: &mut &[u8]) -> Option<u32> {
+    let data = Some(u32::from_le_bytes([
+        bytes.first().copied()?,
+        bytes.get(1).copied()?,
+        bytes.get(2).copied()?,
+        bytes.get(3).copied()?,
+    ]));
+    *bytes = &bytes[4..];
+    data
 }
 
-fn get_bytes(bytes: &mut impl Iterator<Item = (usize, u8)>, count: usize) -> Vec<(usize, u8)> {
-    bytes.take(count).collect()
+fn get_bytes<'a>(bytes: &mut &'a [u8], count: usize) -> &'a [u8] {
+    let data = &bytes[0..count];
+    *bytes = &bytes[count..];
+    data
 }
