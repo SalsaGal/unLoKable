@@ -350,6 +350,7 @@ fn main() {
     ));
     let mut info_file = File::create(info_path).unwrap();
     write!(&mut info_file, "[Samples]\r\n").unwrap();
+    // TODO Make more compact with a single statement
     for wave_entry in &wave_entries {
         write!(
             &mut info_file,
