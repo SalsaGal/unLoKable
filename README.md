@@ -38,6 +38,23 @@ Command-line input:
 Standard out:
 `3164 11788 synth.wav`
 
+### adsunloop
+
+Removes loop markers in an ADS file that has a Sony 4-Bit ADPCM stream.
+
+#### Usage
+
+```
+Usage: adsunloop [OPTIONS] <INPUT>
+
+Arguments:
+  <INPUT>  The `vag` file to read from
+
+Options:
+  -o, --output <OUTPUT>  The output directory
+  -h, --help             Print help
+```
+
 ### cds2seq
 
 This program takes a [CDS](https://github.com/SalsaGal/unlokable/wiki/File-Format:-CDS) file (a proprietary Crystal Dynamics sequence) as an input and converts it into a [SEQ](https://github.com/SalsaGal/unlokable/wiki/File-Format:-SEQ) file (Sony PlayStation sequence format). It also recursively unrolls all the nested loops that often occur in CDS files and makes sure the loop markers are balanced. Some information gets lost during the conversion process, mainly the custom meta commands that are still not well documented.
@@ -248,3 +265,21 @@ Options:
 ```
 
 Some players and converters are not able to handle a shift/filter byte that is set to 0xFF. The usual symptom is the audio being highly distorted and clipping. This utility checks every first byte of each chunk and if it's equal to 0xFF, it substitutes it with the shift/filter value of the previous chunk. Refer to the [wiki article for the VAG format](https://github.com/SalsaGal/unLoKable/wiki/File-Format:-VAG).
+
+### vagunloop
+
+Removes loop markers in an VAG file.
+
+#### Usage
+
+```
+Usage: vagunloop [OPTIONS] <INPUT>
+
+Arguments:
+  <INPUT>  The `vag` file to read from
+
+Options:
+  -o, --output <OUTPUT>  The output directory
+  -h, --help             Print help
+```
+
