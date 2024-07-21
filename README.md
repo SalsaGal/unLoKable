@@ -48,7 +48,7 @@ Removes loop markers in an ADS file that has a Sony 4-Bit ADPCM stream.
 Usage: adsunloop [OPTIONS] <INPUT>
 
 Arguments:
-  <INPUT>  The `vag` file to read from
+  <INPUT>  The `ads` file to read from
 
 Options:
   -o, --output <OUTPUT>  The output directory

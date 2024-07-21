@@ -4,7 +4,7 @@ use clap::Parser;
 
 #[derive(Parser)]
 struct Args {
-    /// The `vag` file to read from.
+    /// The `ads` file to read from.
     input: PathBuf,
     /// The output directory
     #[clap(short, long)]
