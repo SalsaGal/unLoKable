@@ -263,14 +263,16 @@ fn main() {
         )
         .unwrap();
 
-    let label_path = args.snd_path.with_extension("lbl");
-    let mut label_file = File::create(label_path).unwrap();
-    label_file.write_all(&[0x4C, 0x42, 0x4C, 0x61]).unwrap(); // Header, LBLa
-    label_file
-        .write_all(&snd_file.header.num_labels.to_le_bytes())
-        .unwrap();
-    for label in snd_file.labels {
-        label_file.write_all(&label.to_le_bytes()).unwrap();
+    if snd_file.header.num_labels != 0 {
+        let label_path = args.snd_path.with_extension("lbl");
+        let mut label_file = File::create(label_path).unwrap();
+        label_file.write_all(&[0x4C, 0x42, 0x4C, 0x61]).unwrap(); // Header, LBLa
+        label_file
+            .write_all(&snd_file.header.num_labels.to_le_bytes())
+            .unwrap();
+        for label in snd_file.labels {
+            label_file.write_all(&label.to_le_bytes()).unwrap();
+        }
     }
 
     println!("SND header");
