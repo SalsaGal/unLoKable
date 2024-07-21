@@ -254,6 +254,19 @@ fn main() {
     #[cfg(debug_assertions)]
     dbg!(&sequences);
 
+    if header.num_labels != 0 {
+        let labels_path = args.mus_path.with_extension("lbl");
+        let mut labels_file = File::create(labels_path).unwrap();
+        labels_file.write_all(&[0x4C, 0x42, 0x4C, 0x61]).unwrap();
+        labels_file
+            .write_all(&header.num_labels.to_le_bytes())
+            .unwrap();
+        let offset = &mus_file[header.offset_to_labels_offsets_table as usize..];
+        for i in 0..header.num_labels as usize {
+            labels_file.write_all(&offset[i * 4..i * 4 + 4]).unwrap();
+        }
+    }
+
     let sequences_dir = args.mus_path.with_extension("").join("sequences");
     let samples_dir = args.mus_path.with_extension("").join("samples");
     std::fs::create_dir_all(&sequences_dir).unwrap();
