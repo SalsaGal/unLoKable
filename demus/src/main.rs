@@ -40,6 +40,10 @@ fn semitone_tuning(note: i32) -> i32 {
     note / 256
 }
 
+fn bytes_to_cents_rescale(note: i32) -> i32 {
+    note * 100 / 256
+}
+
 fn cents_tuning(note: i32) -> i32 {
     (note % 256) * 100 / 256
 }
@@ -434,13 +438,13 @@ fn main() {
             write!(
                 &mut info_file,
                 "            Z_keynumToVolEnvHold={}\r\n",
-                program_zone.keynum_hold
+                bytes_to_cents_rescale(program_zone.keynum_hold)
             )
             .unwrap();
             write!(
                 &mut info_file,
                 "            Z_keynumToVolEnvDecay={}\r\n",
-                program_zone.keynum_decay
+                bytes_to_cents_rescale(program_zone.keynum_decay)
             )
             .unwrap();
             write!(
@@ -506,7 +510,7 @@ fn main() {
             write!(
                 &mut info_file,
                 "            Z_vibLfoToPitch={}\r\n",
-                program_zone.vib_to_pitch as i32
+                bytes_to_cents_rescale(program_zone.vib_to_pitch as i32)
             )
             .unwrap();
             write!(
@@ -566,7 +570,7 @@ fn main() {
             write!(
                 &mut info_file,
                 "            Z_modEnvToPitch={}\r\n",
-                program_zone.modul_env_to_pitch as i32
+                bytes_to_cents_rescale(program_zone.modul_env_to_pitch as i32)
             )
             .unwrap();
             if program_zone.root_key != -1 {
