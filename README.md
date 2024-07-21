@@ -268,7 +268,7 @@ Some players and converters are not able to handle a shift/filter byte that is s
 
 ### vagunloop
 
-Removes loop markers in an VAG file.
+Removes loop markers in a VAG file.
 
 #### Usage
 
