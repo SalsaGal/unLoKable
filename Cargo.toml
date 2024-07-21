@@ -3,6 +3,7 @@ resolver = "2"
 members = [
     "adsheader",
     "adsloopfind",
+    "adsunloop",
     "cds2seq",
     "demul",
     "demus",
