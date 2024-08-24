@@ -7,6 +7,10 @@ use clap::Parser;
 const HEADER_VERSION_114: i32 = 270;
 const HEADER_VERSION_120: i32 = 276;
 
+// If this value is present at the start of the `sam` file, we have a 8 byte long header
+// Sam!
+const SAM_HAS_HEADER_MAGIC_NUMBER: [u8; 4] = [0x53, 0x61, 0x6D, 0x21];
+
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, clap::ValueEnum)]
 pub enum Platform {
     Console,
@@ -291,11 +295,18 @@ fn main() {
         file.write_all(sequence).unwrap();
     }
 
+    // Check if there is any header at the start of the `sam` file.
+    let sam_has_header = sam_file[0..4] == SAM_HAS_HEADER_MAGIC_NUMBER;
+
     let waves = wave_entries
         .iter()
         .map(|wave_entry| {
-            let wave_range =
-                wave_entry.offset as usize..wave_entry.offset as usize + wave_entry.size as usize;
+            let wave_range = if sam_has_header {
+                (wave_entry.offset as usize + 8)
+                    ..(wave_entry.offset as usize + wave_entry.size as usize + 8)
+            } else {
+                wave_entry.offset as usize..wave_entry.offset as usize + wave_entry.size as usize
+            };
             if platform == Platform::Console {
                 let check_index = wave_range.end - 16;
                 if sam_file[check_index..check_index + 16]
