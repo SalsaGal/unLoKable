@@ -12,17 +12,28 @@ struct Args {
 
 fn main() {
     let args = Args::parse();
-    let ads_file = std::fs::read(&args.ads_input).unwrap();
 
-    if let Some((lb, le)) = find_loops(&ads_file) {
-        print!(
-            "{lb} {le} {}\r\n",
-            args.ads_input
-                .with_extension("wav")
-                .file_name()
-                .unwrap()
-                .to_string_lossy()
-        );
+    let files: &mut dyn Iterator<Item = PathBuf> = if args.ads_input.is_dir() {
+        &mut args
+            .ads_input
+            .read_dir()
+            .unwrap()
+            .flatten()
+            .map(|dir| dir.path())
+    } else {
+        &mut std::iter::once(args.ads_input.clone())
+    };
+
+    for path in files {
+        if let Some((lb, le)) = find_loops(&std::fs::read(&path).unwrap()) {
+            print!(
+                "{lb} {le} {}\r\n",
+                path.with_extension("wav")
+                    .file_name()
+                    .unwrap()
+                    .to_string_lossy()
+            );
+        }
     }
 }
 
