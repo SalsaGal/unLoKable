@@ -4,8 +4,8 @@ use std::{fs::File, io::Write, path::PathBuf};
 
 use clap::Parser;
 
-const HEADER_VERSION_114: i32 = 270;
-const HEADER_VERSION_120: i32 = 276;
+const HEADER_VERSION_1_14: i32 = 270;
+const HEADER_VERSION_1_20: i32 = 276;
 
 // If this value is present at the start of the `sam` file, we have a 8 byte long header
 // Sam!
@@ -719,17 +719,17 @@ impl MusHeader {
             reverb_type: le_bytes!(bytes),
             reverb_multiply: le_bytes!(bytes),
             num_sequences: le_bytes!(bytes),
-            num_streams: if version_number == HEADER_VERSION_120 {
+            num_streams: if version_number == HEADER_VERSION_1_20 {
                 Some(le_bytes!(bytes))
             } else {
                 None
             },
-            stream_bpm: if version_number == HEADER_VERSION_120 {
+            stream_bpm: if version_number == HEADER_VERSION_1_20 {
                 Some(le_bytes!(bytes))
             } else {
                 None
             },
-            stream_info_pointer: if version_number == HEADER_VERSION_120 {
+            stream_info_pointer: if version_number == HEADER_VERSION_1_20 {
                 Some(le_bytes!(bytes))
             } else {
                 None
@@ -762,8 +762,8 @@ impl MusHeader {
             ",
             self.header_size,
             match self.version_number {
-                HEADER_VERSION_114 => "1.14",
-                HEADER_VERSION_120 => "1.20",
+                HEADER_VERSION_1_14 => "1.14",
+                HEADER_VERSION_1_20 => "1.20",
                 _ => "UNKNOWN",
             },
             self.reverb_volume,
