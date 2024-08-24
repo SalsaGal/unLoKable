@@ -264,7 +264,9 @@ fn main() {
         .unwrap();
 
     if snd_file.header.num_labels != 0 {
-        let label_path = args.snd_path.with_extension("lbl");
+        let label_path = output_folder
+            .join(args.snd_path.with_extension("lbl").file_name().unwrap())
+            .with_extension("lbl");
         let mut label_file = File::create(label_path).unwrap();
         label_file.write_all(&[0x4C, 0x42, 0x4C, 0x61]).unwrap(); // Header, LBLa
         label_file

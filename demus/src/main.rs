@@ -258,8 +258,15 @@ fn main() {
     #[cfg(debug_assertions)]
     dbg!(&sequences);
 
+    let output_dir = args
+        .output
+        .unwrap_or_else(|| args.mus_path.with_extension(""));
+    std::fs::create_dir(&output_dir).unwrap();
+
     if header.num_labels != 0 {
-        let labels_path = args.mus_path.with_extension("lbl");
+        let labels_path = output_dir
+            .join(args.mus_path.with_extension("lbl").file_name().unwrap())
+            .with_extension("lbl");
         let mut labels_file = File::create(labels_path).unwrap();
         labels_file.write_all(&[0x4C, 0x42, 0x4C, 0x61]).unwrap();
         labels_file
@@ -271,8 +278,8 @@ fn main() {
         }
     }
 
-    let sequences_dir = args.mus_path.with_extension("").join("sequences");
-    let samples_dir = args.mus_path.with_extension("").join("samples");
+    let sequences_dir = output_dir.join("sequences");
+    let samples_dir = output_dir.join("samples");
     std::fs::create_dir_all(&sequences_dir).unwrap();
     for (i, sequence) in sequences.into_iter().enumerate() {
         let path = sequences_dir.join(format!(
