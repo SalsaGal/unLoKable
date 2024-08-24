@@ -4,6 +4,7 @@ use std::{fs::File, io::Write, path::PathBuf};
 
 use clap::Parser;
 
+const HEADER_VERSION_1_8: i32 = 264;
 const HEADER_VERSION_1_14: i32 = 270;
 const HEADER_VERSION_1_20: i32 = 276;
 
@@ -206,9 +207,21 @@ fn main() {
                 velocity_low: mus_bytes.next().unwrap(),
                 velocity_high: mus_bytes.next().unwrap(),
                 wave_index: le_bytes!(mus_bytes),
-                base_priority: float_le_bytes!(mus_bytes),
-                modul_env: Envelope::parse(&mut mus_bytes),
-                modul_env_to_pitch: float_le_bytes!(mus_bytes),
+                base_priority: if header.version_number > HEADER_VERSION_1_8 {
+                    Some(float_le_bytes!(mus_bytes))
+                } else {
+                    None
+                },
+                modul_env: if header.version_number > HEADER_VERSION_1_8 {
+                    Some(Envelope::parse(&mut mus_bytes))
+                } else {
+                    None
+                },
+                modul_env_to_pitch: if header.version_number > HEADER_VERSION_1_8 {
+                    Some(float_le_bytes!(mus_bytes))
+                } else {
+                    None
+                },
             });
         }
     }
@@ -501,12 +514,14 @@ fn main() {
                 secs_to_timecent(program_zone.volume_env.delay)
             )
             .unwrap();
-            write!(
-                &mut info_file,
-                "            Z_delayModEnv={}\r\n",
-                secs_to_timecent(program_zone.modul_env.delay)
-            )
-            .unwrap();
+            if let Some(modul_env) = &program_zone.modul_env {
+                write!(
+                    &mut info_file,
+                    "            Z_delayModEnv={}\r\n",
+                    secs_to_timecent(modul_env.delay)
+                )
+                .unwrap();
+            }
             write!(
                 &mut info_file,
                 "            Z_initialAttenuation={}\r\n",
@@ -543,54 +558,60 @@ fn main() {
                 program_zone.note_high
             )
             .unwrap();
-            write!(
-                &mut info_file,
-                "            Z_LowVelocity={}\r\n",
-                program_zone.velocity_low
-            )
-            .unwrap();
-            write!(
-                &mut info_file,
-                "            Z_HighVelocity={}\r\n",
-                program_zone.velocity_high
-            )
-            .unwrap();
-            write!(
-                &mut info_file,
-                "            Z_attackModEnv={}\r\n",
-                secs_to_timecent(program_zone.modul_env.attack)
-            )
-            .unwrap();
-            write!(
-                &mut info_file,
-                "            Z_holdModEnv={}\r\n",
-                secs_to_timecent(program_zone.modul_env.hold)
-            )
-            .unwrap();
-            write!(
-                &mut info_file,
-                "            Z_decayModEnv={}\r\n",
-                secs_to_timecent(program_zone.modul_env.decay)
-            )
-            .unwrap();
-            write!(
-                &mut info_file,
-                "            Z_sustainModEnv={}\r\n",
-                (program_zone.modul_env.sustain * 10.0) as i32
-            )
-            .unwrap();
-            write!(
-                &mut info_file,
-                "            Z_releaseModEnv={}\r\n",
-                secs_to_timecent(program_zone.modul_env.release)
-            )
-            .unwrap();
-            write!(
-                &mut info_file,
-                "            Z_modEnvToPitch={}\r\n",
-                bytes_to_cents_rescale(program_zone.modul_env_to_pitch as i32)
-            )
-            .unwrap();
+            if header.version_number > HEADER_VERSION_1_8 {
+                write!(
+                    &mut info_file,
+                    "            Z_LowVelocity={}\r\n",
+                    program_zone.velocity_low
+                )
+                .unwrap();
+                write!(
+                    &mut info_file,
+                    "            Z_HighVelocity={}\r\n",
+                    program_zone.velocity_high
+                )
+                .unwrap();
+            }
+            if let Some(modul_env) = &program_zone.modul_env {
+                write!(
+                    &mut info_file,
+                    "            Z_attackModEnv={}\r\n",
+                    secs_to_timecent(modul_env.attack)
+                )
+                .unwrap();
+                write!(
+                    &mut info_file,
+                    "            Z_holdModEnv={}\r\n",
+                    secs_to_timecent(modul_env.hold)
+                )
+                .unwrap();
+                write!(
+                    &mut info_file,
+                    "            Z_decayModEnv={}\r\n",
+                    secs_to_timecent(modul_env.decay)
+                )
+                .unwrap();
+                write!(
+                    &mut info_file,
+                    "            Z_sustainModEnv={}\r\n",
+                    (modul_env.sustain * 10.0) as i32
+                )
+                .unwrap();
+                write!(
+                    &mut info_file,
+                    "            Z_releaseModEnv={}\r\n",
+                    secs_to_timecent(modul_env.release)
+                )
+                .unwrap();
+            }
+            if let Some(modul_env_to_pitch) = program_zone.modul_env_to_pitch {
+                write!(
+                    &mut info_file,
+                    "            Z_modEnvToPitch={}\r\n",
+                    bytes_to_cents_rescale(modul_env_to_pitch as i32)
+                )
+                .unwrap();
+            }
             if program_zone.root_key != -1 {
                 write!(
                     &mut info_file,
@@ -762,6 +783,7 @@ impl MusHeader {
             ",
             self.header_size,
             match self.version_number {
+                HEADER_VERSION_1_8 => "1.8",
                 HEADER_VERSION_1_14 => "1.14",
                 HEADER_VERSION_1_20 => "1.20",
                 _ => "UNKNOWN",
@@ -858,9 +880,9 @@ struct ProgramZone {
     velocity_low: u8,
     velocity_high: u8,
     wave_index: i32,
-    base_priority: f32,
-    modul_env: Envelope,
-    modul_env_to_pitch: f32,
+    base_priority: Option<f32>,
+    modul_env: Option<Envelope>,
+    modul_env_to_pitch: Option<f32>,
 }
 
 #[derive(Debug)]
