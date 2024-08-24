@@ -666,18 +666,20 @@ fn main() {
                 zone.note_high,
             )
             .unwrap();
-            write!(
-                &mut info_file,
-                "            L_LowVelocity={}\r\n",
-                zone.velocity_low,
-            )
-            .unwrap();
-            write!(
-                &mut info_file,
-                "            L_HighVelocity={}\r\n",
-                zone.velocity_high,
-            )
-            .unwrap();
+            if header.version_number > HEADER_VERSION_1_8 {
+                write!(
+                    &mut info_file,
+                    "            L_LowVelocity={}\r\n",
+                    zone.velocity_low,
+                )
+                .unwrap();
+                write!(
+                    &mut info_file,
+                    "            L_HighVelocity={}\r\n",
+                    zone.velocity_high,
+                )
+                .unwrap();
+            }
             write!(&mut info_file, "\r\n        GlobalLayer\r\n").unwrap();
         }
     }
