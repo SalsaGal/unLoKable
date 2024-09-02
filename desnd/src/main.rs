@@ -128,6 +128,12 @@ fn main() {
         .with_extension("vh"),
     );
     let mut vh_output = File::create(vh_output_path).unwrap();
+
+    // Because some zones can access more zones than are available, we have to skip them in a lot of things
+    // The way we "skip" it is by setting the number of zones a program requests to zero.
+    // This keeps the program around, but can also be a little confusing in some places (hence annoying iterator code like this)
+    let finalised_number_of_programs =
+        snd_file.programs.iter().filter(|p| p.num_zones > 0).count() as u32;
     vh_output
         .write_all(
             &[
@@ -135,7 +141,7 @@ fn main() {
                 [7, 0, 0, 0],
                 [0; 4],
                 (32 + 2048
-                    + snd_file.header.num_programs * 512
+                    + finalised_number_of_programs * 512
                     + 512
                     + smp_file
                         .waves
@@ -146,8 +152,8 @@ fn main() {
                 [
                     0,
                     0,
-                    snd_file.header.num_programs.to_le_bytes()[0],
-                    snd_file.header.num_programs.to_le_bytes()[1],
+                    finalised_number_of_programs.to_le_bytes()[0],
+                    finalised_number_of_programs.to_le_bytes()[1],
                 ],
                 [
                     snd_file.header.num_zones.to_le_bytes()[0],
@@ -240,13 +246,15 @@ fn main() {
                 )
                 .unwrap();
         }
-        vh_output
-            .write_all(
-                &std::iter::repeat(0)
-                    .take(32 * (16 - program.num_zones as usize))
-                    .collect::<Vec<_>>(),
-            )
-            .unwrap();
+        if program.num_zones > 0 {
+            vh_output
+                .write_all(
+                    &std::iter::repeat(0)
+                        .take(32 * (16 - program.num_zones as usize))
+                        .collect::<Vec<_>>(),
+                )
+                .unwrap();
+        }
     }
     vh_output.write_all(&[0; 2]).unwrap();
 
@@ -512,8 +520,17 @@ impl SndFile {
             bytes.next();
         }
 
+        let mut requested_zones = 0;
         let programs = (0..header.num_programs)
-            .map(|_| SndProgram::parse(bytes))
+            .map(|_| {
+                let mut program = SndProgram::parse(bytes);
+                if requested_zones + program.num_zones > header.num_zones as u16 {
+                    program.num_zones = 0;
+                } else {
+                    requested_zones += program.num_zones;
+                }
+                program
+            })
             .collect();
         let zones = (0..header.num_zones)
             .map(|_| SndZone::parse(bytes))
