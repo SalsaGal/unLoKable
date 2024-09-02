@@ -169,7 +169,15 @@ fn main() {
             .collect::<Vec<_>>(),
         )
         .unwrap();
+    let mut bank_attribute: i16 = -1;
+    let mut zone_index = 0;
     for program in &snd_file.programs {
+        if let Some(zone) = snd_file.zones.get(zone_index) {
+            if zone.parent_program == 0 {
+                bank_attribute += 1;
+            }
+        }
+        zone_index += program.num_zones as usize;
         vh_output
             .write_all(&[
                 program.num_zones.to_ne_bytes()[0],
@@ -178,8 +186,8 @@ fn main() {
                 0,
                 program.pan_pos,
                 0,
-                0,
-                0,
+                bank_attribute.to_ne_bytes()[0],
+                bank_attribute.to_ne_bytes()[1],
                 0,
                 0,
                 0,
