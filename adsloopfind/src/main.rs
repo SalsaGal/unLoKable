@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{fs::File, io::Write, path::PathBuf};
 
 use clap::Parser;
 
@@ -8,6 +8,9 @@ const MAGIC_NUMBER: [u8; 4] = [0x53, 0x53, 0x68, 0x64];
 struct Args {
     /// The `ads` file to find loops in
     ads_input: PathBuf,
+    /// The file to write the loop locations to, writes to STDOUT otherwise.
+    #[clap(short)]
+    output: Option<PathBuf>,
 }
 
 fn main() {
@@ -24,15 +27,22 @@ fn main() {
         &mut std::iter::once(args.ads_input.clone())
     };
 
+    let mut file = args.output.map(|path| File::create(path).unwrap());
+
     for path in files {
         if let Some((lb, le)) = find_loops(&std::fs::read(&path).unwrap()) {
-            print!(
+            let text = format!(
                 "{lb} {le} {}\r\n",
                 path.with_extension("wav")
                     .file_name()
                     .unwrap()
                     .to_string_lossy()
             );
+            if let Some(file) = &mut file {
+                write!(file, "{}", text).unwrap();
+            } else {
+                print!("{}", text);
+            }
         }
     }
 }

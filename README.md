@@ -26,7 +26,16 @@ This program takes an [ADS](https://github.com/SalsaGal/unlokable/wiki/File-Form
 
 #### Usage
 
-`adsloopfind [input_file]`
+```
+Usage: adsloopfind [OPTIONS] <ADS_INPUT>
+
+Arguments:
+  <ADS_INPUT>  The `ads` file to find loops in
+
+Options:
+  -o <OUTPUT>      The file to write the loop locations to, writes to STDOUT otherwise
+  -h, --help       Print help
+```
 
 If there is a loop, the output will be a text echo showing the sample-based loop markers.
 
