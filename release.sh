@@ -1,3 +1,4 @@
+# Linux build
 cargo build --release
 mkdir out
 
@@ -17,5 +18,14 @@ cp target/release/vagheader out
 cp target/release/vagsanitizer out
 cp target/release/vagunloop out
 
-zip -r release.zip out
+zip -r linux.zip out
+rm -rf out
+
+# Windows build
+RUSTFLAGS='-L /usr/x86_64-w64-mingw32/lib' cargo zigbuild --target x86_64-pc-windows-gnu --release
+mkdir out
+
+cp target/x86_64-pc-windows-gnu/release/*.exe out
+
+zip -r windows.zip out
 rm -rf out
