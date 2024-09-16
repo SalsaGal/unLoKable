@@ -12,9 +12,6 @@ struct Args {
     /// Whether to display debug information or not
     #[clap(long, short)]
     debug: bool,
-    /// Output path of the cds file, defaults to the input with a different extension
-    #[clap(long, short)]
-    output: Option<PathBuf>,
 }
 
 #[derive(Debug)]
@@ -28,141 +25,155 @@ struct Header {
 
 fn main() {
     let args = Args::parse();
-    let contents = std::fs::read(&args.input).expect("file cannot be opened");
 
-    let mut content_iter = contents.iter().copied();
-
-    let header = Header {
-        magic: u32::from_be_bytes([
-            content_iter.next().unwrap(),
-            content_iter.next().unwrap(),
-            content_iter.next().unwrap(),
-            content_iter.next().unwrap(),
-        ]),
-        quarter_note_time: u32::from_be_bytes([
-            content_iter.next().unwrap(),
-            content_iter.next().unwrap(),
-            content_iter.next().unwrap(),
-            content_iter.next().unwrap(),
-        ]),
-        ppqn: u16::from_be_bytes([content_iter.next().unwrap(), content_iter.next().unwrap()]),
-        version: u16::from_be_bytes([content_iter.next().unwrap(), content_iter.next().unwrap()]),
+    let file_paths: &mut dyn Iterator<Item = PathBuf> = if args.input.is_dir() {
+        &mut args
+            .input
+            .read_dir()
+            .unwrap()
+            .flatten()
+            .map(|dir| dir.path())
+    } else {
+        &mut std::iter::once(args.input)
     };
-    assert_eq!(0x5145_5361, header.magic, "invalid magic number");
 
-    #[cfg(debug_assertions)]
-    dbg_hex!(&header);
+    for file_path in file_paths {
+        let contents = std::fs::read(&file_path).expect("file cannot be opened");
+        let mut content_iter = contents.iter().copied();
 
-    // Balance the tokens
-    let body = content_iter.collect::<Vec<_>>();
-    let mut tokens = parse_file(&body);
-    let mut loop_starter_count = tokens
-        .iter()
-        .filter(|x| matches!(x, Token::LoopStart(_)))
-        .count();
-    let mut loop_terminator_count = tokens
-        .iter()
-        .filter(|x| matches!(x, Token::LoopFinish))
-        .count();
-    while loop_starter_count < loop_terminator_count {
-        tokens.insert(0, Token::LoopStart(0));
-        tokens.insert(0, Token::Data(&[0]));
-        loop_starter_count += 1;
-    }
-    while loop_starter_count > loop_terminator_count {
-        tokens.insert(tokens.len() - 1, Token::LoopFinish);
-        tokens.insert(tokens.len() - 1, Token::Data(&[0]));
-        loop_terminator_count += 1;
-    }
-    #[cfg(debug_assertions)]
-    dbg_hex!(&tokens);
+        let header = Header {
+            magic: u32::from_be_bytes([
+                content_iter.next().unwrap(),
+                content_iter.next().unwrap(),
+                content_iter.next().unwrap(),
+                content_iter.next().unwrap(),
+            ]),
+            quarter_note_time: u32::from_be_bytes([
+                content_iter.next().unwrap(),
+                content_iter.next().unwrap(),
+                content_iter.next().unwrap(),
+                content_iter.next().unwrap(),
+            ]),
+            ppqn: u16::from_be_bytes([content_iter.next().unwrap(), content_iter.next().unwrap()]),
+            version: u16::from_be_bytes([
+                content_iter.next().unwrap(),
+                content_iter.next().unwrap(),
+            ]),
+        };
+        assert_eq!(0x5145_5361, header.magic, "invalid magic number");
 
-    let lexemes = lex_file(&tokens);
-    #[cfg(debug_assertions)]
-    dbg_hex!(&lexemes);
-    #[cfg(debug_assertions)]
-    for lexeme in &lexemes {
-        lexeme.visualise(0);
-    }
+        #[cfg(debug_assertions)]
+        dbg_hex!(&header);
 
-    let mut output = vec![];
-    let mut has_infinite_loop = false;
-    for lexeme in &lexemes {
-        if matches!(lexeme, Lexeme::Loop(0, _)) {
-            has_infinite_loop = true;
-        }
-        write_lexeme(&mut output, lexeme);
-    }
-
-    let mut i = 0;
-    while i < output.len() {
-        let mut chunk = output.iter().skip(i).take(4);
-        if matches!(
-            [chunk.next(), chunk.next(), chunk.next()],
-            [Some(0xff), Some(0x32), Some(0x01)]
-        ) {
-            has_infinite_loop = true;
-            output.splice(i..i + 4, [0xff, 0x2f, 0x00]);
-            i += 3;
-        } else {
-            i += 1;
-        }
-    }
-
-    dictionary(&mut output, header.quarter_note_time, has_infinite_loop);
-
-    let mut output_file = File::create(args.output.unwrap_or_else(|| {
-        args.input.with_file_name(format!(
-            "{}.seq",
-            args.input.file_stem().unwrap().to_string_lossy()
-        ))
-    }))
-    .unwrap();
-    output_file
-        .write_all(
-            &[0x70, 0x51, 0x45, 0x53, 0x00, 0x00, 0x00, 0x01]
-                .into_iter()
-                .chain(header.ppqn.to_le_bytes())
-                .chain(header.quarter_note_time.to_le_bytes().into_iter().skip(1))
-                .chain([0x04, 0x02])
-                .collect::<Vec<_>>(),
-        )
-        .unwrap();
-    let output_end = output
-        .windows(3)
-        .enumerate()
-        .find_map(|(i, c)| {
-            if *c == [0xff, 0x2f, 0x00] {
-                Some(i)
-            } else {
-                None
-            }
-        })
-        .unwrap();
-    output_file.write_all(&output[0..output_end + 3]).unwrap();
-
-    println!("CDS file");
-    println!(
-        "Quarter note time: {}",
-        header.quarter_note_time.swap_bytes()
-    );
-    println!("PPQN: {}", header.ppqn.swap_bytes());
-    println!(
-        "BPM: {}",
-        60_000_000 / header.quarter_note_time.swap_bytes()
-    );
-    println!(
-        "Version: {}.{}",
-        header.version.to_le_bytes()[0],
-        header.version.to_le_bytes()[1],
-    );
-    println!(
-        "Local loops: {}",
-        tokens
+        // Balance the tokens
+        let body = content_iter.collect::<Vec<_>>();
+        let mut tokens = parse_file(&body);
+        let mut loop_starter_count = tokens
             .iter()
-            .filter(|token| matches!(token, Token::LoopStart(_)))
-            .count()
-    );
+            .filter(|x| matches!(x, Token::LoopStart(_)))
+            .count();
+        let mut loop_terminator_count = tokens
+            .iter()
+            .filter(|x| matches!(x, Token::LoopFinish))
+            .count();
+        while loop_starter_count < loop_terminator_count {
+            tokens.insert(0, Token::LoopStart(0));
+            tokens.insert(0, Token::Data(&[0]));
+            loop_starter_count += 1;
+        }
+        while loop_starter_count > loop_terminator_count {
+            tokens.insert(tokens.len() - 1, Token::LoopFinish);
+            tokens.insert(tokens.len() - 1, Token::Data(&[0]));
+            loop_terminator_count += 1;
+        }
+        #[cfg(debug_assertions)]
+        dbg_hex!(&tokens);
+
+        let lexemes = lex_file(&tokens);
+        #[cfg(debug_assertions)]
+        dbg_hex!(&lexemes);
+        #[cfg(debug_assertions)]
+        for lexeme in &lexemes {
+            lexeme.visualise(0);
+        }
+
+        let mut output = vec![];
+        let mut has_infinite_loop = false;
+        for lexeme in &lexemes {
+            if matches!(lexeme, Lexeme::Loop(0, _)) {
+                has_infinite_loop = true;
+            }
+            write_lexeme(&mut output, lexeme);
+        }
+
+        let mut i = 0;
+        while i < output.len() {
+            let mut chunk = output.iter().skip(i).take(4);
+            if matches!(
+                [chunk.next(), chunk.next(), chunk.next()],
+                [Some(0xff), Some(0x32), Some(0x01)]
+            ) {
+                has_infinite_loop = true;
+                output.splice(i..i + 4, [0xff, 0x2f, 0x00]);
+                i += 3;
+            } else {
+                i += 1;
+            }
+        }
+
+        dictionary(&mut output, header.quarter_note_time, has_infinite_loop);
+
+        let mut output_file = File::create(file_path.with_file_name(format!(
+            "{}.seq",
+            file_path.file_stem().unwrap().to_string_lossy()
+        )))
+        .unwrap();
+        output_file
+            .write_all(
+                &[0x70, 0x51, 0x45, 0x53, 0x00, 0x00, 0x00, 0x01]
+                    .into_iter()
+                    .chain(header.ppqn.to_le_bytes())
+                    .chain(header.quarter_note_time.to_le_bytes().into_iter().skip(1))
+                    .chain([0x04, 0x02])
+                    .collect::<Vec<_>>(),
+            )
+            .unwrap();
+        let output_end = output
+            .windows(3)
+            .enumerate()
+            .find_map(|(i, c)| {
+                if *c == [0xff, 0x2f, 0x00] {
+                    Some(i)
+                } else {
+                    None
+                }
+            })
+            .unwrap();
+        output_file.write_all(&output[0..output_end + 3]).unwrap();
+
+        println!("CDS file");
+        println!(
+            "Quarter note time: {}",
+            header.quarter_note_time.swap_bytes()
+        );
+        println!("PPQN: {}", header.ppqn.swap_bytes());
+        println!(
+            "BPM: {}",
+            60_000_000 / header.quarter_note_time.swap_bytes()
+        );
+        println!(
+            "Version: {}.{}",
+            header.version.to_le_bytes()[0],
+            header.version.to_le_bytes()[1],
+        );
+        println!(
+            "Local loops: {}",
+            tokens
+                .iter()
+                .filter(|token| matches!(token, Token::LoopStart(_)))
+                .count()
+        );
+    }
 }
 
 fn dictionary(file: &mut Vec<u8>, quarter_note_time: u32, has_infinite_loop: bool) {
