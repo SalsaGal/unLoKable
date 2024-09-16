@@ -11,51 +11,61 @@ struct Args {
     /// Whether to display debug information or not
     #[clap(long, short)]
     debug: bool,
-    /// Output path of the cds file, defaults to the input with a different extension
-    #[clap(long, short)]
-    output: Option<PathBuf>,
 }
 
 fn main() {
     let args = Args::parse();
-    let bytes = std::fs::read(&args.input).expect("unable to open file");
 
-    let (header, tracks) = convert(bytes, args.debug);
-    let folder = args.input.with_extension("");
-    std::fs::create_dir(&folder).expect("unable to make output folder");
-    for (index, track) in tracks.into_iter().enumerate() {
-        let mut output = File::create(folder.join(format!(
-            "{}_{index:04}.cds",
-            folder.file_name().unwrap().to_string_lossy()
-        )))
-        .unwrap();
-        output
-            .write_all(
-                &[
-                    &[0x51, 0x45, 0x53, 0x61],
-                    header.quarter_note_time.to_ne_bytes().as_slice(),
-                    header.ppqn.to_ne_bytes().as_slice(),
-                    header.version.to_ne_bytes().as_slice(),
-                ]
-                .into_iter()
-                .flatten()
-                .copied()
-                .collect::<Vec<_>>(),
-            )
+    let file_paths: &mut dyn Iterator<Item = PathBuf> = if args.input.is_dir() {
+        &mut args
+            .input
+            .read_dir()
+            .unwrap()
+            .flatten()
+            .map(|dir| dir.path())
+    } else {
+        &mut std::iter::once(args.input)
+    };
+    for file_path in file_paths {
+        let bytes = std::fs::read(&file_path).expect("unable to open file");
+
+        let (header, tracks) = convert(bytes, args.debug);
+        let folder = file_path.with_extension("");
+        std::fs::create_dir(&folder).expect("unable to make output folder");
+        for (index, track) in tracks.into_iter().enumerate() {
+            let mut output = File::create(folder.join(format!(
+                "{}_{index:04}.cds",
+                folder.file_name().unwrap().to_string_lossy()
+            )))
             .unwrap();
-        output.write_all(&track).unwrap();
-    }
+            output
+                .write_all(
+                    &[
+                        &[0x51, 0x45, 0x53, 0x61],
+                        header.quarter_note_time.to_ne_bytes().as_slice(),
+                        header.ppqn.to_ne_bytes().as_slice(),
+                        header.version.to_ne_bytes().as_slice(),
+                    ]
+                    .into_iter()
+                    .flatten()
+                    .copied()
+                    .collect::<Vec<_>>(),
+                )
+                .unwrap();
+            output.write_all(&track).unwrap();
+        }
 
-    println!("MSQ header");
-    println!("Quarter note time: {}", header.quarter_note_time);
-    println!("PPQN: {}", header.ppqn);
-    println!("BPM: {}", 60_000_000 / header.quarter_note_time);
-    println!(
-        "Version: {}.{}",
-        header.version.to_be_bytes()[0],
-        header.version.to_be_bytes()[1]
-    );
-    println!("Tracks/Channels: {}", header.num_tracks);
+        println!("MSQ header for: {file_path:?}");
+        println!("Quarter note time: {}", header.quarter_note_time);
+        println!("PPQN: {}", header.ppqn);
+        println!("BPM: {}", 60_000_000 / header.quarter_note_time);
+        println!(
+            "Version: {}.{}",
+            header.version.to_be_bytes()[0],
+            header.version.to_be_bytes()[1]
+        );
+        println!("Tracks/Channels: {}", header.num_tracks);
+    }
 }
 
 fn convert(bytes: Vec<u8>, debug: bool) -> (MsqHeader, Vec<Vec<u8>>) {
