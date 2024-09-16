@@ -53,7 +53,7 @@ fn find_loops(ads_file: &[u8]) -> Option<(u32, u32)> {
             "Invalid magic number, expected {MAGIC_NUMBER:?}, found {:?}",
             &ads_file[0..4]
         );
-        std::process::exit(1);
+        return None;
     }
 
     let body_size = load_bytes(&ads_file[0x24..]);
