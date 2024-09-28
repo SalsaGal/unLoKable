@@ -2,7 +2,7 @@
 
 use std::{fmt::Display, fs::File, io::Write, ops::Range, path::PathBuf, slice::Iter};
 
-use clap::{Parser, ValueEnum};
+use core::clap::{self, Parser, ValueEnum};
 
 #[derive(Clone, Copy, Debug, Default, ValueEnum)]
 enum Version {
@@ -40,6 +40,8 @@ fn four_bytes(bytes: &mut Iter<u8>) -> [u8; 4] {
 }
 
 fn main() {
+    core::init();
+
     let args = Args::parse();
 
     let snd_bytes = std::fs::read(&args.snd_path).unwrap();

@@ -4,7 +4,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use clap::Parser;
+use core::clap::{self, Parser};
 
 const MAGIC_NUMBER: [u8; 4] = [0x53, 0x53, 0x68, 0x64];
 
@@ -18,6 +18,8 @@ struct Args {
 }
 
 fn main() {
+    core::init();
+
     let args = Args::parse();
 
     let files: &mut dyn Iterator<Item = PathBuf> = if args.ads_input.is_dir() {

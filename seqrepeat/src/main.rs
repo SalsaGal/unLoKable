@@ -5,7 +5,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use clap::Parser;
+use core::clap::{self, Parser};
 
 #[derive(Parser)]
 struct Args {
@@ -22,6 +22,8 @@ struct Args {
 }
 
 fn main() {
+    core::init();
+
     let args = Args::parse();
 
     if args.input.is_dir() {

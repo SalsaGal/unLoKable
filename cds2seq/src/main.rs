@@ -1,4 +1,4 @@
-use clap::Parser;
+use core::clap::{self, Parser};
 use dbg_hex::dbg_hex;
 use either::Either;
 use std::io::Write;
@@ -24,6 +24,8 @@ struct Header {
 }
 
 fn main() {
+    core::init();
+
     let args = Args::parse();
 
     let file_paths: &mut dyn Iterator<Item = PathBuf> = if args.input.is_dir() {

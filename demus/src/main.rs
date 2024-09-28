@@ -2,7 +2,7 @@
 
 use std::{fs::File, io::Write, path::PathBuf};
 
-use clap::Parser;
+use core::clap::{self, Parser};
 
 const HEADER_VERSION_1_8: i32 = 264;
 const HEADER_VERSION_1_14: i32 = 270;

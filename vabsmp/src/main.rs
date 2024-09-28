@@ -9,7 +9,7 @@ use std::{
     slice::Iter,
 };
 
-use clap::Parser;
+use core::clap::{self, Parser};
 
 #[derive(Parser)]
 struct Args {
@@ -23,6 +23,8 @@ struct Args {
 }
 
 fn main() {
+    core::init();
+
     let args = Args::parse();
 
     if args.vab_path.is_dir() {

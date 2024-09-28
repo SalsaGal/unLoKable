@@ -1,6 +1,6 @@
 use std::{fs::File, io::Write, num::NonZeroU32, path::PathBuf};
 
-use clap::Parser;
+use core::clap::{self, Parser};
 
 #[derive(Parser)]
 #[clap(version)]
@@ -16,6 +16,8 @@ struct Args {
 }
 
 fn main() {
+    core::init();
+
     let args = Args::parse();
 
     let file = std::fs::read(&args.input).unwrap();

@@ -1,6 +1,6 @@
 use std::{fs::File, io::Write, path::PathBuf};
 
-use clap::Parser;
+use core::clap::{self, Parser};
 
 #[derive(Parser)]
 struct Args {
@@ -9,6 +9,8 @@ struct Args {
 }
 
 fn main() {
+    core::init();
+
     let args = Args::parse();
 
     let file_paths: &mut dyn Iterator<Item = PathBuf> = if args.input.is_dir() {

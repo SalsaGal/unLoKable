@@ -6,21 +6,21 @@ version = 3
 name = "adsheader"
 version = "0.1.0"
 dependencies = [
- "clap",
+ "core",
 ]
 
 [[package]]
 name = "adsloopfind"
 version = "0.1.0"
 dependencies = [
- "clap",
+ "core",
 ]
 
 [[package]]
 name = "adsunloop"
 version = "0.1.0"
 dependencies = [
- "clap",
+ "core",
 ]
 
 [[package]]
@@ -75,7 +75,7 @@ dependencies = [
 name = "cds2seq"
 version = "0.1.0"
 dependencies = [
- "clap",
+ "core",
  "dbg_hex",
  "either",
 ]
@@ -130,6 +130,7 @@ checksum = "acbf1af155f9b9ef647e42cdc158db4b64a1b61f743629225fde6f3e0be2a7c7"
 name = "core"
 version = "0.1.0"
 dependencies = [
+ "clap",
  "log",
  "simplelog",
 ]
@@ -144,14 +145,14 @@ checksum = "35df069ad4872b5d65ee7f5e37d12ab629834b1e162b3292a71f30ba7e8884ee"
 name = "demul"
 version = "0.1.0"
 dependencies = [
- "clap",
+ "core",
 ]
 
 [[package]]
 name = "demus"
 version = "0.1.0"
 dependencies = [
- "clap",
+ "core",
 ]
 
 [[package]]
@@ -167,7 +168,7 @@ dependencies = [
 name = "desnd"
 version = "0.1.0"
 dependencies = [
- "clap",
+ "core",
 ]
 
 [[package]]
@@ -204,7 +205,7 @@ checksum = "a7a70ba024b9dc04c27ea2f0c0548feb474ec5c54bba33a7f72f873a39d07b24"
 name = "msqsplit"
 version = "0.1.0"
 dependencies = [
- "clap",
+ "core",
  "dbg_hex",
 ]
 
@@ -251,7 +252,7 @@ dependencies = [
 name = "seqrepeat"
 version = "0.1.0"
 dependencies = [
- "clap",
+ "core",
 ]
 
 [[package]]
@@ -278,7 +279,7 @@ dependencies = [
 name = "sf2panlaw"
 version = "0.1.0"
 dependencies = [
- "clap",
+ "core",
 ]
 
 [[package]]
@@ -367,35 +368,35 @@ checksum = "711b9620af191e0cdc7468a8d14e709c3dcdb115b36f838e601583af800a370a"
 name = "vabfine"
 version = "0.1.0"
 dependencies = [
- "clap",
+ "core",
 ]
 
 [[package]]
 name = "vabsmp"
 version = "0.1.0"
 dependencies = [
- "clap",
+ "core",
 ]
 
 [[package]]
 name = "vagheader"
 version = "0.1.0"
 dependencies = [
- "clap",
+ "core",
 ]
 
 [[package]]
 name = "vagsanitizer"
 version = "0.1.0"
 dependencies = [
- "clap",
+ "core",
 ]
 
 [[package]]
 name = "vagunloop"
 version = "0.1.0"
 dependencies = [
- "clap",
+ "core",
 ]
 
 [[package]]
