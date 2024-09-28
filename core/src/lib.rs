@@ -9,7 +9,11 @@ pub use log;
 /// all unLoKable projects. Primarily initalising debugging.
 pub fn init() {
     TermLogger::init(
-        log::LevelFilter::Trace,
+        if cfg!(debug_assertions) {
+            log::LevelFilter::Trace
+        } else {
+            log::LevelFilter::Warn
+        },
         simplelog::Config::default(),
         simplelog::TerminalMode::Mixed,
         simplelog::ColorChoice::Auto,
