@@ -1,28 +1,40 @@
-use std::{fs::File, io::Write, num::NonZeroUsize, path::PathBuf};
+use std::{
+    fs::File,
+    io::Write,
+    num::NonZeroUsize,
+    path::{Path, PathBuf},
+};
 
 use clap::Parser;
 
 #[derive(Parser)]
 struct Args {
-    /// `seq` to read from.
+    /// `seq` files to read from.
     input: PathBuf,
     /// The number of the passes in the final file.
     count: NonZeroUsize,
     /// Whether to read from the tempo marker rather than the entire file.
     #[clap(short)]
     tempo_marker: bool,
-    /// Whether to read from the loop markers.
+    /// Whether to read from the loop markers. This is the default.
     #[clap(short)]
     loop_marker: bool,
-    /// `seq` to write to.
-    #[clap(short)]
-    output: Option<PathBuf>,
 }
 
 fn main() {
     let args = Args::parse();
 
-    let file = std::fs::read(&args.input).expect("unable to load file");
+    if args.input.is_dir() {
+        for file in std::fs::read_dir(&args.input).unwrap().flatten() {
+            repeat_file(&file.path(), &args);
+        }
+    } else {
+        repeat_file(&args.input, &args);
+    }
+}
+
+fn repeat_file(path: &Path, args: &Args) {
+    let file = std::fs::read(path).unwrap();
     let mut bytes = file.iter().copied();
 
     let (loop_start, loop_end) = args
@@ -87,14 +99,11 @@ fn main() {
         output.write_all(&file[end + 3..]).unwrap();
     }
 
-    let mut out = File::create(
-        args.output
-            .unwrap_or(args.input.parent().unwrap().join(format!(
-                "{}_x{:02}.seq",
-                args.input.file_stem().unwrap().to_string_lossy(),
-                args.count
-            ))),
-    )
+    let mut out = File::create(path.parent().unwrap().join(format!(
+        "{}_x{:02}.seq",
+        path.file_stem().unwrap().to_string_lossy(),
+        args.count
+    )))
     .unwrap();
     out.write_all(&output).unwrap();
 }
