@@ -14,7 +14,9 @@ pub fn init() {
         } else {
             log::LevelFilter::Warn
         },
-        simplelog::Config::default(),
+        simplelog::ConfigBuilder::new()
+            .set_thread_level(log::LevelFilter::Off)
+            .build(),
         simplelog::TerminalMode::Mixed,
         simplelog::ColorChoice::Auto,
     )
