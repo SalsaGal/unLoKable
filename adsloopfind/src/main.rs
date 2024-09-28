@@ -22,16 +22,7 @@ fn main() {
 
     let args = Args::parse();
 
-    let files: &mut dyn Iterator<Item = PathBuf> = if args.ads_input.is_dir() {
-        &mut args
-            .ads_input
-            .read_dir()
-            .unwrap()
-            .flatten()
-            .map(|dir| dir.path())
-    } else {
-        &mut std::iter::once(args.ads_input.clone())
-    };
+    let files = core::get_files(&args.ads_input).unwrap();
 
     let mut file = args.output.map(|path| File::create(path).unwrap());
 

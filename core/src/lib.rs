@@ -1,3 +1,5 @@
+use std::path::{Path, PathBuf};
+
 use simplelog::TermLogger;
 
 pub use clap;
@@ -12,4 +14,17 @@ pub fn init() {
         simplelog::ColorChoice::Auto,
     )
     .unwrap();
+}
+
+/// Takes a file path and returns either an iterator of the file path,
+/// or if the path is to a directory a list of the files in the path.
+pub fn get_files(path: &Path) -> Result<Vec<PathBuf>, std::io::Error> {
+    Ok(if path.is_dir() {
+        std::fs::read_dir(path)?
+            .flatten()
+            .map(|f| f.path())
+            .collect()
+    } else {
+        std::iter::once(path.to_owned()).collect()
+    })
 }

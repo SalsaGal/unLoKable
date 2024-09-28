@@ -43,12 +43,8 @@ fn main() {
         Function::Attenuate
     };
 
-    if args.input.is_dir() {
-        for file in std::fs::read_dir(&args.input).unwrap().flatten() {
-            convert(&file.path(), function);
-        }
-    } else {
-        convert(&args.input, function);
+    for file in core::get_files(&args.input).unwrap() {
+        convert(&file, function);
     }
 }
 

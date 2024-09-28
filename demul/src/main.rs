@@ -13,16 +13,7 @@ fn main() {
 
     let args = Args::parse();
 
-    let file_paths: &mut dyn Iterator<Item = PathBuf> = if args.input.is_dir() {
-        &mut args
-            .input
-            .read_dir()
-            .unwrap()
-            .flatten()
-            .map(|dir| dir.path())
-    } else {
-        &mut std::iter::once(args.input)
-    };
+    let file_paths = core::get_files(&args.input).unwrap();
 
     for file_path in file_paths {
         let mul_file = std::fs::read(&file_path).unwrap();

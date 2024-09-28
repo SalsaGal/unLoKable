@@ -25,12 +25,8 @@ fn main() {
 
     let args = Args::parse();
 
-    if args.vab_path.is_dir() {
-        for file in std::fs::read_dir(&args.vab_path).unwrap().flatten() {
-            fine_tune(&file.path(), args.psx);
-        }
-    } else {
-        fine_tune(&args.vab_path, args.psx);
+    for file in core::get_files(&args.vab_path).unwrap() {
+        fine_tune(&file, args.psx);
     }
 }
 

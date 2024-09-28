@@ -13,18 +13,7 @@ fn main() {
 
     let args = Args::parse();
 
-    let file_paths: &mut dyn Iterator<Item = PathBuf> = if args.input.is_dir() {
-        &mut args
-            .input
-            .read_dir()
-            .unwrap()
-            .flatten()
-            .map(|dir| dir.path())
-    } else {
-        &mut std::iter::once(args.input)
-    };
-
-    for file_path in file_paths {
+    for file_path in core::get_files(&args.input).unwrap() {
         let mut ads_bytes = std::fs::read(&file_path).unwrap();
 
         if ads_bytes[0..4] != [0x53, 0x53, 0x68, 0x64] {

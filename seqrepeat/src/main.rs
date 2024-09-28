@@ -26,12 +26,8 @@ fn main() {
 
     let args = Args::parse();
 
-    if args.input.is_dir() {
-        for file in std::fs::read_dir(&args.input).unwrap().flatten() {
-            repeat_file(&file.path(), &args);
-        }
-    } else {
-        repeat_file(&args.input, &args);
+    for file in core::get_files(&args.input).unwrap() {
+        repeat_file(&file, &args);
     }
 }
 

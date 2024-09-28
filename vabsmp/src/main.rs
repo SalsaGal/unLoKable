@@ -27,12 +27,8 @@ fn main() {
 
     let args = Args::parse();
 
-    if args.vab_path.is_dir() {
-        for file in std::fs::read_dir(&args.vab_path).unwrap().flatten() {
-            create(&file.path(), args.sample_rate, args.ads);
-        }
-    } else {
-        create(&args.vab_path, args.sample_rate, args.ads);
+    for file in core::get_files(&args.vab_path).unwrap() {
+        create(&file, args.sample_rate, args.ads);
     }
 }
 
