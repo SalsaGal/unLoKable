@@ -1,6 +1,12 @@
 #![allow(dead_code)]
 
-use std::{fs::File, io::Write, ops::Range, path::PathBuf, slice::IterMut};
+use std::{
+    fs::File,
+    io::Write,
+    ops::Range,
+    path::{Path, PathBuf},
+    slice::IterMut,
+};
 
 use clap::Parser;
 
@@ -17,22 +23,27 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    let mut file = std::fs::read(&args.vab_path).unwrap();
+    if args.vab_path.is_dir() {
+        for file in std::fs::read_dir(&args.vab_path).unwrap().flatten() {
+            fine_tune(&file.path(), args.psx);
+        }
+    } else {
+        fine_tune(&args.vab_path, args.psx);
+    }
+}
+
+fn fine_tune(path: &Path, psx: bool) {
+    let mut file = std::fs::read(path).unwrap();
     let file_len = file.len();
     let mut file_iter = file.iter_mut();
 
-    VabFile::parse(&mut file_iter, file_len, args.psx);
+    VabFile::parse(&mut file_iter, file_len, psx);
 
-    let out_path = if args.psx {
-        format!(
-            "{}_psx.vab",
-            args.vab_path.file_stem().unwrap().to_string_lossy()
-        )
+    let path_stem = path.with_extension("");
+    let out_path = if psx {
+        format!("{}_psx.vab", path_stem.to_string_lossy())
     } else {
-        format!(
-            "{}_cents.vab",
-            args.vab_path.file_stem().unwrap().to_string_lossy()
-        )
+        format!("{}_cents.vab", path_stem.to_string_lossy())
     };
     let mut out = File::create(out_path).unwrap();
     out.write_all(&file).unwrap();
