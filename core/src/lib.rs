@@ -3,6 +3,7 @@ use std::path::{Path, PathBuf};
 use simplelog::TermLogger;
 
 pub use clap;
+pub use log;
 
 /// Perform initialisation functions that are common across
 /// all unLoKable projects. Primarily initalising debugging.

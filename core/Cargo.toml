@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-clap = { workspace = true }
+clap = { version = "4.5.13", features = ["derive"] }
 simplelog = "0.12.2"
-log = { workspace = true }
+log = "0.4.22"
