@@ -1,6 +1,8 @@
 [workspace]
 resolver = "2"
 members = [
+    "core",
+
     "adsheader",
     "adsloopfind",
     "adsunloop",
@@ -20,5 +22,5 @@ members = [
 
 [workspace.dependencies]
 clap = { version = "4.5.13", features = ["derive"] }
-simplelog = "0.12.2"
 log = "0.4.22"
+core = { path = "core" }
