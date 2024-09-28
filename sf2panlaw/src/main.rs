@@ -1,7 +1,12 @@
-use std::{fs::File, io::Write, path::PathBuf};
+use std::{
+    fs::File,
+    io::Write,
+    path::{Path, PathBuf},
+};
 
 use clap::Parser;
 
+#[derive(Clone, Copy, PartialEq, Eq)]
 enum Function {
     Attenuate,
     Amplify,
@@ -20,8 +25,6 @@ impl Function {
 #[clap(version)]
 struct Args {
     input: PathBuf,
-    #[clap(short, long)]
-    output: Option<PathBuf>,
     /// DEFAULT
     #[clap(long)]
     attenuate: bool,
@@ -37,7 +40,18 @@ fn main() {
     } else {
         Function::Attenuate
     };
-    let file = std::fs::read_to_string(&args.input).unwrap();
+
+    if args.input.is_dir() {
+        for file in std::fs::read_dir(&args.input).unwrap().flatten() {
+            convert(&file.path(), function);
+        }
+    } else {
+        convert(&args.input, function);
+    }
+}
+
+fn convert(path: &Path, function: Function) {
+    let file = std::fs::read_to_string(path).unwrap();
     let mut lines = file
         .lines()
         .map(std::borrow::ToOwned::to_owned)
@@ -47,12 +61,9 @@ fn main() {
         .iter()
         .enumerate()
         .filter_map(|(i, x)| {
-            x.trim().strip_prefix("Z_pan=").map(|value| {
-                (
-                    i,
-                    f32::from(u16_to_i16(value.parse::<u16>().unwrap())) / 500.0,
-                )
-            })
+            x.trim()
+                .strip_prefix("Z_pan=")
+                .map(|value| (i, z_pan(value)))
         })
         .collect::<Vec<_>>();
     let z_atten = lines.iter().enumerate().filter_map(|(i, x)| {
@@ -86,21 +97,28 @@ fn main() {
         lines[line] = format!("            Z_initialAttenuation={value}");
     }
 
-    let mut output = File::create(args.output.unwrap_or_else(|| {
-        format!(
-            "{}_{}.{}",
-            args.input.with_extension("").to_string_lossy(),
-            if args.amplify {
-                "amplified"
-            } else {
-                "attenuated"
-            },
-            args.input.extension().unwrap().to_string_lossy(),
-        )
-        .into()
-    }))
+    let mut output = File::create(format!(
+        "{}_{}.{}",
+        path.with_extension("").to_string_lossy(),
+        if function == Function::Amplify {
+            "amplified"
+        } else {
+            "attenuated"
+        },
+        path.extension().unwrap().to_string_lossy(),
+    ))
     .unwrap();
     write!(output, "{}", lines.join("\r\n")).unwrap();
+}
+
+fn z_pan(value: &str) -> f32 {
+    let integer = value
+        .parse::<u16>()
+        .map(u16_to_i16)
+        .or_else(|_| value.parse::<i16>())
+        .unwrap();
+
+    integer as f32 / 500.0
 }
 
 fn u16_to_i16(x: u16) -> i16 {
