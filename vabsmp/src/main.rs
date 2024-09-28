@@ -1,6 +1,13 @@
 #![allow(dead_code)]
 
-use std::{fs::File, io::Write, num::NonZeroU32, ops::Range, path::PathBuf, slice::Iter};
+use std::{
+    fs::File,
+    io::Write,
+    num::NonZeroU32,
+    ops::Range,
+    path::{Path, PathBuf},
+    slice::Iter,
+};
 
 use clap::Parser;
 
@@ -8,6 +15,7 @@ use clap::Parser;
 struct Args {
     vab_path: PathBuf,
     sample_rate: NonZeroU32,
+    /// DEFAULT
     #[clap(long)]
     vag: bool,
     #[clap(long)]
@@ -17,27 +25,37 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    let file = std::fs::read(&args.vab_path).unwrap();
+    if args.vab_path.is_dir() {
+        for file in std::fs::read_dir(&args.vab_path).unwrap().flatten() {
+            create(&file.path(), args.sample_rate, args.ads);
+        }
+    } else {
+        create(&args.vab_path, args.sample_rate, args.ads);
+    }
+}
+
+fn create(path: &Path, sample_rate: NonZeroU32, ads: bool) {
+    let file = std::fs::read(path).unwrap();
     let mut file_iter = file.iter();
 
     let vab_file = VabFile::parse(&mut file_iter, file.len());
 
-    let output_path = args.vab_path.with_extension("");
+    let output_path = path.with_extension("");
     std::fs::create_dir(&output_path).unwrap();
     for (i, range) in vab_file.vag_ranges.iter().enumerate() {
         let path = output_path.join(format!(
             "{}_{i:04}.{}",
             output_path.file_name().unwrap().to_string_lossy(),
-            if args.ads { "ads" } else { "vag" }
+            if ads { "ads" } else { "vag" }
         ));
         let mut out_file = File::create(path).unwrap();
 
-        let header = if args.ads {
+        let header = if ads {
             [
                 [0x53, 0x53, 0x68, 0x64],
                 [0x18, 0, 0, 0],
                 [0x10, 0, 0, 0],
-                args.sample_rate.get().to_le_bytes(),
+                sample_rate.get().to_le_bytes(),
                 [1, 0, 0, 0],
                 [0; 4],
                 [0xff; 4],
@@ -54,7 +72,7 @@ fn main() {
                 [0, 0, 0, 3],
                 [0; 4],
                 (range.len() as u32).to_be_bytes(),
-                args.sample_rate.get().to_be_bytes(),
+                sample_rate.get().to_be_bytes(),
                 [0; 4],
                 [0; 4],
                 [0; 4],
