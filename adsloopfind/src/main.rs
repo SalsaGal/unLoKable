@@ -2,9 +2,13 @@ use std::{
     fs::File,
     io::Write,
     path::{Path, PathBuf},
+    process::exit,
 };
 
-use core::clap::{self, Parser};
+use core::{
+    clap::{self, Parser},
+    log::error,
+};
 
 const MAGIC_NUMBER: [u8; 4] = [0x53, 0x53, 0x68, 0x64];
 
@@ -24,10 +28,22 @@ fn main() {
 
     let files = core::get_files(&args.ads_input);
 
-    let mut file = args.output.map(|path| File::create(path).unwrap());
+    let mut file = args.output.map(|path| {
+        File::create(&path).unwrap_or_else(|e| {
+            error!("Unable to create file {path:?}: {e}");
+            exit(1)
+        })
+    });
 
     for path in files {
-        if let Some((lb, le)) = find_loops(&path, &std::fs::read(&path).unwrap()) {
+        // if let Some((lb, le)) = find_loops(&path, &std::fs::read(&path).unwrap()) {
+        if let Some((lb, le)) = std::fs::read(&path)
+            .inspect_err(|e| {
+                error!("Unable to read file {path:?}, skipping: {e}");
+            })
+            .ok()
+            .and_then(|contents| find_loops(&path, &contents))
+        {
             let text = format!(
                 "{lb} {le} {}\r\n",
                 path.with_extension("wav")
@@ -46,7 +62,7 @@ fn main() {
 
 fn find_loops(path: &Path, ads_file: &[u8]) -> Option<(u32, u32)> {
     if ads_file[0..4] != MAGIC_NUMBER {
-        eprintln!(
+        error!(
             "Invalid magic number, expected {MAGIC_NUMBER:?}, found {:?}, in file {path:?}",
             &ads_file[0..4]
         );
