@@ -15,7 +15,7 @@ pub fn init() {
         if cfg!(debug_assertions) {
             log::LevelFilter::Trace
         } else {
-            log::LevelFilter::Warn
+            log::LevelFilter::Info
         },
         simplelog::ConfigBuilder::new()
             .set_thread_level(log::LevelFilter::Off)
