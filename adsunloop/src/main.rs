@@ -1,6 +1,9 @@
 use std::{fs::File, io::Write, path::PathBuf};
 
-use core::clap::{self, Parser};
+use core::{
+    clap::{self, Parser},
+    log::{error, info},
+};
 
 #[derive(Parser)]
 struct Args {
@@ -14,20 +17,22 @@ fn main() {
     let args = Args::parse();
 
     for file_path in core::get_files(&args.input) {
+        info!("Unlooping {file_path:?}");
+
         let mut ads_bytes = std::fs::read(&file_path).unwrap();
 
         if ads_bytes[0..4] != [0x53, 0x53, 0x68, 0x64] {
-            eprintln!("Invalid header magic number");
+            error!("Invalid header magic number, skipping");
             continue;
         }
 
         if ads_bytes[8..12] != 0x10u32.to_le_bytes() {
-            eprintln!("Invalid codec, only support Sony 4-bit ADPCM");
+            error!("Invalid codec, only support Sony 4-bit ADPCM, skipping");
             continue;
         }
 
         if ads_bytes[32..36] != [0x53, 0x53, 0x62, 0x64] {
-            eprintln!("Invalid body magic number");
+            error!("Invalid body magic number, skipping");
             continue;
         }
 
@@ -39,7 +44,7 @@ fn main() {
         }
 
         if changed_chunks == 0 {
-            println!("No markers found");
+            info!("No markers found");
         } else {
             let out_path = format!(
                 "{}_unlooped.ads",
@@ -48,7 +53,7 @@ fn main() {
             let mut out_file = File::create(out_path).unwrap();
             out_file.write_all(&ads_bytes).unwrap();
 
-            println!("{changed_chunks} markers removed");
+            info!("{changed_chunks} markers removed");
         }
     }
 }
