@@ -1,4 +1,4 @@
-use std::{fs::File, io::Write, path::PathBuf, process::exit};
+use std::{fs::File, io::Write, path::PathBuf};
 
 use core::{
     clap::{self, Parser},
@@ -22,10 +22,7 @@ fn main() {
 
     let args = Args::parse();
 
-    let file_paths = core::get_files(&args.input).unwrap_or_else(|e| {
-        error!("Unable to load paths `{:?}`, aborting: {e}", args.input);
-        exit(1);
-    });
+    let file_paths = core::get_files(&args.input);
 
     for file_path in file_paths {
         info!("Doing {file_path:?}");

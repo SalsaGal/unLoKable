@@ -43,7 +43,7 @@ fn main() {
         Function::Attenuate
     };
 
-    for file in core::get_files(&args.input).unwrap() {
+    for file in core::get_files(&args.input) {
         convert(&file, function);
     }
 }

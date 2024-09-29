@@ -13,7 +13,7 @@ fn main() {
 
     let args = Args::parse();
 
-    for file_path in core::get_files(&args.input).unwrap() {
+    for file_path in core::get_files(&args.input) {
         let mut ads_bytes = std::fs::read(&file_path).unwrap();
 
         if ads_bytes[0..4] != [0x53, 0x53, 0x68, 0x64] {

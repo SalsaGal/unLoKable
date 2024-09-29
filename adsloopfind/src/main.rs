@@ -22,7 +22,7 @@ fn main() {
 
     let args = Args::parse();
 
-    let files = core::get_files(&args.ads_input).unwrap();
+    let files = core::get_files(&args.ads_input);
 
     let mut file = args.output.map(|path| File::create(path).unwrap());
 

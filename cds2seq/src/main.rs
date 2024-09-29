@@ -28,7 +28,7 @@ fn main() {
 
     let args = Args::parse();
 
-    let file_paths = core::get_files(&args.input).unwrap();
+    let file_paths = core::get_files(&args.input);
 
     for file_path in file_paths {
         let contents = std::fs::read(&file_path).expect("file cannot be opened");

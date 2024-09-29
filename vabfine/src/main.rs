@@ -25,7 +25,7 @@ fn main() {
 
     let args = Args::parse();
 
-    for file in core::get_files(&args.vab_path).unwrap() {
+    for file in core::get_files(&args.vab_path) {
         fine_tune(&file, args.psx);
     }
 }

@@ -18,7 +18,7 @@ fn main() {
 
     let args = Args::parse();
 
-    for file_path in core::get_files(&args.input).unwrap() {
+    for file_path in core::get_files(&args.input) {
         let bytes = std::fs::read(&file_path).expect("unable to open file");
 
         let (header, tracks) = convert(bytes, args.debug);

@@ -26,7 +26,7 @@ fn main() {
 
     let args = Args::parse();
 
-    for file in core::get_files(&args.input).unwrap() {
+    for file in core::get_files(&args.input) {
         repeat_file(&file, &args);
     }
 }
