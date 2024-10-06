@@ -1,6 +1,9 @@
 use std::{fs::File, io::Write, path::PathBuf};
 
-use core::clap::{self, Parser};
+use core::{
+    clap::{self, Parser},
+    log::{error, info},
+};
 
 #[derive(Parser)]
 struct Args {
@@ -16,6 +19,7 @@ fn main() {
     let file_paths = core::get_files(&args.input);
 
     for file_path in file_paths {
+        info!("{file_path:?}");
         let mul_file = std::fs::read(&file_path).unwrap();
 
         let sample_rate = u32::from_le_bytes([mul_file[0], mul_file[1], mul_file[2], mul_file[3]]);
@@ -46,6 +50,7 @@ fn main() {
 
         let project_name = file_path.file_stem().unwrap().to_string_lossy();
         let output_dir = file_path.with_extension("");
+        info!("Writing to {output_dir:?}");
         std::fs::create_dir(&output_dir).unwrap();
         if !audio_slices.is_empty() {
             for (i, slices) in audio_slices.iter().enumerate() {
@@ -96,16 +101,15 @@ fn main() {
             .unwrap();
         }
 
-        println!("MUL file");
-        println!("Audio channels: {channels}");
-        println!("Audio sample rate: {sample_rate}");
-        println!(
+        info!("Audio channels: {channels}");
+        info!("Audio sample rate: {sample_rate}");
+        info!(
             "Total chunks: {}",
             data_slices.len() + audio_chunks + padding_chunks
         );
-        println!("Data chunks: {}", data_slices.len());
-        println!("Audio chunks: {audio_chunks}");
-        println!("Padding chunks: {padding_chunks}");
+        info!("Data chunks: {}", data_slices.len());
+        info!("Audio chunks: {audio_chunks}");
+        info!("Padding chunks: {padding_chunks}");
     }
 }
 
@@ -140,7 +144,10 @@ impl Chunk {
                 get_bytes(bytes, 8);
                 Some(data)
             }
-            _ => panic!("Unsupported variant: {variant}"),
+            _ => {
+                error!("Unsupported variant: {variant}");
+                None
+            }
         }
     }
 }
