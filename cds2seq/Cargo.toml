@@ -7,5 +7,4 @@ edition = "2021"
 
 [dependencies]
 core = { workspace = true }
-dbg_hex = "0.2.0"
 either = "1.11.0"

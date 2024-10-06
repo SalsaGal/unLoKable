@@ -1,5 +1,5 @@
 use core::clap::{self, Parser};
-use dbg_hex::dbg_hex;
+use core::log::{debug, error, info, trace};
 use either::Either;
 use std::io::Write;
 use std::{fs::File, path::PathBuf};
@@ -23,6 +23,24 @@ struct Header {
     version: u16,
 }
 
+impl Header {
+    const MAGIC: u32 = 0x5145_5361;
+
+    fn parse(bytes: &mut dyn Iterator<Item = u8>) -> Option<Self> {
+        Some(Header {
+            magic: u32::from_be_bytes([bytes.next()?, bytes.next()?, bytes.next()?, bytes.next()?]),
+            quarter_note_time: u32::from_be_bytes([
+                bytes.next()?,
+                bytes.next()?,
+                bytes.next()?,
+                bytes.next()?,
+            ]),
+            ppqn: u16::from_be_bytes([bytes.next()?, bytes.next()?]),
+            version: u16::from_be_bytes([bytes.next()?, bytes.next()?]),
+        })
+    }
+}
+
 fn main() {
     core::init();
 
@@ -31,32 +49,28 @@ fn main() {
     let file_paths = core::get_files(&args.input);
 
     for file_path in file_paths {
-        let contents = std::fs::read(&file_path).expect("file cannot be opened");
+        let contents = match std::fs::read(&file_path) {
+            Ok(file) => file,
+            Err(e) => {
+                error!("Unable to load {file_path:?}, skipping: {e}");
+                continue;
+            }
+        };
         let mut content_iter = contents.iter().copied();
 
-        let header = Header {
-            magic: u32::from_be_bytes([
-                content_iter.next().unwrap(),
-                content_iter.next().unwrap(),
-                content_iter.next().unwrap(),
-                content_iter.next().unwrap(),
-            ]),
-            quarter_note_time: u32::from_be_bytes([
-                content_iter.next().unwrap(),
-                content_iter.next().unwrap(),
-                content_iter.next().unwrap(),
-                content_iter.next().unwrap(),
-            ]),
-            ppqn: u16::from_be_bytes([content_iter.next().unwrap(), content_iter.next().unwrap()]),
-            version: u16::from_be_bytes([
-                content_iter.next().unwrap(),
-                content_iter.next().unwrap(),
-            ]),
+        let header = match Header::parse(&mut content_iter) {
+            Some(header) => header,
+            None => {
+                error!("Failed to parse header {file_path:?}, skipping");
+                continue;
+            }
         };
-        assert_eq!(0x5145_5361, header.magic, "invalid magic number");
+        if header.magic != Header::MAGIC {
+            error!("File {file_path:?} has incorrect magic number, skipping");
+            continue;
+        }
 
-        #[cfg(debug_assertions)]
-        dbg_hex!(&header);
+        debug!("{header:?}");
 
         // Balance the tokens
         let body = content_iter.collect::<Vec<_>>();
@@ -79,13 +93,12 @@ fn main() {
             tokens.insert(tokens.len() - 1, Token::Data(&[0]));
             loop_terminator_count += 1;
         }
-        #[cfg(debug_assertions)]
-        dbg_hex!(&tokens);
+        trace!("{tokens:?}");
 
-        let lexemes = lex_file(&tokens);
-        #[cfg(debug_assertions)]
-        dbg_hex!(&lexemes);
-        #[cfg(debug_assertions)]
+        let Some(lexemes) = lex_file(&tokens) else {
+            continue;
+        };
+        trace!("{lexemes:?}");
         for lexeme in &lexemes {
             lexeme.visualise(0);
         }
@@ -144,22 +157,21 @@ fn main() {
             .unwrap();
         output_file.write_all(&output[0..output_end + 3]).unwrap();
 
-        println!("CDS file");
-        println!(
+        info!(
             "Quarter note time: {}",
             header.quarter_note_time.swap_bytes()
         );
-        println!("PPQN: {}", header.ppqn.swap_bytes());
-        println!(
+        info!("PPQN: {}", header.ppqn.swap_bytes());
+        info!(
             "BPM: {}",
             60_000_000 / header.quarter_note_time.swap_bytes()
         );
-        println!(
+        info!(
             "Version: {}.{}",
             header.version.to_le_bytes()[0],
             header.version.to_le_bytes()[1],
         );
-        println!(
+        info!(
             "Local loops: {}",
             tokens
                 .iter()
@@ -317,12 +329,12 @@ impl Lexeme {
     fn visualise(&self, depth: usize) {
         match self {
             Self::Loop(count, children) => {
-                println!("{}Loop: {}x", "\t".repeat(depth), count);
+                trace!("{}Loop: {}x", "\t".repeat(depth), count);
                 for child in children {
                     child.visualise(depth + 1);
                 }
             }
-            Self::Data(data) => println!(
+            Self::Data(data) => trace!(
                 "{}Data: {:#04x} .. {:#04x}",
                 "\t".repeat(depth),
                 data[0],
@@ -332,7 +344,7 @@ impl Lexeme {
     }
 }
 
-fn lex_file(tokens: &[Token]) -> Vec<Lexeme> {
+fn lex_file<'a>(tokens: &'a [Token<'a>]) -> Option<Vec<Lexeme>> {
     let mut lexemes: Vec<Either<Token, Lexeme>> =
         tokens.iter().copied().map(Either::Left).collect::<Vec<_>>();
 
@@ -352,7 +364,10 @@ fn lex_file(tokens: &[Token]) -> Vec<Lexeme> {
                             i = j;
                             break;
                         }
-                        Either::Left(token) => panic!("unexpected token: {token:?}"),
+                        Either::Left(token) => {
+                            error!("unexpected token: {token:?}");
+                            return None;
+                        }
                         Either::Right(_) => loop_body.push(lexemes.remove(j).unwrap_right()),
                     }
                     j -= 1;
@@ -370,5 +385,5 @@ fn lex_file(tokens: &[Token]) -> Vec<Lexeme> {
         i += 1;
     }
 
-    lexemes.into_iter().map(Either::unwrap_right).collect()
+    Some(lexemes.into_iter().map(Either::unwrap_right).collect())
 }

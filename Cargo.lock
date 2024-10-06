@@ -76,7 +76,6 @@ name = "cds2seq"
 version = "0.1.0"
 dependencies = [
  "core",
- "dbg_hex",
  "either",
 ]
 
