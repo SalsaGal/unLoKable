@@ -6,9 +6,6 @@ use core::clap::{self, Parser};
 struct Args {
     /// The `vag` file to read from.
     input: PathBuf,
-    /// The output directory
-    #[clap(short, long)]
-    output: Option<PathBuf>,
 }
 
 fn main() {
@@ -16,28 +13,28 @@ fn main() {
 
     let args = Args::parse();
 
-    let mut vag_bytes = std::fs::read(&args.input).unwrap();
-    assert_eq!(
-        vag_bytes[0..4],
-        [0x56, 0x41, 0x47, 0x70],
-        "invalid magic number"
-    );
-    let changed = sanitized(&mut vag_bytes);
+    for file_path in core::get_files(&args.input) {
+        let mut vag_bytes = std::fs::read(&file_path).unwrap();
+        assert_eq!(
+            vag_bytes[0..4],
+            [0x56, 0x41, 0x47, 0x70],
+            "invalid magic number"
+        );
+        let changed = sanitized(&mut vag_bytes);
 
-    if changed != 0 {
-        println!("{changed} bad chunks fixed!");
-        let mut output = File::create(args.output.unwrap_or_else(|| {
-            format!(
+        print!("{file_path:?}: ");
+        if changed != 0 {
+            println!("{changed} bad chunks fixed!");
+            let mut output = File::create(format!(
                 "{}_clean.{}",
-                args.input.with_extension("").to_string_lossy(),
-                args.input.extension().unwrap().to_string_lossy(),
-            )
-            .into()
-        }))
-        .unwrap();
-        output.write_all(&vag_bytes).unwrap();
-    } else {
-        println!("No bad chunks were found!");
+                file_path.with_extension("").to_string_lossy(),
+                file_path.extension().unwrap().to_string_lossy(),
+            ))
+            .unwrap();
+            output.write_all(&vag_bytes).unwrap();
+        } else {
+            println!("No bad chunks were found!");
+        }
     }
 }
 
