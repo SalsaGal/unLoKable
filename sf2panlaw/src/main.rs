@@ -1,4 +1,5 @@
 use std::{
+    fmt::Display,
     fs::File,
     io::Write,
     path::{Path, PathBuf},
@@ -17,6 +18,15 @@ impl Function {
         match self {
             Self::Attenuate => atten + (pan.abs() * (10.0 * f32::log10(2.0))),
             Self::Amplify => atten - (pan.abs() * (10.0 * f32::log10(2.0))),
+        }
+    }
+}
+
+impl Display for Function {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Amplify => f.write_str("amplify"),
+            Self::Attenuate => f.write_str("attenuate"),
         }
     }
 }
@@ -96,13 +106,8 @@ fn convert(path: &Path, function: Function) {
     }
 
     let mut output = File::create(format!(
-        "{}_{}.{}",
+        "{}_{function}.{}",
         path.with_extension("").to_string_lossy(),
-        if function == Function::Amplify {
-            "amplified"
-        } else {
-            "attenuated"
-        },
         path.extension().unwrap().to_string_lossy(),
     ))
     .unwrap();
