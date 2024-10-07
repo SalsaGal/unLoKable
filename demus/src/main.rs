@@ -2,7 +2,12 @@
 
 use std::{fs::File, io::Write, path::PathBuf};
 
-use core::clap::{self, Parser};
+use core::{
+    clap::{self, Parser},
+    log::{debug, error, info, trace},
+};
+
+const HEADER_MAGIC: i32 = 0x4D75_7321;
 
 const HEADER_VERSION_1_8: i32 = 264;
 const HEADER_VERSION_1_14: i32 = 270;
@@ -132,6 +137,8 @@ fn name_to_str(name: &[char; 20]) -> String {
 }
 
 fn main() {
+    core::init();
+
     let args = Args::parse();
     let platform = if args.console {
         Platform::Console
@@ -144,9 +151,10 @@ fn main() {
     let mut sam_file = std::fs::read(&args.sam_path).unwrap();
 
     let header = MusHeader::parse(&mut mus_bytes);
-    assert_eq!(header.magic, 0x4D75_7321, "Invalid magic number");
-    #[cfg(debug_assertions)]
-    dbg!(&header);
+    if header.magic != HEADER_MAGIC {
+        error!("Invalid magic number");
+    }
+    debug!("Header: {header:?}");
 
     let msq_tables = (0..header.num_sequences)
         .map(|_| MsqTable {
@@ -154,14 +162,12 @@ fn main() {
             offset: le_bytes!(mus_bytes),
         })
         .collect::<Vec<_>>();
-    #[cfg(debug_assertions)]
-    dbg!(&msq_tables);
+    debug!("MSQ tables: {msq_tables:#?}");
 
     let layers = (0..header.num_presets + header.num_programs)
         .map(|_| le_bytes!(mus_bytes))
         .collect::<Vec<_>>();
-    #[cfg(debug_assertions)]
-    dbg!(&layers);
+    debug!("Layers: {layers:?}");
 
     let wave_entries = (0..header.num_waves)
         .map(|_| WaveEntry {
@@ -176,8 +182,7 @@ fn main() {
             snd_handle: le_bytes!(mus_bytes),
         })
         .collect::<Vec<_>>();
-    #[cfg(debug_assertions)]
-    dbg!(&wave_entries);
+    debug!("Wave entries: {wave_entries:#?}");
 
     let mut program_entries = Vec::with_capacity(header.num_programs as usize);
     let mut program_zones = Vec::with_capacity(header.num_programs as usize);
@@ -225,8 +230,8 @@ fn main() {
             });
         }
     }
-    #[cfg(debug_assertions)]
-    dbg!(&program_entries, &program_zones);
+    debug!("Program entries: {program_entries:#?}");
+    debug!("Program zones: {program_zones:#?}");
 
     let mut preset_entries = Vec::with_capacity(header.num_presets as usize);
     let mut preset_zones = Vec::with_capacity(header.num_presets as usize);
@@ -237,8 +242,6 @@ fn main() {
             midi_preset_number: le_bytes!(mus_bytes),
             num_zones: le_bytes!(mus_bytes),
         });
-        #[cfg(debug_assertions)]
-        dbg!(&preset_entries);
         preset_zones.push(Vec::with_capacity(
             preset_entries.last().unwrap().num_zones as usize,
         ));
@@ -253,8 +256,8 @@ fn main() {
             });
         }
     }
-    #[cfg(debug_assertions)]
-    dbg!(&preset_entries, &preset_zones);
+    debug!("Preset entries: {preset_entries:#?}");
+    debug!("Preset zones: {preset_zones:#?}");
 
     // Definitely doable with iterators, but too lazy to work it out right now
     let mut sequences: Vec<(i32, Option<i32>)> = Vec::with_capacity(header.num_sequences as usize);
@@ -272,19 +275,24 @@ fn main() {
             None => &mus_file[start as usize..header.offset_to_labels_offsets_table as usize],
         })
         .collect::<Vec<_>>();
-    #[cfg(debug_assertions)]
-    dbg!(&sequences);
+    trace!("Sequences: {sequences:?}");
 
     let output_dir = args
         .output
         .unwrap_or_else(|| args.mus_path.with_extension(""));
-    std::fs::create_dir(&output_dir).unwrap();
+    std::fs::create_dir(&output_dir).unwrap_or_else(|e| {
+        error!("Unable to create output directory {output_dir:?}: {e}");
+        std::process::exit(1);
+    });
 
     if header.num_labels != 0 {
         let labels_path = output_dir
             .join(args.mus_path.with_extension("lbl").file_name().unwrap())
             .with_extension("lbl");
-        let mut labels_file = File::create(labels_path).unwrap();
+        let mut labels_file = File::create(&labels_path).unwrap_or_else(|e| {
+            error!("Unable to create labels file at {labels_path:?}: {e}");
+            std::process::exit(1);
+        });
         labels_file.write_all(&[0x4C, 0x42, 0x4C, 0x61]).unwrap();
         labels_file
             .write_all(&header.num_labels.to_le_bytes())
@@ -297,14 +305,23 @@ fn main() {
 
     let sequences_dir = output_dir.join("sequences");
     let samples_dir = output_dir.join("samples");
-    std::fs::create_dir_all(&sequences_dir).unwrap();
+    std::fs::create_dir_all(&sequences_dir).unwrap_or_else(|e| {
+        error!("Unable to create sequences directory {sequences_dir:?}: {e}");
+        std::process::exit(1);
+    });
     for (i, sequence) in sequences.into_iter().enumerate() {
         let path = sequences_dir.join(format!(
             "{}_{:04}.msq",
             args.mus_path.file_stem().unwrap().to_string_lossy(),
             i,
         ));
-        let mut file = File::create(path).unwrap();
+        let mut file = match File::create(&path) {
+            Ok(f) => f,
+            Err(e) => {
+                error!("Unable to create sequence file {path:?}: {e}");
+                continue;
+            }
+        };
         file.write_all(sequence).unwrap();
     }
 
@@ -335,10 +352,19 @@ fn main() {
         })
         .collect::<Vec<_>>();
 
-    std::fs::create_dir(&samples_dir).unwrap();
+    std::fs::create_dir(&samples_dir).unwrap_or_else(|e| {
+        error!("Unable to create samples directory {samples_dir:?}: {e}");
+        std::process::exit(1);
+    });
     for (wave, wave_entry) in waves.iter().zip(&wave_entries) {
         let path = samples_dir.join(format!("{}.ads", name_to_str(&wave_entry.name)));
-        let mut sample_file = File::create(path).unwrap();
+        let mut sample_file = match File::create(&path) {
+            Ok(f) => f,
+            Err(e) => {
+                error!("Unable to create wave file {path:?}: {e}");
+                continue;
+            }
+        };
 
         sample_file
             .write_all(&[0x53, 0x53, 0x68, 0x64, 0x18, 0x0, 0x0, 0x0])
@@ -371,7 +397,10 @@ fn main() {
             .unwrap()
             .to_string_lossy()
     ));
-    let mut smp_loop_info = File::create(smp_loop_info_path).unwrap();
+    let mut smp_loop_info = File::create(&smp_loop_info_path).unwrap_or_else(|e| {
+        error!("Unable to create loop info file {smp_loop_info_path:?}: {e}");
+        std::process::exit(1);
+    });
     for entry in &wave_entries {
         if entry.loop_info != 0 {
             smp_loop_info
@@ -396,7 +425,10 @@ fn main() {
             .unwrap()
             .to_string_lossy()
     ));
-    let mut info_file = File::create(info_path).unwrap();
+    let mut info_file = File::create(&info_path).unwrap_or_else(|e| {
+        error!("Unable to create info file {info_path:?}: {e}");
+        std::process::exit(1);
+    });
     write!(&mut info_file, "[Samples]\r\n").unwrap();
     // TODO Make more compact with a single statement
     for wave_entry in &wave_entries {
@@ -699,7 +731,7 @@ fn main() {
     .unwrap();
     write!(&mut info_file, "Editor=Demus\r\n").unwrap();
 
-    print!(
+    info!(
         "{}",
         header.display(
             platform,
