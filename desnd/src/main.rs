@@ -415,10 +415,7 @@ impl SndHeader {
                 magic_number: u32::from_le_bytes(four_bytes(bytes)?),
                 header_size: HeaderSize::new(u32::from_le_bytes(four_bytes(bytes)?)),
                 bank_version: Some(u16::from_le_bytes([*bytes.next()?, *bytes.next()?]) as u32),
-                num_programs: {
-                    let _pad = bytes.next();
-                    *bytes.next()? as u32
-                },
+                num_programs: *bytes.nth(1)? as u32,
                 num_zones: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]) as u32,
                 num_waves: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]) as u32,
                 num_sequences: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]) as u32,
@@ -430,12 +427,7 @@ impl SndHeader {
                 magic_number: u32::from_le_bytes(four_bytes(bytes)?),
                 header_size: HeaderSize::new(u16::from_le_bytes([*bytes.next()?, *bytes.next()?])),
                 bank_version: None,
-                num_programs: {
-                    let _pad = bytes.next();
-                    // TODO try *bytes.nth(1)? as u32
-                    // Honestly a lot of parts have repeated next calls that should be nth or skip
-                    *bytes.next()? as u32
-                },
+                num_programs: *bytes.nth(1)? as u32,
                 num_zones: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]) as u32,
                 num_waves: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]) as u32,
                 num_sequences: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]) as u32,
