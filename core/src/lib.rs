@@ -13,7 +13,7 @@ pub use log;
 pub fn init() {
     TermLogger::init(
         if cfg!(debug_assertions) {
-            log::LevelFilter::Trace
+            log::LevelFilter::Debug
         } else {
             log::LevelFilter::Info
         },
