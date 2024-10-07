@@ -2,7 +2,10 @@
 
 use std::{fmt::Display, fs::File, io::Write, ops::Range, path::PathBuf, slice::Iter};
 
-use core::clap::{self, Parser, ValueEnum};
+use core::{
+    clap::{self, Parser, ValueEnum},
+    log::error,
+};
 
 #[derive(Clone, Copy, Debug, Default, ValueEnum)]
 enum Version {
@@ -30,13 +33,13 @@ struct Args {
     output: Option<PathBuf>,
 }
 
-fn four_bytes(bytes: &mut Iter<u8>) -> [u8; 4] {
-    [
-        *bytes.next().unwrap(),
-        *bytes.next().unwrap(),
-        *bytes.next().unwrap(),
-        *bytes.next().unwrap(),
-    ]
+fn four_bytes(bytes: &mut Iter<u8>) -> Option<[u8; 4]> {
+    Some([
+        *bytes.next()?,
+        *bytes.next()?,
+        *bytes.next()?,
+        *bytes.next()?,
+    ])
 }
 
 fn main() {
@@ -44,15 +47,28 @@ fn main() {
 
     let args = Args::parse();
 
-    let snd_bytes = std::fs::read(&args.snd_path).unwrap();
-    let smp_bytes = std::fs::read(&args.smp_path).unwrap();
+    let snd_bytes = std::fs::read(&args.snd_path).unwrap_or_else(|e| {
+        error!("Unable to load SND file {:?}: {e}", &args.snd_path);
+        std::process::exit(1);
+    });
+    let smp_bytes = std::fs::read(&args.smp_path).unwrap_or_else(|e| {
+        error!("Unable to load SMP file {:?}: {e}", &args.smp_path);
+        std::process::exit(1);
+    });
 
-    let snd_file = SndFile::parse(
+    let Some(snd_file) = SndFile::parse(
         &mut snd_bytes.iter(),
         snd_bytes.len() as u32,
         args.file_version.unwrap_or_default(),
-    );
-    let smp_file = SmpFile::parse(&snd_file, &mut smp_bytes.iter(), smp_bytes.len() as u32);
+    ) else {
+        error!("Unable to parse SND file");
+        std::process::exit(1);
+    };
+    let Some(smp_file) = SmpFile::parse(&snd_file, &mut smp_bytes.iter(), smp_bytes.len() as u32)
+    else {
+        error!("Unable to parse SMP file");
+        std::process::exit(1);
+    };
 
     let output_folder = args
         .output
@@ -381,69 +397,53 @@ struct SndHeader {
 }
 
 impl SndHeader {
-    fn parse(bytes: &mut Iter<u8>, version: Version) -> Self {
-        match version {
+    fn parse(bytes: &mut Iter<u8>, version: Version) -> Option<Self> {
+        Some(match version {
             Version::SoulReaver => Self {
-                magic_number: u32::from_le_bytes(four_bytes(bytes)),
-                header_size: HeaderSize::new(u32::from_le_bytes(four_bytes(bytes))),
-                bank_version: Some(u32::from_le_bytes(four_bytes(bytes))),
-                num_programs: u32::from_le_bytes(four_bytes(bytes)),
-                num_zones: u32::from_le_bytes(four_bytes(bytes)),
-                num_waves: u32::from_le_bytes(four_bytes(bytes)),
-                num_sequences: u32::from_le_bytes(four_bytes(bytes)),
-                num_labels: u32::from_le_bytes(four_bytes(bytes)),
-                reverb_mode: u32::from_le_bytes(four_bytes(bytes)),
-                reverb_depth: u32::from_le_bytes(four_bytes(bytes)),
+                magic_number: u32::from_le_bytes(four_bytes(bytes)?),
+                header_size: HeaderSize::new(u32::from_le_bytes(four_bytes(bytes)?)),
+                bank_version: Some(u32::from_le_bytes(four_bytes(bytes)?)),
+                num_programs: u32::from_le_bytes(four_bytes(bytes)?),
+                num_zones: u32::from_le_bytes(four_bytes(bytes)?),
+                num_waves: u32::from_le_bytes(four_bytes(bytes)?),
+                num_sequences: u32::from_le_bytes(four_bytes(bytes)?),
+                num_labels: u32::from_le_bytes(four_bytes(bytes)?),
+                reverb_mode: u32::from_le_bytes(four_bytes(bytes)?),
+                reverb_depth: u32::from_le_bytes(four_bytes(bytes)?),
             },
             Version::Prototype => Self {
-                magic_number: u32::from_le_bytes(four_bytes(bytes)),
-                header_size: HeaderSize::new(u32::from_le_bytes(four_bytes(bytes))),
-                bank_version: Some(u16::from_le_bytes([
-                    *bytes.next().unwrap(),
-                    *bytes.next().unwrap(),
-                ]) as u32),
+                magic_number: u32::from_le_bytes(four_bytes(bytes)?),
+                header_size: HeaderSize::new(u32::from_le_bytes(four_bytes(bytes)?)),
+                bank_version: Some(u16::from_le_bytes([*bytes.next()?, *bytes.next()?]) as u32),
                 num_programs: {
                     let _pad = bytes.next();
-                    *bytes.next().unwrap() as u32
+                    *bytes.next()? as u32
                 },
-                num_zones: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
-                    as u32,
-                num_waves: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
-                    as u32,
-                num_sequences: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
-                    as u32,
-                num_labels: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
-                    as u32,
-                reverb_mode: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
-                    as u32,
-                reverb_depth: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
-                    as u32,
+                num_zones: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]) as u32,
+                num_waves: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]) as u32,
+                num_sequences: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]) as u32,
+                num_labels: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]) as u32,
+                reverb_mode: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]) as u32,
+                reverb_depth: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]) as u32,
             },
             Version::Gex => Self {
-                magic_number: u32::from_le_bytes(four_bytes(bytes)),
-                header_size: HeaderSize::new(u16::from_le_bytes([
-                    *bytes.next().unwrap(),
-                    *bytes.next().unwrap(),
-                ])),
+                magic_number: u32::from_le_bytes(four_bytes(bytes)?),
+                header_size: HeaderSize::new(u16::from_le_bytes([*bytes.next()?, *bytes.next()?])),
                 bank_version: None,
                 num_programs: {
                     let _pad = bytes.next();
-                    *bytes.next().unwrap() as u32
+                    // TODO try *bytes.nth(1)? as u32
+                    // Honestly a lot of parts have repeated next calls that should be nth or skip
+                    *bytes.next()? as u32
                 },
-                num_zones: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
-                    as u32,
-                num_waves: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
-                    as u32,
-                num_sequences: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
-                    as u32,
-                num_labels: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
-                    as u32,
-                reverb_mode: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
-                    as u32,
-                reverb_depth: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
-                    as u32,
+                num_zones: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]) as u32,
+                num_waves: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]) as u32,
+                num_sequences: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]) as u32,
+                num_labels: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]) as u32,
+                reverb_mode: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]) as u32,
+                reverb_depth: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]) as u32,
             },
-        }
+        })
     }
 }
 
@@ -456,18 +456,18 @@ struct SndProgram {
 }
 
 impl SndProgram {
-    fn parse(bytes: &mut Iter<u8>) -> Self {
+    fn parse(bytes: &mut Iter<u8>) -> Option<Self> {
         let program = Self {
-            num_zones: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            first_tone: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            volume: *bytes.next().unwrap(),
-            pan_pos: *bytes.next().unwrap(),
+            num_zones: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]),
+            first_tone: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]),
+            volume: *bytes.next()?,
+            pan_pos: *bytes.next()?,
         };
 
-        bytes.next().unwrap();
-        bytes.next().unwrap();
+        bytes.next()?;
+        bytes.next()?;
 
-        program
+        Some(program)
     }
 }
 
@@ -489,24 +489,24 @@ struct SndZone {
 }
 
 impl SndZone {
-    fn parse(bytes: &mut Iter<u8>) -> Self {
-        Self {
-            priority: *bytes.next().unwrap(),
-            parent_program: *bytes.next().unwrap(),
-            volume: *bytes.next().unwrap(),
-            pan_pos: *bytes.next().unwrap(),
-            root_key: *bytes.next().unwrap(),
-            pitch_fine_tuning: *bytes.next().unwrap(),
-            note_low: *bytes.next().unwrap(),
-            note_high: *bytes.next().unwrap(),
-            mode: *bytes.next().unwrap(),
-            max_pitch_range: *bytes.next().unwrap(),
-            adsr1: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            adsr2: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            wave_index: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()])
+    fn parse(bytes: &mut Iter<u8>) -> Option<Self> {
+        Some(Self {
+            priority: *bytes.next()?,
+            parent_program: *bytes.next()?,
+            volume: *bytes.next()?,
+            pan_pos: *bytes.next()?,
+            root_key: *bytes.next()?,
+            pitch_fine_tuning: *bytes.next()?,
+            note_low: *bytes.next()?,
+            note_high: *bytes.next()?,
+            mode: *bytes.next()?,
+            max_pitch_range: *bytes.next()?,
+            adsr1: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]),
+            adsr2: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]),
+            wave_index: u16::from_le_bytes([*bytes.next()?, *bytes.next()?])
                 .checked_add(1)
                 .unwrap_or(1),
-        }
+        })
     }
 }
 
@@ -522,8 +522,8 @@ struct SndFile {
 }
 
 impl SndFile {
-    fn parse(bytes: &mut Iter<u8>, file_size: u32, version: Version) -> Self {
-        let header = SndHeader::parse(bytes, version);
+    fn parse(bytes: &mut Iter<u8>, file_size: u32, version: Version) -> Option<Self> {
+        let header = SndHeader::parse(bytes, version)?;
         assert_eq!(header.magic_number, 0x6153_4e44);
 
         while file_size - (bytes.as_slice().len() as u32) < header.header_size.size as u32 {
@@ -533,34 +533,34 @@ impl SndFile {
         let mut requested_zones = 0;
         let programs = (0..header.num_programs)
             .map(|_| {
-                let mut program = SndProgram::parse(bytes);
+                let mut program = SndProgram::parse(bytes)?;
                 if requested_zones + program.num_zones > header.num_zones as u16 {
                     program.num_zones = 0;
                 } else {
                     requested_zones += program.num_zones;
                 }
-                program
+                Some(program)
             })
-            .collect();
+            .collect::<Option<Vec<_>>>()?;
         let zones = (0..header.num_zones)
             .map(|_| SndZone::parse(bytes))
-            .collect();
+            .collect::<Option<Vec<_>>>()?;
         let mut wave_offsets_start = None;
         let wave_offsets = (0..header.num_waves)
             .map(|_| {
-                let num = u32::from_le_bytes(four_bytes(bytes));
+                let num = u32::from_le_bytes(four_bytes(bytes)?);
                 if wave_offsets_start.is_none() {
                     wave_offsets_start = Some(num);
                 }
-                num - wave_offsets_start.unwrap()
+                Some(num - wave_offsets_start.unwrap())
             })
-            .collect();
+            .collect::<Option<Vec<_>>>()?;
         let sequence_offsets = (0..header.num_sequences)
-            .map(|_| u32::from_le_bytes(four_bytes(bytes)))
-            .collect::<Vec<_>>();
+            .map(|_| Some(u32::from_le_bytes(four_bytes(bytes)?)))
+            .collect::<Option<Vec<_>>>()?;
         let labels = (0..header.num_labels)
-            .map(|_| u32::from_le_bytes(four_bytes(bytes)))
-            .collect();
+            .map(|_| Some(u32::from_le_bytes(four_bytes(bytes)?)))
+            .collect::<Option<Vec<_>>>()?;
 
         let sequences_start = file_size - bytes.as_slice().len() as u32;
         let mut sequences = vec![];
@@ -574,7 +574,7 @@ impl SndFile {
             sequences.push(start..end);
         }
 
-        Self {
+        Some(Self {
             header,
             programs,
             zones,
@@ -582,7 +582,7 @@ impl SndFile {
             sequence_offsets,
             labels,
             sequences,
-        }
+        })
     }
 }
 
@@ -594,17 +594,17 @@ pub struct SmpFile {
 }
 
 impl SmpFile {
-    fn parse(snd: &SndFile, bytes: &mut Iter<u8>, file_size: u32) -> Self {
+    fn parse(snd: &SndFile, bytes: &mut Iter<u8>, file_size: u32) -> Option<Self> {
         const MAGIC: u32 = 0x61534d50;
-        let first_bytes = u32::from_le_bytes(four_bytes(bytes));
+        let first_bytes = u32::from_le_bytes(four_bytes(bytes)?);
 
         let (magic_number, body_size, header_size) = if first_bytes == MAGIC {
-            (Some(first_bytes), u32::from_le_bytes(four_bytes(bytes)), 8)
+            (Some(first_bytes), u32::from_le_bytes(four_bytes(bytes)?), 8)
         } else {
             (None, first_bytes, 4)
         };
 
-        Self {
+        Some(Self {
             magic_number,
             body_size,
             waves: (0..snd.header.num_waves as usize)
@@ -618,6 +618,6 @@ impl SmpFile {
                     start..end
                 })
                 .collect(),
-        }
+        })
     }
 }
