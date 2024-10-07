@@ -1,16 +1,15 @@
-use dbg_hex::dbg_hex;
 use std::{fs::File, io::Write, path::PathBuf};
 
-use core::clap::{self, Parser};
+use core::{
+    clap::{self, Parser},
+    log::{debug, error, info},
+};
 
 #[derive(Parser)]
 #[command(version)]
 struct Args {
     /// msq file to read
     input: PathBuf,
-    /// Whether to display debug information or not
-    #[clap(long, short)]
-    debug: bool,
 }
 
 fn main() {
@@ -19,11 +18,24 @@ fn main() {
     let args = Args::parse();
 
     for file_path in core::get_files(&args.input) {
-        let bytes = std::fs::read(&file_path).expect("unable to open file");
+        info!("Handling {file_path:?}");
+        let bytes = match std::fs::read(&file_path) {
+            Ok(b) => b,
+            Err(e) => {
+                error!("Unable to open {file_path:?}: {e}");
+                continue;
+            }
+        };
 
-        let (header, tracks) = convert(bytes, args.debug);
+        let Some((header, tracks)) = convert(bytes) else {
+            error!("Unable to parse MSQ header");
+            continue;
+        };
         let folder = file_path.with_extension("");
-        std::fs::create_dir(&folder).expect("unable to make output folder");
+        if let Err(e) = std::fs::create_dir(&folder) {
+            error!("Unable to create output folder {folder:?}: {e}");
+            continue;
+        }
         for (index, track) in tracks.into_iter().enumerate() {
             let mut output = File::create(folder.join(format!(
                 "{}_{index:04}.cds",
@@ -47,31 +59,29 @@ fn main() {
             output.write_all(&track).unwrap();
         }
 
-        println!("MSQ header for: {file_path:?}");
-        println!("Quarter note time: {}", header.quarter_note_time);
-        println!("PPQN: {}", header.ppqn);
-        println!("BPM: {}", 60_000_000 / header.quarter_note_time);
-        println!(
+        info!("MSQ header for: {file_path:?}");
+        info!("Quarter note time: {}", header.quarter_note_time);
+        info!("PPQN: {}", header.ppqn);
+        info!("BPM: {}", 60_000_000 / header.quarter_note_time);
+        info!(
             "Version: {}.{}",
             header.version.to_be_bytes()[0],
             header.version.to_be_bytes()[1]
         );
-        println!("Tracks/Channels: {}", header.num_tracks);
+        info!("Tracks/Channels: {}", header.num_tracks);
     }
 }
 
-fn convert(bytes: Vec<u8>, debug: bool) -> (MsqHeader, Vec<Vec<u8>>) {
+fn convert(bytes: Vec<u8>) -> Option<(MsqHeader, Vec<Vec<u8>>)> {
     let mut bytes_iter = bytes.iter();
 
-    let header = MsqHeader::parse(&mut bytes_iter);
+    let header = MsqHeader::parse(&mut bytes_iter)?;
     assert!(
         header.magic == 0x614d_5351 || header.magic == 0x6153_4551,
         "found invalid magic number {:#x}",
         header.magic
     );
-    if debug {
-        dbg_hex!(&header);
-    }
+    debug!("{header:#?}");
 
     let track_offsets = bytes_iter
         .take(header.num_tracks as usize * 4)
@@ -80,9 +90,7 @@ fn convert(bytes: Vec<u8>, debug: bool) -> (MsqHeader, Vec<Vec<u8>>) {
         .map(|x| u32::from_le_bytes([*x[0], *x[1], *x[2], *x[3]]))
         .collect::<Vec<_>>();
 
-    if debug {
-        dbg!(&track_offsets);
-    }
+    debug!("{track_offsets:#?}");
 
     let mut tracks = Vec::with_capacity(track_offsets.len());
     for (i, offset) in track_offsets.iter().copied().enumerate() {
@@ -95,17 +103,15 @@ fn convert(bytes: Vec<u8>, debug: bool) -> (MsqHeader, Vec<Vec<u8>>) {
         );
     }
 
-    if debug {
-        dbg!(&tracks);
-    }
+    debug!("{tracks:#?}");
 
-    (
+    Some((
         header,
         tracks
             .into_iter()
             .map(|x| bytes[x].to_vec())
             .collect::<Vec<_>>(),
-    )
+    ))
 }
 
 #[derive(Debug)]
@@ -119,24 +125,24 @@ struct MsqHeader {
 }
 
 impl MsqHeader {
-    fn parse<'a>(bytes: &mut impl Iterator<Item = &'a u8>) -> Self {
-        MsqHeader {
+    fn parse<'a>(bytes: &mut impl Iterator<Item = &'a u8>) -> Option<Self> {
+        Some(MsqHeader {
             magic: u32::from_le_bytes([
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
+                *bytes.next()?,
+                *bytes.next()?,
+                *bytes.next()?,
+                *bytes.next()?,
             ]),
             quarter_note_time: u32::from_le_bytes([
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
+                *bytes.next()?,
+                *bytes.next()?,
+                *bytes.next()?,
+                *bytes.next()?,
             ]),
-            ppqn: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            version: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            num_tracks: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            _padding: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-        }
+            ppqn: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]),
+            version: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]),
+            num_tracks: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]),
+            _padding: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]),
+        })
     }
 }
