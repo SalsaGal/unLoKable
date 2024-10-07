@@ -5,7 +5,12 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use core::clap::{self, Parser};
+use core::{
+    clap::{self, Parser},
+    log::{error, info, warn},
+};
+
+const MAGIC: [u8; 4] = [0x70, 0x51, 0x45, 0x53];
 
 #[derive(Parser)]
 struct Args {
@@ -32,7 +37,14 @@ fn main() {
 }
 
 fn repeat_file(path: &Path, args: &Args) {
-    let file = std::fs::read(path).unwrap();
+    info!("Repeating {path:?}");
+    let file = match std::fs::read(path) {
+        Ok(f) => f,
+        Err(e) => {
+            error!("Unable to open file {path:?}: {e}");
+            return;
+        }
+    };
     let mut bytes = file.iter().copied();
 
     let (loop_start, loop_end) = args
@@ -41,12 +53,14 @@ fn repeat_file(path: &Path, args: &Args) {
         .unwrap_or_default();
 
     // Check magic number
-    let header = Header::load(&mut bytes);
-    assert_eq!(
-        header.magic,
-        [0x70, 0x51, 0x45, 0x53],
-        "Invalid magic number",
-    );
+    let Some(header) = Header::load(&mut bytes) else {
+        error!("Unable to load header");
+        return;
+    };
+    if header.magic != MAGIC {
+        error!("Invalid magic number");
+        return;
+    }
 
     let beginning_index = match args.tempo_marker {
         // 0xff51XXXXXX
@@ -55,7 +69,7 @@ fn repeat_file(path: &Path, args: &Args) {
                 .enumerate()
                 .find(|(_, w)| *w == [0xff, 0x51])
                 .unwrap_or_else(|| {
-                    eprintln!("No marker found, defaulting to full file");
+                    warn!("No marker found, defaulting to full file");
                     (10, &[])
                 })
                 .0
@@ -97,12 +111,18 @@ fn repeat_file(path: &Path, args: &Args) {
         output.write_all(&file[end + 3..]).unwrap();
     }
 
-    let mut out = File::create(path.parent().unwrap().join(format!(
+    let out_path = path.parent().unwrap().join(format!(
         "{}_x{:02}.seq",
         path.file_stem().unwrap().to_string_lossy(),
         args.count
-    )))
-    .unwrap();
+    ));
+    let mut out = match File::create(&out_path) {
+        Ok(o) => o,
+        Err(e) => {
+            error!("Unable to create output file {out_path:?}: {e}");
+            return;
+        }
+    };
     out.write_all(&output).unwrap();
 }
 
@@ -131,28 +151,19 @@ struct Header {
 }
 
 impl Header {
-    fn load(bytes: &mut impl Iterator<Item = u8>) -> Self {
-        Self {
-            magic: [
-                bytes.next().unwrap(),
-                bytes.next().unwrap(),
-                bytes.next().unwrap(),
-                bytes.next().unwrap(),
-            ],
+    fn load(bytes: &mut impl Iterator<Item = u8>) -> Option<Self> {
+        Some(Self {
+            magic: [bytes.next()?, bytes.next()?, bytes.next()?, bytes.next()?],
             _version: u32::from_ne_bytes([
-                bytes.next().unwrap(),
-                bytes.next().unwrap(),
-                bytes.next().unwrap(),
-                bytes.next().unwrap(),
+                bytes.next()?,
+                bytes.next()?,
+                bytes.next()?,
+                bytes.next()?,
             ]),
-            _ppqn: u16::from_ne_bytes([bytes.next().unwrap(), bytes.next().unwrap()]),
-            tempo: [
-                bytes.next().unwrap(),
-                bytes.next().unwrap(),
-                bytes.next().unwrap(),
-            ],
-            _time_signature: u16::from_ne_bytes([bytes.next().unwrap(), bytes.next().unwrap()]),
-        }
+            _ppqn: u16::from_ne_bytes([bytes.next()?, bytes.next()?]),
+            tempo: [bytes.next()?, bytes.next()?, bytes.next()?],
+            _time_signature: u16::from_ne_bytes([bytes.next()?, bytes.next()?]),
+        })
     }
 
     fn dummy_string(&self, file: &[u8], loop_marker: bool, loop_start: Option<usize>) -> Vec<u8> {
