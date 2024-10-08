@@ -8,7 +8,10 @@ use std::{
     slice::IterMut,
 };
 
-use core::clap::{self, Parser};
+use core::{
+    clap::{self, Parser},
+    log::{error, info},
+};
 
 #[derive(Parser)]
 struct Args {
@@ -31,11 +34,20 @@ fn main() {
 }
 
 fn fine_tune(path: &Path, psx: bool) {
-    let mut file = std::fs::read(path).unwrap();
+    info!("Handling {path:?}");
+    let mut file = match std::fs::read(path) {
+        Ok(f) => f,
+        Err(e) => {
+            error!("Unable to open file {path:?}: {e}");
+            return;
+        }
+    };
     let file_len = file.len();
     let mut file_iter = file.iter_mut();
 
-    VabFile::parse(&mut file_iter, file_len, psx);
+    if VabFile::parse(&mut file_iter, file_len, psx).is_none() {
+        return;
+    };
 
     let path_stem = path.with_extension("");
     let out_path = if psx {
@@ -57,12 +69,12 @@ struct VabFile {
 }
 
 impl VabFile {
-    fn parse(bytes: &mut IterMut<u8>, file_len: usize, psx: bool) -> Self {
-        let header = VabHeader::parse(bytes);
-        assert!(
-            (file_len as u32) >= header.total_size,
-            "File size mismatch!"
-        );
+    fn parse(bytes: &mut IterMut<u8>, file_len: usize, psx: bool) -> Option<Self> {
+        let header = VabHeader::parse(bytes)?;
+        if (file_len as u32) < header.total_size {
+            error!("File size mismatch!");
+            return None;
+        }
 
         let mut programs = Vec::with_capacity(header.programs_number as usize);
         let mut program_space = 0;
@@ -73,7 +85,7 @@ impl VabFile {
             program_space += 1;
         }
         for _ in 0..16 * (128 - program_space) {
-            bytes.next().unwrap();
+            bytes.next()?;
         }
 
         let tones = programs
@@ -81,15 +93,15 @@ impl VabFile {
             .map(|program| {
                 let tones = (0..program.tones_number)
                     .map(|_| Tone::parse(bytes, psx))
-                    .collect::<Vec<_>>();
+                    .collect::<Option<Vec<_>>>()?;
 
                 for _ in 0..32 * (16 - program.tones_number as usize) {
-                    bytes.next().unwrap();
+                    bytes.next()?;
                 }
 
-                tones
+                Some(tones)
             })
-            .collect::<Vec<_>>();
+            .collect::<Option<Vec<_>>>()?;
 
         let pitch_finetunings = tones.iter().map(|tones| tones.iter().len()).sum::<usize>();
         let nonzero_finetunings = tones
@@ -100,16 +112,14 @@ impl VabFile {
         println!("Tones found: {pitch_finetunings}");
         println!("Changed Non-zero Pitch Finetunings: {nonzero_finetunings}");
 
-        bytes.next().unwrap();
-        bytes.next().unwrap();
+        bytes.next()?;
+        bytes.next()?;
 
         let vag_sizes: Vec<usize> = (0..header.vags_number)
-            .map(|_| {
-                u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]) as usize * 8
-            })
-            .collect();
+            .map(|_| Some(u16::from_le_bytes([*bytes.next()?, *bytes.next()?]) as usize * 8))
+            .collect::<Option<Vec<_>>>()?;
         for _ in 0..512 - vag_sizes.len() * 2 - 2 {
-            bytes.next().unwrap();
+            bytes.next()?;
         }
 
         let start_of_samples = file_len - bytes.as_ref().len();
@@ -121,13 +131,13 @@ impl VabFile {
             })
             .0;
 
-        Self {
+        Some(Self {
             header,
             programs,
             tones,
             vag_sizes,
             vag_ranges,
-        }
+        })
     }
 }
 
@@ -149,47 +159,47 @@ struct VabHeader {
 }
 
 impl VabHeader {
-    fn parse(bytes: &mut IterMut<u8>) -> Self {
-        Self {
+    fn parse(bytes: &mut IterMut<u8>) -> Option<Self> {
+        Some(Self {
             magic_number: u32::from_le_bytes([
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
+                *bytes.next()?,
+                *bytes.next()?,
+                *bytes.next()?,
+                *bytes.next()?,
             ]),
             version: u32::from_le_bytes([
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
+                *bytes.next()?,
+                *bytes.next()?,
+                *bytes.next()?,
+                *bytes.next()?,
             ]),
             vab_id: u32::from_le_bytes([
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
+                *bytes.next()?,
+                *bytes.next()?,
+                *bytes.next()?,
+                *bytes.next()?,
             ]),
             total_size: u32::from_le_bytes([
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
+                *bytes.next()?,
+                *bytes.next()?,
+                *bytes.next()?,
+                *bytes.next()?,
             ]),
-            _pad0: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            programs_number: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            tones_number: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            vags_number: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            master_volume: *bytes.next().unwrap(),
-            master_pan: *bytes.next().unwrap(),
-            bank_attributes_1: *bytes.next().unwrap(),
-            bank_attributes_2: *bytes.next().unwrap(),
+            _pad0: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]),
+            programs_number: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]),
+            tones_number: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]),
+            vags_number: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]),
+            master_volume: *bytes.next()?,
+            master_pan: *bytes.next()?,
+            bank_attributes_1: *bytes.next()?,
+            bank_attributes_2: *bytes.next()?,
             _pad1: u32::from_le_bytes([
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
+                *bytes.next()?,
+                *bytes.next()?,
+                *bytes.next()?,
+                *bytes.next()?,
             ]),
-        }
+        })
     }
 }
 
@@ -209,24 +219,24 @@ struct Program {
 impl Program {
     fn parse(bytes: &mut IterMut<u8>) -> Option<Self> {
         let program = Self {
-            tones_number: *bytes.next().unwrap(),
-            volume: *bytes.next().unwrap(),
-            priority: *bytes.next().unwrap(),
-            mode: *bytes.next().unwrap(),
-            pan: *bytes.next().unwrap(),
-            _pad0: *bytes.next().unwrap(),
-            attribute: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
+            tones_number: *bytes.next()?,
+            volume: *bytes.next()?,
+            priority: *bytes.next()?,
+            mode: *bytes.next()?,
+            pan: *bytes.next()?,
+            _pad0: *bytes.next()?,
+            attribute: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]),
             _pad1: u32::from_le_bytes([
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
+                *bytes.next()?,
+                *bytes.next()?,
+                *bytes.next()?,
+                *bytes.next()?,
             ]),
             _pad2: u32::from_le_bytes([
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
-                *bytes.next().unwrap(),
+                *bytes.next()?,
+                *bytes.next()?,
+                *bytes.next()?,
+                *bytes.next()?,
             ]),
         };
 
@@ -267,15 +277,15 @@ struct Tone {
 }
 
 impl Tone {
-    fn parse(bytes: &mut IterMut<u8>, psx: bool) -> Self {
-        Self {
-            priority: *bytes.next().unwrap(),
-            reverb_mode: *bytes.next().unwrap(),
-            volume: *bytes.next().unwrap(),
-            pan: *bytes.next().unwrap(),
-            unity_key: *bytes.next().unwrap(),
+    fn parse(bytes: &mut IterMut<u8>, psx: bool) -> Option<Self> {
+        Some(Self {
+            priority: *bytes.next()?,
+            reverb_mode: *bytes.next()?,
+            volume: *bytes.next()?,
+            pan: *bytes.next()?,
+            unity_key: *bytes.next()?,
             pitch_tune: {
-                let byte = bytes.next().unwrap();
+                let byte = bytes.next()?;
                 if psx {
                     *byte = ((*byte as u32) * 128 / 100) as u8;
                 } else {
@@ -283,24 +293,24 @@ impl Tone {
                 };
                 *byte
             },
-            key_low: *bytes.next().unwrap(),
-            key_high: *bytes.next().unwrap(),
-            vibrato_width: *bytes.next().unwrap(),
-            vibrato_time: *bytes.next().unwrap(),
-            port_width: *bytes.next().unwrap(),
-            port_hold: *bytes.next().unwrap(),
-            pitch_bend_minimum: *bytes.next().unwrap(),
-            pitch_bend_maximum: *bytes.next().unwrap(),
-            _pad0: *bytes.next().unwrap(),
-            _pad1: *bytes.next().unwrap(),
-            adsr1: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            adsr2: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            parent_program: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            sample_number: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            _pad2: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            _pad3: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            _pad4: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-            _pad5: u16::from_le_bytes([*bytes.next().unwrap(), *bytes.next().unwrap()]),
-        }
+            key_low: *bytes.next()?,
+            key_high: *bytes.next()?,
+            vibrato_width: *bytes.next()?,
+            vibrato_time: *bytes.next()?,
+            port_width: *bytes.next()?,
+            port_hold: *bytes.next()?,
+            pitch_bend_minimum: *bytes.next()?,
+            pitch_bend_maximum: *bytes.next()?,
+            _pad0: *bytes.next()?,
+            _pad1: *bytes.next()?,
+            adsr1: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]),
+            adsr2: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]),
+            parent_program: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]),
+            sample_number: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]),
+            _pad2: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]),
+            _pad3: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]),
+            _pad4: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]),
+            _pad5: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]),
+        })
     }
 }
