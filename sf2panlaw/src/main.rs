@@ -2,10 +2,14 @@ use std::{
     fmt::Display,
     fs::File,
     io::Write,
+    num::ParseIntError,
     path::{Path, PathBuf},
 };
 
-use core::clap::{self, Parser};
+use core::{
+    clap::{self, Parser},
+    log::{error, info},
+};
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Function {
@@ -59,7 +63,14 @@ fn main() {
 }
 
 fn convert(path: &Path, function: Function) {
-    let file = std::fs::read_to_string(path).unwrap();
+    info!("Converting {path:?}");
+    let file = match std::fs::read_to_string(path) {
+        Ok(f) => f,
+        Err(e) => {
+            error!("Unable to open file: {e}");
+            return;
+        }
+    };
     let mut lines = file
         .lines()
         .map(std::borrow::ToOwned::to_owned)
@@ -69,9 +80,15 @@ fn convert(path: &Path, function: Function) {
         .iter()
         .enumerate()
         .filter_map(|(i, x)| {
-            x.trim()
-                .strip_prefix("Z_pan=")
-                .map(|value| (i, z_pan(value)))
+            x.trim().strip_prefix("Z_pan=").map(|value| {
+                (
+                    i,
+                    z_pan(value).unwrap_or_else(|e| {
+                        error!("Unable to interpret panning {value} on line {i}, defaulting to 0.0: {e}");
+                        0.0
+                    }),
+                )
+            })
         })
         .collect::<Vec<_>>();
     let z_atten = lines.iter().enumerate().filter_map(|(i, x)| {
@@ -82,11 +99,11 @@ fn convert(path: &Path, function: Function) {
 
     let pair_count = z_pans.len();
     let changed_attenuations = z_pans.iter().filter(|(_, x)| *x != 0.0).count();
-    println!("Pair count: {pair_count}");
-    println!("Changed Attenuations: {changed_attenuations}");
+    info!("Pair count: {pair_count}");
+    info!("Changed Attenuations: {changed_attenuations}");
 
     if changed_attenuations == 0 {
-        eprintln!("No attenuations changed, aborting");
+        error!("No attenuations changed, aborting");
         return;
     }
 
@@ -105,23 +122,28 @@ fn convert(path: &Path, function: Function) {
         lines[line] = format!("            Z_initialAttenuation={value}");
     }
 
-    let mut output = File::create(format!(
+    let output_path = format!(
         "{}_{function}.{}",
         path.with_extension("").to_string_lossy(),
         path.extension().unwrap().to_string_lossy(),
-    ))
-    .unwrap();
+    );
+    let mut output = match File::create(&output_path) {
+        Ok(o) => o,
+        Err(e) => {
+            error!("Unable to create output file {output_path:?}: {e}");
+            return;
+        }
+    };
     write!(output, "{}", lines.join("\r\n")).unwrap();
 }
 
-fn z_pan(value: &str) -> f32 {
+fn z_pan(value: &str) -> Result<f32, ParseIntError> {
     let integer = value
         .parse::<u16>()
         .map(u16_to_i16)
-        .or_else(|_| value.parse::<i16>())
-        .unwrap();
+        .or_else(|_| value.parse::<i16>())?;
 
-    integer as f32 / 500.0
+    Ok(integer as f32 / 500.0)
 }
 
 fn u16_to_i16(x: u16) -> i16 {
