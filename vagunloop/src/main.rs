@@ -1,6 +1,11 @@
 use std::{fs::File, io::Write, path::PathBuf};
 
-use core::clap::{self, Parser};
+use core::{
+    clap::{self, Parser},
+    log::{error, info},
+};
+
+const MAGIC: [u8; 4] = [0x56, 0x41, 0x47, 0x70];
 
 #[derive(Parser)]
 struct Args {
@@ -14,13 +19,19 @@ fn main() {
     let args = Args::parse();
 
     for file_path in core::get_files(&args.input) {
-        let mut vag_bytes = std::fs::read(&file_path).unwrap();
+        info!("Handling {file_path:?}");
+        let mut vag_bytes = match std::fs::read(&file_path) {
+            Ok(v) => v,
+            Err(e) => {
+                error!("Unable to read file: {e}");
+                continue;
+            }
+        };
 
-        assert_eq!(
-            &vag_bytes[0..4],
-            &[0x56, 0x41, 0x47, 0x70],
-            "Invalid magic number"
-        );
+        if vag_bytes[0..4] != MAGIC {
+            error!("Invalid magic number");
+            continue;
+        }
 
         let mut changed_chunks = 0;
         for chunk in vag_bytes[48..].chunks_mut(16) {
@@ -30,7 +41,7 @@ fn main() {
         }
 
         if changed_chunks == 0 {
-            println!("No markers found");
+            info!("No markers found");
         } else {
             let out_path = {
                 format!(
@@ -38,10 +49,16 @@ fn main() {
                     file_path.with_extension("").to_string_lossy()
                 )
             };
-            let mut out_file = File::create(out_path).unwrap();
+            let mut out_file = match File::create(out_path) {
+                Ok(o) => o,
+                Err(e) => {
+                    error!("Unable to create output file: {e}");
+                    continue;
+                }
+            };
             out_file.write_all(&vag_bytes).unwrap();
 
-            println!("{changed_chunks} markers removed");
+            info!("Removed {changed_chunks} markers");
         }
     }
 }
