@@ -1,6 +1,9 @@
 use std::{fs::File, io::Write, num::NonZeroU32, path::PathBuf};
 
-use core::clap::{self, Parser};
+use core::{
+    clap::{self, Parser},
+    log::{error, info},
+};
 
 #[derive(Parser)]
 #[clap(version)]
@@ -19,10 +22,24 @@ fn main() {
     let args = Args::parse();
 
     for file_path in core::get_files(&args.input) {
-        let file = std::fs::read(&file_path).unwrap();
+        info!("Handling {file_path:?}");
+        let file = match std::fs::read(&file_path) {
+            Ok(f) => f,
+            Err(e) => {
+                error!("Unable to open file: {e}");
+                continue;
+            }
+        };
         let file_len = file.len();
 
-        let mut output = File::create(file_path.with_extension("vag")).unwrap();
+        let output_path = file_path.with_extension("vag");
+        let mut output = match File::create(&output_path) {
+            Ok(o) => o,
+            Err(e) => {
+                error!("Unable to create output {output_path:?}: {e}");
+                continue;
+            }
+        };
 
         output
             .write_all(
