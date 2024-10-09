@@ -36,7 +36,6 @@ fn main() {
     });
 
     for path in files {
-        // if let Some((lb, le)) = find_loops(&path, &std::fs::read(&path).unwrap()) {
         if let Some((lb, le)) = std::fs::read(&path)
             .inspect_err(|e| {
                 error!("Unable to read file {path:?}, skipping: {e}");
@@ -54,7 +53,7 @@ fn main() {
             if let Some(file) = &mut file {
                 write!(file, "{}", text).unwrap();
             } else {
-                print!("{}", text);
+                print!("{text}");
             }
         }
     }
