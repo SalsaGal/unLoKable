@@ -1,6 +1,11 @@
 use std::{fs::File, io::Write, path::PathBuf};
 
-use core::clap::{self, Parser};
+use core::{
+    clap::{self, Parser},
+    log::{error, info},
+};
+
+const MAGIC: [u8; 4] = [0x56, 0x41, 0x47, 0x70];
 
 #[derive(Parser)]
 struct Args {
@@ -14,17 +19,22 @@ fn main() {
     let args = Args::parse();
 
     for file_path in core::get_files(&args.input) {
-        let mut vag_bytes = std::fs::read(&file_path).unwrap();
-        assert_eq!(
-            vag_bytes[0..4],
-            [0x56, 0x41, 0x47, 0x70],
-            "invalid magic number"
-        );
+        info!("Sanitizing {file_path:?}");
+        let mut vag_bytes = match std::fs::read(&file_path) {
+            Ok(v) => v,
+            Err(e) => {
+                error!("Unable to read file: {e}");
+                continue;
+            }
+        };
+        if vag_bytes[0..4] == MAGIC {
+            error!("File is missing the magic number");
+            continue;
+        }
         let changed = sanitized(&mut vag_bytes);
 
-        print!("{file_path:?}: ");
         if changed != 0 {
-            println!("{changed} bad chunks fixed!");
+            info!("Fixed {changed} bad chunks");
             let mut output = File::create(format!(
                 "{}_clean.{}",
                 file_path.with_extension("").to_string_lossy(),
@@ -33,7 +43,7 @@ fn main() {
             .unwrap();
             output.write_all(&vag_bytes).unwrap();
         } else {
-            println!("No bad chunks were found!");
+            info!("No bad chunks were found!");
         }
     }
 }
