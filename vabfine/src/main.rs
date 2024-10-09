@@ -109,8 +109,8 @@ impl VabFile {
             .map(|tones| tones.iter().filter(|t| t.pitch_tune != 0).count())
             .sum::<usize>();
 
-        println!("Tones found: {pitch_finetunings}");
-        println!("Changed Non-zero Pitch Finetunings: {nonzero_finetunings}");
+        info!("Tones found: {pitch_finetunings}");
+        info!("Changed Non-zero Pitch Finetunings: {nonzero_finetunings}");
 
         bytes.next()?;
         bytes.next()?;
