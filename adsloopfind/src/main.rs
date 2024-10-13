@@ -41,16 +41,16 @@ fn main() {
             .and_then(|contents| find_loops(&contents))
         {
             let text = format!(
-                "{loop_begin} {loop_end} {}\r\n",
+                "{loop_begin} {loop_end} {}",
                 path.with_extension("wav")
                     .file_name()
                     .unwrap()
                     .to_string_lossy()
             );
             if let Some(file) = &mut file {
-                write!(file, "{}", text).unwrap();
+                write!(file, "{}\r\n", text).unwrap();
             } else {
-                print!("{text}");
+                info!("{text}");
             }
         }
     }
@@ -111,4 +111,10 @@ fn without_loop() {
 fn with_loop() {
     let loops = find_loops(include_bytes!("../tests/withloop.ads"));
     assert_eq!(loops, Some((896, 1791)));
+}
+
+#[test]
+fn with_loop_multichannel() {
+    let loops = find_loops(include_bytes!("../tests/multichannel.ads"));
+    assert_eq!(loops, Some((448, 895)));
 }
