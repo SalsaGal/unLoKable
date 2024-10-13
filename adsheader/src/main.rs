@@ -91,7 +91,7 @@ fn adsheader_test() {
         format: 16,
         output: None,
     };
-    let mut file = include_bytes!("../../tests/adsheader/vag_adpcm_test.bin").to_vec();
+    let mut file = include_bytes!("../tests/vag_adpcm.bin").to_vec();
     add_header(&args, &mut file);
 
     assert_eq!(file[0], 0x53);
