@@ -21,27 +21,9 @@ fn main() {
 
         let mut ads_bytes = std::fs::read(&file_path).unwrap();
 
-        if ads_bytes[0..4] != [0x53, 0x53, 0x68, 0x64] {
-            error!("Invalid header magic number, skipping");
+        let Some(changed_chunks) = unloop(&mut ads_bytes) else {
             continue;
-        }
-
-        if ads_bytes[8..12] != 0x10u32.to_le_bytes() {
-            error!("Invalid codec, only support Sony 4-bit ADPCM, skipping");
-            continue;
-        }
-
-        if ads_bytes[32..36] != [0x53, 0x53, 0x62, 0x64] {
-            error!("Invalid body magic number, skipping");
-            continue;
-        }
-
-        let mut changed_chunks = 0;
-        for chunk in ads_bytes[40..].chunks_mut(16) {
-            if remove_loop(chunk) {
-                changed_chunks += 1;
-            }
-        }
+        };
 
         if changed_chunks == 0 {
             info!("No markers found");
@@ -58,6 +40,33 @@ fn main() {
     }
 }
 
+/// Returns the number of changed chunks
+fn unloop(ads_bytes: &mut [u8]) -> Option<usize> {
+    if ads_bytes[0..4] != [0x53, 0x53, 0x68, 0x64] {
+        error!("Invalid header magic number, skipping");
+        return None;
+    }
+
+    if ads_bytes[8..12] != 0x10u32.to_le_bytes() {
+        error!("Invalid codec, only support Sony 4-bit ADPCM, skipping");
+        return None;
+    }
+
+    if ads_bytes[32..36] != [0x53, 0x53, 0x62, 0x64] {
+        error!("Invalid body magic number, skipping");
+        return None;
+    }
+
+    let mut changed_chunks = 0;
+    for chunk in ads_bytes[40..].chunks_mut(16) {
+        if remove_loop(chunk) {
+            changed_chunks += 1;
+        }
+    }
+
+    Some(changed_chunks)
+}
+
 /// Removes the loop and returns true if any change was made
 fn remove_loop(bytes: &mut [u8]) -> bool {
     if bytes[1] != 7 && bytes[1] != 0 {
@@ -66,4 +75,22 @@ fn remove_loop(bytes: &mut [u8]) -> bool {
     } else {
         false
     }
+}
+
+#[test]
+fn with_loop() {
+    let mut file = include_bytes!("../tests/withloop.ads").to_vec();
+    assert_eq!(unloop(&mut file), Some(64));
+}
+
+#[test]
+fn without_loop() {
+    let mut file = include_bytes!("../tests/withoutloop.ads").to_vec();
+    assert_eq!(unloop(&mut file), Some(2));
+}
+
+#[test]
+fn invalid() {
+    let mut file = include_bytes!("../tests/pcm.ads").to_vec();
+    assert_eq!(unloop(&mut file), None);
 }
