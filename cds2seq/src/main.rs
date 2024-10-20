@@ -9,9 +9,6 @@ use std::{fs::File, path::PathBuf};
 struct Args {
     /// `cds` file to read
     input: PathBuf,
-    /// Whether to display debug information or not
-    #[clap(long, short)]
-    debug: bool,
 }
 
 #[derive(Debug)]
