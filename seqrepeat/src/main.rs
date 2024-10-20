@@ -1,9 +1,4 @@
-use std::{
-    fs::File,
-    io::Write,
-    num::NonZeroUsize,
-    path::{Path, PathBuf},
-};
+use std::{fs::File, io::Write, num::NonZeroUsize, path::PathBuf};
 
 use core::{
     clap::{self, Parser},
@@ -32,7 +27,16 @@ fn main() {
     let args = Args::parse();
 
     for file in core::get_files(&args.input) {
-        let Some(output) = repeat_file(&file, &args) else {
+        info!("Repeating {file:?}");
+        let bytes = match std::fs::read(&file) {
+            Ok(f) => f,
+            Err(e) => {
+                error!("Unable to open file: {e}");
+                continue;
+            }
+        };
+
+        let Some(output) = repeat_file(&bytes, &args) else {
             continue;
         };
 
@@ -52,20 +56,12 @@ fn main() {
     }
 }
 
-fn repeat_file(path: &Path, args: &Args) -> Option<Vec<u8>> {
-    info!("Repeating {path:?}");
-    let file = match std::fs::read(path) {
-        Ok(f) => f,
-        Err(e) => {
-            error!("Unable to open file: {e}");
-            return None;
-        }
-    };
+fn repeat_file(file: &[u8], args: &Args) -> Option<Vec<u8>> {
     let mut bytes = file.iter().copied();
 
     let (loop_start, loop_end) = args
         .loop_marker
-        .then_some(find_loops(&file))
+        .then_some(find_loops(file))
         .unwrap_or_default();
 
     // Check magic number
@@ -119,7 +115,7 @@ fn repeat_file(path: &Path, args: &Args) -> Option<Vec<u8>> {
         if i < args.count.get() - 1 {
             output.splice(
                 output.len() - 3..,
-                header.dummy_string(&file, args.loop_marker, loop_start),
+                header.dummy_string(file, args.loop_marker, loop_start),
             );
         }
     }
@@ -179,4 +175,40 @@ impl Header {
             vec![0xff, 0x51, self.tempo[0], self.tempo[1], self.tempo[2]]
         }
     }
+}
+
+#[test]
+fn with_loop_normal() {
+    let args = Args {
+        input: PathBuf::default(),
+        count: NonZeroUsize::new(3).unwrap(),
+        tempo_marker: false,
+        loop_marker: true,
+    };
+    let input = include_bytes!("../tests/with_loop_normal.seq");
+    assert_eq!(repeat_file(input, &args).unwrap().len(), 715);
+}
+
+#[test]
+fn with_loop_tempo() {
+    let args = Args {
+        input: PathBuf::default(),
+        count: NonZeroUsize::new(3).unwrap(),
+        tempo_marker: true,
+        loop_marker: false,
+    };
+    let input = include_bytes!("../tests/with_loop_tempo.seq");
+    assert_eq!(repeat_file(input, &args).unwrap().len(), 699);
+}
+
+#[test]
+fn no_loops() {
+    let args = Args {
+        input: PathBuf::default(),
+        count: NonZeroUsize::new(3).unwrap(),
+        tempo_marker: true,
+        loop_marker: false,
+    };
+    let input = include_bytes!("../tests/noloops.seq");
+    assert_eq!(repeat_file(input, &args).unwrap().len(), 979);
 }
