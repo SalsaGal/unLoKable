@@ -1,3 +1,5 @@
+#!/usr/bin/sh
+
 # Linux build
 cargo build --release
 mkdir out
