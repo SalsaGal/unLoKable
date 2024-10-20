@@ -32,17 +32,33 @@ fn main() {
     let args = Args::parse();
 
     for file in core::get_files(&args.input) {
-        repeat_file(&file, &args);
+        let Some(output) = repeat_file(&file, &args) else {
+            continue;
+        };
+
+        let out_path = file.parent().unwrap().join(format!(
+            "{}_x{:02}.seq",
+            file.file_stem().unwrap().to_string_lossy(),
+            args.count
+        ));
+        let mut out = match File::create(&out_path) {
+            Ok(o) => o,
+            Err(e) => {
+                error!("Unable to create output file {out_path:?}: {e}");
+                return;
+            }
+        };
+        out.write_all(&output).unwrap();
     }
 }
 
-fn repeat_file(path: &Path, args: &Args) {
+fn repeat_file(path: &Path, args: &Args) -> Option<Vec<u8>> {
     info!("Repeating {path:?}");
     let file = match std::fs::read(path) {
         Ok(f) => f,
         Err(e) => {
-            error!("Unable to open file {path:?}: {e}");
-            return;
+            error!("Unable to open file: {e}");
+            return None;
         }
     };
     let mut bytes = file.iter().copied();
@@ -55,11 +71,11 @@ fn repeat_file(path: &Path, args: &Args) {
     // Check magic number
     let Some(header) = Header::load(&mut bytes) else {
         error!("Unable to load header");
-        return;
+        return None;
     };
     if header.magic != MAGIC {
         error!("Invalid magic number");
-        return;
+        return None;
     }
 
     let beginning_index = match args.tempo_marker {
@@ -111,19 +127,7 @@ fn repeat_file(path: &Path, args: &Args) {
         output.write_all(&file[end + 3..]).unwrap();
     }
 
-    let out_path = path.parent().unwrap().join(format!(
-        "{}_x{:02}.seq",
-        path.file_stem().unwrap().to_string_lossy(),
-        args.count
-    ));
-    let mut out = match File::create(&out_path) {
-        Ok(o) => o,
-        Err(e) => {
-            error!("Unable to create output file {out_path:?}: {e}");
-            return;
-        }
-    };
-    out.write_all(&output).unwrap();
+    Some(output)
 }
 
 fn find_loops(file: &[u8]) -> (Option<usize>, Option<usize>) {
