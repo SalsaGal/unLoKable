@@ -149,3 +149,9 @@ fn z_pan(value: &str) -> Result<f32, ParseIntError> {
 fn u16_to_i16(x: u16) -> i16 {
     unsafe { std::mem::transmute(x) }
 }
+
+#[test]
+fn u16_i16_conversion() {
+    assert_eq!(u16_to_i16(0), 0);
+    assert_eq!(u16_to_i16(0xffff), -1);
+}
