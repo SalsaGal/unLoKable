@@ -284,15 +284,7 @@ impl Tone {
             volume: *bytes.next()?,
             pan: *bytes.next()?,
             unity_key: *bytes.next()?,
-            pitch_tune: {
-                let byte = bytes.next()?;
-                if psx {
-                    *byte = ((*byte as u32) * 128 / 100) as u8;
-                } else {
-                    *byte = ((*byte as u32) * 100 / 128) as u8;
-                };
-                *byte
-            },
+            pitch_tune: Self::convert(bytes.next()?, psx),
             key_low: *bytes.next()?,
             key_high: *bytes.next()?,
             vibrato_width: *bytes.next()?,
@@ -313,4 +305,49 @@ impl Tone {
             _pad5: u16::from_le_bytes([*bytes.next()?, *bytes.next()?]),
         })
     }
+
+    fn convert(byte: &mut u8, psx: bool) -> u8 {
+        if psx {
+            *byte = ((*byte as f32) * 128.0 / 100.0).round() as u8;
+        } else {
+            *byte = ((*byte as f32) * 100.0 / 128.0).round() as u8;
+        };
+        *byte
+    }
+}
+
+#[test]
+fn test_cents() {
+    assert_eq!(Tone::convert(&mut 0, false), 0);
+    assert_eq!(Tone::convert(&mut 127, false), 99);
+}
+
+#[test]
+fn test_psx() {
+    assert_eq!(Tone::convert(&mut 0, true), 0);
+    assert_eq!(Tone::convert(&mut 99, true), 127);
+}
+
+#[test]
+fn cents_parsing() {
+    let mut file = include_bytes!("../tests/test.vab").to_vec();
+    let file_length = file.len();
+    let vab = VabFile::parse(&mut file.iter_mut(), file_length, false).unwrap();
+
+    assert_eq!(vab.tones[1][1].pitch_tune, 56);
+    assert_eq!(vab.tones[1][2].pitch_tune, 19);
+    assert_eq!(vab.tones[1][15].pitch_tune, 27);
+    assert_eq!(vab.tones.iter().map(|x| x.len()).sum::<usize>(), 17);
+}
+
+#[test]
+fn psx_parsing() {
+    let mut file = include_bytes!("../tests/test.vab").to_vec();
+    let file_length = file.len();
+    let vab = VabFile::parse(&mut file.iter_mut(), file_length, true).unwrap();
+
+    assert_eq!(vab.tones[1][1].pitch_tune, 92);
+    assert_eq!(vab.tones[1][2].pitch_tune, 31);
+    assert_eq!(vab.tones[1][15].pitch_tune, 45);
+    assert_eq!(vab.tones.iter().map(|x| x.len()).sum::<usize>(), 17);
 }
