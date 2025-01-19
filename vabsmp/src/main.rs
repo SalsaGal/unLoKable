@@ -31,11 +31,11 @@ fn main() {
     let args = Args::parse();
 
     for file in core::get_files(&args.vab_path) {
-        create(&file, args.sample_rate, args.ads);
+        convert(&file, args.sample_rate, args.ads);
     }
 }
 
-fn create(path: &Path, sample_rate: NonZeroU32, ads: bool) {
+fn convert(path: &Path, sample_rate: NonZeroU32, ads: bool) {
     info!("Reading {path:?}");
     let file = match std::fs::read(path) {
         Ok(f) => f,
@@ -56,9 +56,11 @@ fn create(path: &Path, sample_rate: NonZeroU32, ads: bool) {
         error!("Unable to create folder {output_path:?}: {e}");
         return;
     }
-    for (i, range) in vab_file.vag_ranges.iter().enumerate() {
+
+    let samples = vab_file.create(&file, sample_rate, ads);
+    for (index, sample) in samples.iter().enumerate() {
         let path = output_path.join(format!(
-            "{}_{i:04}.{}",
+            "{}_{index:04}.{}",
             output_path.file_name().unwrap().to_string_lossy(),
             if ads { "ads" } else { "vag" }
         ));
@@ -69,44 +71,7 @@ fn create(path: &Path, sample_rate: NonZeroU32, ads: bool) {
                 continue;
             }
         };
-
-        let header = if ads {
-            [
-                [0x53, 0x53, 0x68, 0x64],
-                [0x18, 0, 0, 0],
-                [0x10, 0, 0, 0],
-                sample_rate.get().to_le_bytes(),
-                [1, 0, 0, 0],
-                [0; 4],
-                [0xff; 4],
-                [0xff; 4],
-                [0x53, 0x53, 0x62, 0x64],
-                (range.len() as u32).to_le_bytes(),
-            ]
-            .into_iter()
-            .flatten()
-            .collect::<Vec<_>>()
-        } else {
-            [
-                [0x56, 0x41, 0x47, 0x70],
-                [0, 0, 0, 3],
-                [0; 4],
-                (range.len() as u32).to_be_bytes(),
-                sample_rate.get().to_be_bytes(),
-                [0; 4],
-                [0; 4],
-                [0; 4],
-                [0; 4],
-                [0; 4],
-                [0; 4],
-                [0; 4],
-            ]
-            .into_iter()
-            .flatten()
-            .collect::<Vec<_>>()
-        };
-        out_file.write_all(&header).unwrap();
-        out_file.write_all(&file[range.clone()]).unwrap();
+        out_file.write_all(sample).unwrap();
     }
 }
 
@@ -185,6 +150,52 @@ impl VabFile {
             vag_sizes,
             vag_ranges,
         })
+    }
+
+    fn create(&self, file: &[u8], sample_rate: NonZeroU32, ads: bool) -> Vec<Vec<u8>> {
+        self.vag_ranges
+            .iter()
+            .cloned()
+            .map(|range| {
+                let mut header = if ads {
+                    [
+                        [0x53, 0x53, 0x68, 0x64],
+                        [0x18, 0, 0, 0],
+                        [0x10, 0, 0, 0],
+                        sample_rate.get().to_le_bytes(),
+                        [1, 0, 0, 0],
+                        [0; 4],
+                        [0xff; 4],
+                        [0xff; 4],
+                        [0x53, 0x53, 0x62, 0x64],
+                        (range.len() as u32).to_le_bytes(),
+                    ]
+                    .into_iter()
+                    .flatten()
+                    .collect::<Vec<_>>()
+                } else {
+                    [
+                        [0x56, 0x41, 0x47, 0x70],
+                        [0, 0, 0, 3],
+                        [0; 4],
+                        (range.len() as u32).to_be_bytes(),
+                        sample_rate.get().to_be_bytes(),
+                        [0; 4],
+                        [0; 4],
+                        [0; 4],
+                        [0; 4],
+                        [0; 4],
+                        [0; 4],
+                        [0; 4],
+                    ]
+                    .into_iter()
+                    .flatten()
+                    .collect::<Vec<_>>()
+                };
+                header.extend_from_slice(&file[range]);
+                header
+            })
+            .collect()
     }
 }
 
