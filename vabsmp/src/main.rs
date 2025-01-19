@@ -364,3 +364,74 @@ impl Tone {
         })
     }
 }
+
+#[test]
+fn test_file() {
+    let vab = include_bytes!("../tests/test.vab");
+    let vab_file = VabFile::parse(&mut vab.iter(), vab.len()).unwrap();
+    assert_eq!(vab_file.header.total_size, vab.len() as u32);
+    assert_eq!(vab_file.tones.len(), 2);
+}
+
+#[test]
+fn test_conversion() {
+    let vab = include_bytes!("../tests/test.vab");
+    let vab_file = VabFile::parse(&mut vab.iter(), vab.len()).unwrap();
+    let samples = vab_file.create(vab, NonZeroU32::new(22050).unwrap(), false);
+    assert_eq!(samples[0].len(), 25264);
+    assert_eq!(samples[1].len(), 15968);
+}
+
+#[test]
+fn cursor() {
+    let vab = include_bytes!("../tests/test.vab");
+    let mut iter = vab.iter();
+
+    let header = VabHeader::parse(&mut iter).unwrap();
+
+    let mut programs = Vec::with_capacity(header.programs_number as usize);
+    let mut program_space = 0;
+    while programs.len() < header.programs_number as usize {
+        if let Some(program) = Program::parse(&mut iter) {
+            programs.push(program);
+        }
+        program_space += 1;
+    }
+    for _ in 0..16 * (128 - program_space) {
+        iter.next().unwrap();
+    }
+
+    let _ = programs
+        .iter()
+        .map(|program| {
+            let tones = (0..program.tones_number)
+                .map(|_| Tone::parse(&mut iter))
+                .collect::<Option<Vec<_>>>()
+                .unwrap();
+
+            for _ in 0..32 * (16 - program.tones_number as usize) {
+                iter.next().unwrap();
+            }
+
+            Some(tones)
+        })
+        .collect::<Option<Vec<_>>>()
+        .unwrap();
+
+    iter.next().unwrap();
+    iter.next().unwrap();
+
+    let vag_sizes = (0..header.vags_number)
+        .map(|_| {
+            Some(u16::from_le_bytes([*iter.next().unwrap(), *iter.next().unwrap()]) as usize * 8)
+        })
+        .collect::<Option<Vec<_>>>()
+        .unwrap();
+    for _ in 0..512 - vag_sizes.len() * 2 - 2 {
+        iter.next().unwrap();
+    }
+
+    let cursor_index = vab.len() - iter.as_slice().len();
+    assert_eq!(cursor_index, 0xe20);
+    assert_eq!(vab.len() - cursor_index, 0xa0b0);
+}
