@@ -338,7 +338,7 @@ fn cents_parsing() {
     assert_eq!(vab.tones[1][1].pitch_tune, 56);
     assert_eq!(vab.tones[1][2].pitch_tune, 19);
     assert_eq!(vab.tones[1][15].pitch_tune, 27);
-    assert_eq!(vab.tones.iter().map(|x| x.len()).sum::<usize>(), 17);
+    assert_eq!(vab.tones.iter().map(std::vec::Vec::len).sum::<usize>(), 17);
 }
 
 #[test]
@@ -350,5 +350,5 @@ fn psx_parsing() {
     assert_eq!(vab.tones[1][1].pitch_tune, 92);
     assert_eq!(vab.tones[1][2].pitch_tune, 31);
     assert_eq!(vab.tones[1][15].pitch_tune, 45);
-    assert_eq!(vab.tones.iter().map(|x| x.len()).sum::<usize>(), 17);
+    assert_eq!(vab.tones.iter().map(std::vec::Vec::len).sum::<usize>(), 17);
 }

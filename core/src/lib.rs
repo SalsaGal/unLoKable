@@ -30,7 +30,7 @@ pub fn init() {
 /// or if the path is to a directory a list of the files in the path.
 ///
 /// Displays an error and quits if there is an error.
-pub fn get_files(path: &Path) -> Vec<PathBuf> {
+#[must_use] pub fn get_files(path: &Path) -> Vec<PathBuf> {
     if path.is_dir() {
         std::fs::read_dir(path)
             .unwrap_or_else(|e| {

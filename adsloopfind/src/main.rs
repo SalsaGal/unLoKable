@@ -49,7 +49,7 @@ fn main() {
                     .to_string_lossy()
             );
             if let Some(file) = &mut file {
-                write!(file, "{}\r\n", text).unwrap();
+                write!(file, "{text}\r\n").unwrap();
             } else {
                 info!("{text}");
             }
