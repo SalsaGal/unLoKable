@@ -30,7 +30,6 @@ fn main() {
                 continue;
             }
         };
-        let file_len = file.len();
 
         let output_path = file_path.with_extension("vag");
         let mut output = match File::create(&output_path) {
@@ -41,30 +40,34 @@ fn main() {
             }
         };
 
-        output
-            .write_all(
-                &[
-                    [0x56, 0x41, 0x47, 0x70],
-                    [0x0, 0x0, 0x0, 0x3],
-                    [0; 4],
-                    (file_len as u32).to_be_bytes(),
-                    (args.sample_rate.get().to_be_bytes()),
-                    [0; 4],
-                    [0; 4],
-                    [0; 4],
-                    [0; 4],
-                    [0; 4],
-                    [0; 4],
-                    [0; 4],
-                ]
-                .into_iter()
-                .flatten()
-                .collect::<Vec<_>>(),
-            )
-            .unwrap();
-        if !args.short {
-            output.write_all(&[0; 16]).unwrap();
-        }
-        output.write_all(&file).unwrap();
+        let new_file = add_header(&file, &args);
+        output.write_all(&new_file).unwrap();
     }
+}
+
+fn add_header(file: &[u8], args: &Args) -> Vec<u8> {
+    let mut new_file = vec![];
+    new_file.extend(
+        [
+            [0x56, 0x41, 0x47, 0x70],
+            [0x0, 0x0, 0x0, 0x3],
+            [0; 4],
+            (file.len() as u32).to_be_bytes(),
+            (args.sample_rate.get().to_be_bytes()),
+            [0; 4],
+            [0; 4],
+            [0; 4],
+            [0; 4],
+            [0; 4],
+            [0; 4],
+            [0; 4],
+        ]
+        .into_iter()
+        .flatten(),
+    );
+    if !args.short {
+        new_file.extend_from_slice(&[0; 16]);
+    }
+    new_file.extend_from_slice(file);
+    new_file
 }
