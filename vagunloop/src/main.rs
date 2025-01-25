@@ -33,12 +33,7 @@ fn main() {
             continue;
         }
 
-        let mut changed_chunks = 0;
-        for chunk in vag_bytes[48..].chunks_mut(16) {
-            if remove_loop(chunk) {
-                changed_chunks += 1;
-            }
-        }
+        let changed_chunks = unloop(&mut vag_bytes);
 
         if changed_chunks == 0 {
             info!("No markers found");
@@ -61,6 +56,16 @@ fn main() {
             info!("Removed {changed_chunks} markers");
         }
     }
+}
+
+fn unloop(vag_bytes: &mut [u8]) -> usize {
+    let mut changed_chunks = 0;
+    for chunk in vag_bytes[48..].chunks_mut(16) {
+        if remove_loop(chunk) {
+            changed_chunks += 1;
+        }
+    }
+    changed_chunks
 }
 
 /// Removes the loop and returns true if any change was made
