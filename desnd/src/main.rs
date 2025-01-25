@@ -311,19 +311,20 @@ fn main() {
         }
     }
 
-    info!("SND header");
-    info!("Header bytes: {}", snd_file.header.header_size);
+    info!("");
+    println!("SND header");
+    println!("Header bytes: {}", snd_file.header.header_size);
     if let Some(version) = snd_file.header.bank_version {
         let minor = version.to_le_bytes()[0];
         let major = version.to_le_bytes()[1];
-        info!(
+        println!(
             "SND version: {major}.{minor} ({:?})",
             args.file_version.unwrap_or_default()
         );
     } else {
-        info!("SND version: Gex");
+        println!("SND version: Gex");
     }
-    info!(
+    println!(
         "System: {}",
         if args.dreamcast {
             "Dreamcast"
@@ -331,13 +332,13 @@ fn main() {
             "PlayStation"
         },
     );
-    info!("Reverb mode: {}", snd_file.header.reverb_mode);
-    info!("Reverb depth: {}", snd_file.header.reverb_depth);
-    info!("Instruments: {}", snd_file.header.num_programs);
-    info!("Zones: {}", snd_file.header.num_zones);
-    info!("Samples: {}", snd_file.header.num_waves);
-    info!("Sequences: {}", snd_file.header.num_sequences);
-    info!("Labels: {}", snd_file.header.num_labels);
+    println!("Reverb mode: {}", snd_file.header.reverb_mode);
+    println!("Reverb depth: {}", snd_file.header.reverb_depth);
+    println!("Instruments: {}", snd_file.header.num_programs);
+    println!("Zones: {}", snd_file.header.num_zones);
+    println!("Samples: {}", snd_file.header.num_waves);
+    println!("Sequences: {}", snd_file.header.num_sequences);
+    println!("Labels: {}", snd_file.header.num_labels);
 }
 
 #[derive(Debug)]

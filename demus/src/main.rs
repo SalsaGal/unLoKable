@@ -732,7 +732,7 @@ fn main() {
     write!(&mut info_file, "Editor=Demus\r\n").unwrap();
 
     info!(
-        "{}",
+        "\n{}",
         header.display(
             platform,
             program_zones.iter().fold(0, |acc, xs| acc + xs.len()),
