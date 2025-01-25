@@ -77,3 +77,20 @@ fn remove_loop(bytes: &mut [u8]) -> bool {
         false
     }
 }
+
+#[test]
+fn count_changes() {
+    let mut file = include_bytes!("../tests/silence.vag").to_vec();
+    let changes = unloop(&mut file);
+    assert_eq!(changes, 1575);
+}
+
+#[test]
+fn checksum() {
+    let mut file = include_bytes!("../tests/silence.vag").to_vec();
+    unloop(&mut file);
+    assert_eq!(
+        format!("{:X}", md5::compute(file)),
+        "0722A447B5600CB563166ED2ECB582AD"
+    );
+}

@@ -396,6 +396,7 @@ name = "vagunloop"
 version = "0.1.0"
 dependencies = [
  "core",
+ "md5",
 ]
 
 [[package]]
