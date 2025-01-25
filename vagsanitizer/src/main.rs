@@ -61,3 +61,10 @@ fn sanitized(bytes: &mut [u8]) -> usize {
     }
     changed
 }
+
+#[test]
+fn sanitization() {
+    let mut file = include_bytes!("../tests/silence.vag").to_vec();
+    let changed = sanitized(&mut file);
+    assert_eq!(changed, 6);
+}
