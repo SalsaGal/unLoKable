@@ -25,7 +25,7 @@ pub enum Platform {
 }
 
 #[derive(Parser)]
-#[command(version)]
+#[clap(version)]
 struct Args {
     /// `mus` file to read
     mus_path: PathBuf,

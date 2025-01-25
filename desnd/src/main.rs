@@ -16,7 +16,7 @@ enum Version {
 }
 
 #[derive(Parser)]
-#[command(version)]
+#[clap(version)]
 struct Args {
     /// The `snd` path to load from.
     snd_path: PathBuf,

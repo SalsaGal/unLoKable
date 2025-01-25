@@ -5,7 +5,7 @@ use std::io::Write;
 use std::{fs::File, path::PathBuf};
 
 #[derive(Parser)]
-#[command(version)]
+#[clap(version)]
 struct Args {
     /// `cds` file to read
     input: PathBuf,

@@ -8,6 +8,7 @@ use core::{
 const MAGIC_NUMBER: [u8; 4] = [0x53, 0x53, 0x68, 0x64];
 
 #[derive(Parser)]
+#[clap(version)]
 struct Args {
     /// The `ads` file to find loops in
     ads_input: PathBuf,

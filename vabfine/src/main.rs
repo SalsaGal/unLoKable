@@ -14,6 +14,7 @@ use core::{
 };
 
 #[derive(Parser)]
+#[clap(version)]
 struct Args {
     vab_path: PathBuf,
     /// DEFAULT

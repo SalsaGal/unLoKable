@@ -8,6 +8,7 @@ use core::{
 const MAGIC: [u8; 4] = [0x56, 0x41, 0x47, 0x70];
 
 #[derive(Parser)]
+#[clap(version)]
 struct Args {
     /// The `vag` file to read from.
     input: PathBuf,

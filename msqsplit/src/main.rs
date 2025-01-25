@@ -6,7 +6,7 @@ use core::{
 };
 
 #[derive(Parser)]
-#[command(version)]
+#[clap(version)]
 struct Args {
     /// msq file to read
     input: PathBuf,

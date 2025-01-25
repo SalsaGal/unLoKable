@@ -6,6 +6,7 @@ use core::{
 };
 
 #[derive(Parser)]
+#[clap(version)]
 struct Args {
     /// The `mul` file to read from.
     input: PathBuf,

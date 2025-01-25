@@ -15,6 +15,7 @@ use core::{
 };
 
 #[derive(Parser)]
+#[clap(version)]
 struct Args {
     vab_path: PathBuf,
     sample_rate: NonZeroU32,

@@ -8,6 +8,7 @@ use core::{
 const MAGIC: [u8; 4] = [0x70, 0x51, 0x45, 0x53];
 
 #[derive(Parser)]
+#[clap(version)]
 struct Args {
     /// `seq` files to read from.
     input: PathBuf,
