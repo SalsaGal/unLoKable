@@ -71,3 +71,33 @@ fn add_header(file: &[u8], args: &Args) -> Vec<u8> {
     new_file.extend_from_slice(file);
     new_file
 }
+
+#[test]
+fn short() {
+    let file = include_bytes!("../tests/silence.bin");
+    let vag = add_header(
+        file,
+        &Args {
+            input: PathBuf::new(),
+            sample_rate: NonZeroU32::new(22100).unwrap(),
+            long: false,
+            short: true,
+        },
+    );
+    assert_eq!(vag.len(), file.len() + 48);
+}
+
+#[test]
+fn long() {
+    let file = include_bytes!("../tests/silence.bin");
+    let vag = add_header(
+        file,
+        &Args {
+            input: PathBuf::new(),
+            sample_rate: NonZeroU32::new(22100).unwrap(),
+            long: true,
+            short: false,
+        },
+    );
+    assert_eq!(vag.len(), file.len() + 64);
+}
