@@ -7,3 +7,6 @@ edition = "2021"
 
 [dependencies]
 core = { workspace = true }
+
+[dev-dependencies]
+md5 = "0.7.0"

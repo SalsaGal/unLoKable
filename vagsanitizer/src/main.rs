@@ -67,4 +67,8 @@ fn sanitization() {
     let mut file = include_bytes!("../tests/silence.vag").to_vec();
     let changed = sanitized(&mut file);
     assert_eq!(changed, 6);
+    assert_eq!(
+        format!("{:X}", md5::compute(file)),
+        "6B55C00C906E3D11165F0988981ECA1B"
+    );
 }
